@@ -1,10 +1,13 @@
 package com.example.yannd.tp1_inf8405;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.ArrayList;
 
 public class MainMenu extends AppCompatActivity {
 
@@ -33,7 +36,7 @@ public class MainMenu extends AppCompatActivity {
             //reference : http://stackoverflow.com/questions/4186021/how-to-start-new-activity-on-button-click
 
             Intent intent = new Intent(MainMenu.this, GamingActivity.class);
-            //intent.putExtra("key", value); //Optional parameters
+            intent.putExtra("size", 8); //Optional parameters : Size of the grid
             MainMenu.this.startActivity(intent);
         }
     };
