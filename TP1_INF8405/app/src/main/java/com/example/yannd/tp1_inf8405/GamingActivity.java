@@ -18,6 +18,7 @@ public class GamingActivity extends AppCompatActivity {
     private int gameHeight;
     private int gameWidth;
     private ArrayList<CellView> endpointCells;
+    private int currentColorDragged = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,5 +70,14 @@ public class GamingActivity extends AppCompatActivity {
             }
             gameLayout.addView(row);
         }
+    }
+
+    public int getCurrentColorDragged(){
+        return this.currentColorDragged;
+    }
+
+    public void setCurrentColorDragged(int color){
+        //Set to Color.BLACK means not dragging currently any endpoint cell
+        this.currentColorDragged = color;
     }
 }
