@@ -3,9 +3,13 @@ package com.example.yannd.tp1_inf8405;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -37,7 +41,7 @@ public class GamingActivity extends AppCompatActivity {
         endpointCells.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(0,0)));
         endpointCells.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(2,4)));
         endpointCells.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(4,7)));
-        endpointCells.add(new CellView(this, Color.CYAN, true, new Pair<Integer, Integer>(6,1)));
+        endpointCells.add(new CellView(this, Color.CYAN, true, new Pair<Integer, Integer>(6, 1)));
 
         this.fillTable();
     }
@@ -70,6 +74,44 @@ public class GamingActivity extends AppCompatActivity {
             }
             gameLayout.addView(row);
         }
+
+        gameLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
+
+                int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
+                int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
+
+                int colIdx = (int) (event.getX() / colWidth);
+                int rowIdx = (int) (event.getY() / rowHeight);
+
+                TableRow row = (TableRow) gameLayout.getChildAt(rowIdx);
+                CellView cell = (CellView) row.getChildAt(colIdx);
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if(cell.isEndpoint()){
+                            GamingActivity.this.currentColorDragged = cell.getColor();
+                            cell.setUsed(true);
+                        }
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        if(!cell.isEndpoint() && cell.getColor() == Color.BLACK){
+                            if(GamingActivity.this.currentColorDragged != Color.BLACK){ //If the currentColorBeing dragged is black this means there's no endpoint being dragged right now
+                                cell.setColor(GamingActivity.this.currentColorDragged);
+                                cell.setUsed(true);
+                                cell.invalidate(); //Forces cell to re-draw itself
+                            }
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     public int getCurrentColorDragged(){
