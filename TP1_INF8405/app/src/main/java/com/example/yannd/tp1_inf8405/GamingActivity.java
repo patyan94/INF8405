@@ -11,11 +11,13 @@ import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class GamingActivity extends AppCompatActivity {
 
@@ -23,11 +25,16 @@ public class GamingActivity extends AppCompatActivity {
     private int gameWidth;
     private ArrayList<CellView> endpointCells;
     private int currentColorDragged = 0;
+    private ArrayList<CellView> selectedCells;
+    private int pastColIdx;
+    private int pastRowIdx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gaming);
+
+        selectedCells = new ArrayList<CellView>();
 
         // Gather the value passed by the mainMenu to know the size of the grid
         Intent intent = getIntent();
@@ -40,12 +47,141 @@ public class GamingActivity extends AppCompatActivity {
         endpointCells = new ArrayList<CellView>();
         endpointCells.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(0,0)));
         endpointCells.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(2,4)));
+        endpointCells.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(6,7)));
         endpointCells.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(4,7)));
         endpointCells.add(new CellView(this, Color.CYAN, true, new Pair<Integer, Integer>(6, 1)));
 
+        //Constructing the game's grid & adding the endpoint cells to it
         this.fillTable();
+
+        //Settings up the event listener for the game's mechanics
+        TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
+        gameLayout.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
+
+                int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
+                int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
+
+                int colIdx = (int) (event.getX() / colWidth);
+                int rowIdx = (int) (event.getY() / rowHeight);
+
+                //This 'if' serves as protection against dragging in diagonal.
+                //Expl : If both the row and col indexes are DIFFERENT from the previous ones this means we moved diagonally. We don't allow it
+                if ( (pastColIdx != colIdx && pastRowIdx != rowIdx) && currentColorDragged != Color.BLACK ) {
+                    currentColorDragged = Color.BLACK;
+                    return false;
+                }
+
+                //This is a flag used to only trigger the MOVE event when the position detected actually changes (Évite les doublons)
+                boolean ignoreMoveEvent = false;
+                if (colIdx == pastColIdx && rowIdx == pastRowIdx) {
+                    ignoreMoveEvent = true;
+                } else {
+                    pastRowIdx = rowIdx;
+                    pastColIdx = colIdx;
+                }
+
+                TableRow row = null;
+                CellView cell = null;
+                //Checking that the coordinates do, in fact, point to a cell inside the layout
+                if (colIdx < GamingActivity.this.gameWidth && rowIdx < GamingActivity.this.gameHeight) {
+                    row = (TableRow) gameLayout.getChildAt(rowIdx);
+                    cell = (CellView) row.getChildAt(colIdx);
+                }
+
+                if (cell != null) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            if (cell.isEndpoint() && !cell.isUsed()) {
+                                GamingActivity.this.currentColorDragged = cell.getColor();
+                                cell.setUsed(true);
+                                selectedCells.add(cell);
+                            }
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            GamingActivity.this.currentColorDragged = Color.BLACK;
+                            GamingActivity.this.clearSelectedCells();
+                            return true;
+                        case MotionEvent.ACTION_MOVE:
+
+                            //We ignore move events when we previously detect that it is the same cell that has been triggered
+                            //This allows us to detect if we have to remove cells from the path (if the player is stepping back from the path)
+                            if (!ignoreMoveEvent) {
+
+                                //Linking two endpoints of the same color
+                                if (cell.isEndpoint() && !cell.isUsed() && cell.getColor() == GamingActivity.this.currentColorDragged) {
+                                    cell.setUsed(true);
+                                    GamingActivity.this.selectedCells.clear(); //Clearing the temp array since the link is now permanent
+                                    GamingActivity.this.currentColorDragged = Color.BLACK; //Meaning we stop dragging any color since it's been linked
+                                    return true;
+                                }
+
+                                //Drawing of the path under certain conditions
+                                if (!cell.isEndpoint() && !cell.isUsed()) {
+                                    if (GamingActivity.this.currentColorDragged != Color.BLACK) { //If the currentColorBeing dragged is black this means there's no endpoint being dragged right now
+                                        cell.setColor(GamingActivity.this.currentColorDragged);
+                                        cell.setUsed(true);
+                                        selectedCells.add(cell);
+                                        cell.invalidate(); //Forces cell to re-draw itself
+                                        return true;
+                                    }
+                                } else {
+                                    //This condition is used to detect if we cross another color already placed
+                                    if (cell.getColor() != Color.BLACK && currentColorDragged != cell.getColor()) {
+                                        GamingActivity.this.currentColorDragged = Color.BLACK; // This state of the color dragged stops the user from dragging anymore
+                                        return true;
+                                    }
+                                }
+
+                                //This part is used to remove the path when the user "backs-up" over previously painted cells.
+                                if (selectedCells.contains(cell) && !cell.isEndpoint()) {
+                                    CellView lastCell = selectedCells.get(selectedCells.size() - 1);
+                                    lastCell.setUsed(false);
+                                    lastCell.setColor(Color.BLACK);
+                                    lastCell.invalidate();
+                                    selectedCells.remove(lastCell);
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+                return false;
+            }
+        });
+
+
+        Button btnReset = (Button) findViewById(R.id.buttonResetBoard);
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
+
+                for(int i = 0; i < gameHeight; i++){
+                    TableRow row = (TableRow) gameLayout.getChildAt(i);
+
+                    for(int j = 0; j < gameWidth; j++){
+                        CellView cell = (CellView) row.getChildAt(j);
+                        cell.setUsed(false);
+                        if(!cell.isEndpoint()){
+                            cell.setColor(Color.BLACK);
+                        }
+                        cell.invalidate();
+                    }
+                }
+            }
+        });
     }
 
+    //Constructing the game's grid & adding the endpoint cells to it
     private void fillTable(){
         TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
         gameLayout.removeAllViews();
@@ -74,52 +210,17 @@ public class GamingActivity extends AppCompatActivity {
             }
             gameLayout.addView(row);
         }
+    }
 
-        gameLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
 
-                int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
-                int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
-
-                int colIdx = (int) (event.getX() / colWidth);
-                int rowIdx = (int) (event.getY() / rowHeight);
-
-                TableRow row = (TableRow) gameLayout.getChildAt(rowIdx);
-                CellView cell = (CellView) row.getChildAt(colIdx);
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if(cell.isEndpoint()){
-                            GamingActivity.this.currentColorDragged = cell.getColor();
-                            cell.setUsed(true);
-                        }
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        if(!cell.isEndpoint() && cell.getColor() == Color.BLACK){
-                            if(GamingActivity.this.currentColorDragged != Color.BLACK){ //If the currentColorBeing dragged is black this means there's no endpoint being dragged right now
-                                cell.setColor(GamingActivity.this.currentColorDragged);
-                                cell.setUsed(true);
-                                cell.invalidate(); //Forces cell to re-draw itself
-                            }
-                        }
-                        return true;
-                    default:
-                        return false;
-                }
+    private void clearSelectedCells(){
+        for(CellView c : this.selectedCells){
+            c.setUsed(false);
+            if(!c.isEndpoint()){
+                c.setColor(Color.BLACK);
             }
-        });
-    }
-
-    public int getCurrentColorDragged(){
-        return this.currentColorDragged;
-    }
-
-    public void setCurrentColorDragged(int color){
-        //Set to Color.BLACK means not dragging currently any endpoint cell
-        this.currentColorDragged = color;
+            c.invalidate();
+        }
+        selectedCells.clear();
     }
 }

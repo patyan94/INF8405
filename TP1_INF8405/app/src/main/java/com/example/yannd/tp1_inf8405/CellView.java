@@ -20,6 +20,7 @@ public class CellView extends View {
     private boolean isEndpoint;
     private boolean isUsed;
     private Pair<Integer, Integer> position;
+    private Paint cellPaint;
 
     public CellView(Context context, int color, boolean isEndpoint, Pair<Integer, Integer> position)
     {
@@ -28,22 +29,23 @@ public class CellView extends View {
         this.isEndpoint = isEndpoint;
         this.isUsed = false;
         this.position = position;
+        cellPaint = new Paint();
     }
 
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
-        Paint paint = new Paint();
+        cellPaint.reset();
 
-        paint.setColor(this.color);
+        cellPaint.setColor(this.color);
         if(this.isEndpoint){
-            canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, paint);
+            canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, cellPaint);
         }else if(this.isUsed){
-            canvas.drawRect(0, 0, getWidth()-8, getHeight()-8, paint);
+            canvas.drawRect(0, 0, getWidth()-8, getHeight()-8, cellPaint);
         }
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
-        canvas.drawRect(4, 4, getWidth()-4, getHeight()-4, paint);
+        cellPaint.setStyle(Paint.Style.STROKE);
+        cellPaint.setColor(Color.BLACK);
+        canvas.drawRect(4, 4, getWidth()-4, getHeight()-4, cellPaint);
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
