@@ -70,19 +70,14 @@ public class GamingActivity extends AppCompatActivity {
 
                 //This 'if' serves as protection against dragging in diagonal.
                 //Expl : If both the row and col indexes are DIFFERENT from the previous ones this means we moved diagonally. We don't allow it
-                if ( (pastColIdx != colIdx && pastRowIdx != rowIdx) && currentColorDragged != Color.BLACK ) {
-                    currentColorDragged = Color.BLACK;
+                if ((pastColIdx != colIdx && pastRowIdx != rowIdx) && currentColorDragged != Color.BLACK) {
                     return false;
                 }
 
                 //This is a flag used to only trigger the MOVE event when the position detected actually changes (Évite les doublons)
-                boolean ignoreMoveEvent = false;
-                if (colIdx == pastColIdx && rowIdx == pastRowIdx) {
-                    ignoreMoveEvent = true;
-                } else {
-                    pastRowIdx = rowIdx;
-                    pastColIdx = colIdx;
-                }
+                boolean ignoreMoveEvent = (colIdx == pastColIdx && rowIdx == pastRowIdx) ||
+                                           Math.abs(colIdx - pastColIdx)>2 ||
+                                           Math.abs(rowIdx - pastRowIdx)>2;
 
                 TableRow row = null;
                 CellView cell = null;
@@ -99,6 +94,8 @@ public class GamingActivity extends AppCompatActivity {
                                 GamingActivity.this.currentColorDragged = cell.getColor();
                                 cell.setUsed(true);
                                 selectedCells.add(cell);
+                                pastRowIdx = rowIdx;
+                                pastColIdx = colIdx;
                             }
                             return true;
                         case MotionEvent.ACTION_UP:
@@ -126,27 +123,29 @@ public class GamingActivity extends AppCompatActivity {
                                         cell.setUsed(true);
                                         selectedCells.add(cell);
                                         cell.invalidate(); //Forces cell to re-draw itself
+                                        pastRowIdx = rowIdx;
+                                        pastColIdx = colIdx;
                                         return true;
                                     }
                                 } else {
+                                    //This part is used to remove the path when the user "backs-up" over previously painted cells.
+                                    if (selectedCells.contains(cell) && !cell.isEndpoint()) {
+                                        int count = selectedCells.size() - selectedCells.indexOf(cell);
+                                        while (count-- > 0) {
+                                            CellView last = selectedCells.get(selectedCells.size() - 1);
+                                            last.setUsed(false);
+                                            last.setColor(Color.BLACK);
+                                            last.invalidate();
+                                            selectedCells.remove(last);
+                                        }
+                                        return true;
+                                    }
                                     //This condition is used to detect if we cross another color already placed
-                                    if (cell.getColor() != Color.BLACK && currentColorDragged != cell.getColor()) {
-                                        GamingActivity.this.currentColorDragged = Color.BLACK; // This state of the color dragged stops the user from dragging anymore
+                                    if (cell.getColor() != Color.BLACK) {
                                         return true;
                                     }
                                 }
-
-                                //This part is used to remove the path when the user "backs-up" over previously painted cells.
-                                if (selectedCells.contains(cell) && !cell.isEndpoint()) {
-                                    CellView lastCell = selectedCells.get(selectedCells.size() - 1);
-                                    lastCell.setUsed(false);
-                                    lastCell.setColor(Color.BLACK);
-                                    lastCell.invalidate();
-                                    selectedCells.remove(lastCell);
-                                }
-                            }
-                            else
-                            {
+                            } else {
                                 return false;
                             }
                             return true;
@@ -165,13 +164,13 @@ public class GamingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
 
-                for(int i = 0; i < gameHeight; i++){
+                for (int i = 0; i < gameHeight; i++) {
                     TableRow row = (TableRow) gameLayout.getChildAt(i);
 
-                    for(int j = 0; j < gameWidth; j++){
+                    for (int j = 0; j < gameWidth; j++) {
                         CellView cell = (CellView) row.getChildAt(j);
                         cell.setUsed(false);
-                        if(!cell.isEndpoint()){
+                        if (!cell.isEndpoint()) {
                             cell.setColor(Color.BLACK);
                         }
                         cell.invalidate();
