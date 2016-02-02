@@ -24,7 +24,7 @@ public class GamingActivity extends AppCompatActivity {
     private int gameHeight;
     private int gameWidth;
     private ArrayList<CellView> endpointCells;
-    private int currentColorDragged = 0;
+    private int currentColorDragged = Color.BLACK;
     private ArrayList<CellView> selectedCells;
     private int pastColIdx;
     private int pastRowIdx;
@@ -61,7 +61,7 @@ public class GamingActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
-
+                Log.d("app", "Now");
                 int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
                 int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
 
@@ -71,6 +71,7 @@ public class GamingActivity extends AppCompatActivity {
                 //This 'if' serves as protection against dragging in diagonal.
                 //Expl : If both the row and col indexes are DIFFERENT from the previous ones this means we moved diagonally. We don't allow it
                 if ((pastColIdx != colIdx && pastRowIdx != rowIdx) && currentColorDragged != Color.BLACK) {
+                    currentColorDragged = Color.BLACK;
                     return false;
                 }
 
