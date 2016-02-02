@@ -76,8 +76,8 @@ public class GamingActivity extends AppCompatActivity {
 
                 //This is a flag used to only trigger the MOVE event when the position detected actually changes (Évite les doublons)
                 boolean ignoreMoveEvent = (colIdx == pastColIdx && rowIdx == pastRowIdx) ||
-                                           Math.abs(colIdx - pastColIdx)>2 ||
-                                           Math.abs(rowIdx - pastRowIdx)>2;
+                                           Math.abs(colIdx - pastColIdx)>1 ||
+                                           Math.abs(rowIdx - pastRowIdx)>1;
 
                 TableRow row = null;
                 CellView cell = null;
