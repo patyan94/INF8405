@@ -61,7 +61,6 @@ public class GamingActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
-                Log.d("app", "Now");
                 int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
                 int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
 
@@ -108,7 +107,6 @@ public class GamingActivity extends AppCompatActivity {
                             //We ignore move events when we previously detect that it is the same cell that has been triggered
                             //This allows us to detect if we have to remove cells from the path (if the player is stepping back from the path)
                             if (!ignoreMoveEvent) {
-
                                 //Linking two endpoints of the same color
                                 if (cell.isEndpoint() && !cell.isUsed() && cell.getColor() == GamingActivity.this.currentColorDragged) {
                                     cell.setUsed(true);
@@ -126,6 +124,15 @@ public class GamingActivity extends AppCompatActivity {
                                         cell.invalidate(); //Forces cell to re-draw itself
                                         pastRowIdx = rowIdx;
                                         pastColIdx = colIdx;
+
+                                        //Setting up the position of the preceding cell inside the new cell
+                                        cell.setPrecedingCellPosition(GamingActivity.this.selectedCells.get(selectedCells.size() - 2).getPosition());
+
+                                        //Setting up the position of the next cell inside the previous cell
+                                        CellView previousCell = GamingActivity.this.selectedCells.get(selectedCells.size() - 2);
+                                        previousCell.setNextCellPosition(cell.getPosition());
+                                        previousCell.invalidate(); // Forcing the prev. cell to re-draw if we want a corner to appear
+
                                         return true;
                                     }
                                 } else {
@@ -174,6 +181,7 @@ public class GamingActivity extends AppCompatActivity {
                         if (!cell.isEndpoint()) {
                             cell.setColor(Color.BLACK);
                         }
+                        cell.emptyOldCellPositions();
                         cell.invalidate();
                     }
                 }
@@ -219,6 +227,7 @@ public class GamingActivity extends AppCompatActivity {
             if(!c.isEndpoint()){
                 c.setColor(Color.BLACK);
             }
+            c.emptyOldCellPositions();
             c.invalidate();
         }
         selectedCells.clear();

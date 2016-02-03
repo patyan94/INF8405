@@ -4,12 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Parcelable;
 import android.util.Log;
 import android.util.Pair;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 /**
  * Created by yannd on 2016-01-28.
@@ -21,6 +18,8 @@ public class CellView extends View {
     private boolean isUsed;
     private Pair<Integer, Integer> position;
     private Paint cellPaint;
+    private Pair<Integer, Integer> precedingCellPosition;
+    private Pair<Integer, Integer> nextCellPosition;
 
     public CellView(Context context, int color, boolean isEndpoint, Pair<Integer, Integer> position)
     {
@@ -29,7 +28,9 @@ public class CellView extends View {
         this.isEndpoint = isEndpoint;
         this.isUsed = false;
         this.position = position;
-        cellPaint = new Paint();
+        this.cellPaint = new Paint();
+        this.precedingCellPosition = new Pair<>(-1, -1);
+        this.nextCellPosition = new Pair<>(-1, -1);
     }
 
     protected void onDraw(Canvas canvas)
@@ -41,11 +42,79 @@ public class CellView extends View {
         if(this.isEndpoint){
             canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, cellPaint);
         }else if(this.isUsed){
-            canvas.drawRect(0, 0, getWidth()-8, getHeight()-8, cellPaint);
+            int drawOffset = (int) (0.333 * getWidth());
+
+            //This first condition checks if the current cell is a "corner" between two other cells
+            if(nextCellPosition.first != -1 && precedingCellPosition.first != -1 &&
+               Math.abs(nextCellPosition.first - precedingCellPosition.first) == 1 &&
+               Math.abs(nextCellPosition.second - precedingCellPosition.second) == 1){
+
+                // +--
+                // |
+
+                // AND
+
+                //   |
+                // --+
+                if( (nextCellPosition.first < precedingCellPosition.first && nextCellPosition.second > precedingCellPosition.second)
+                    || (nextCellPosition.first > precedingCellPosition.first && nextCellPosition.second < precedingCellPosition.second)){
+
+                    if( (position.second < nextCellPosition.second ) || (position.second < precedingCellPosition.second) ){
+
+                        canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 6, cellPaint);
+                        canvas.drawRect(getWidth() / 2, drawOffset, getWidth(), getHeight() - drawOffset, cellPaint);
+                        canvas.drawRect(drawOffset, getHeight() / 2, getWidth() - drawOffset, getHeight(), cellPaint);
+
+                    }else{
+
+                        canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 6, cellPaint);
+                        canvas.drawRect(0, drawOffset, getWidth() / 2, getHeight() - drawOffset, cellPaint);
+                        canvas.drawRect(drawOffset, 0, getWidth() - drawOffset, getHeight() / 2, cellPaint);
+                    }
+
+                } else
+
+                // --+
+                //   |
+
+                // AND
+
+                // |
+                // +--
+                if( (nextCellPosition.first > precedingCellPosition.first && nextCellPosition.second > precedingCellPosition.second)
+                    || (nextCellPosition.first < precedingCellPosition.first && nextCellPosition.second < precedingCellPosition.second)){
+
+                    if( (position.second > nextCellPosition.second) || (position.second > precedingCellPosition.second)  ){
+
+                        canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 6, cellPaint);
+                        canvas.drawRect(0, drawOffset, getWidth() / 2, getHeight() - drawOffset, cellPaint);
+                        canvas.drawRect(drawOffset, getHeight() / 2, getWidth() - drawOffset, getHeight(), cellPaint);
+
+                    }else{
+
+                        canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 6, cellPaint);
+                        canvas.drawRect(drawOffset, 0, getWidth() - drawOffset, getHeight() / 2, cellPaint);
+                        canvas.drawRect(getWidth() / 2, +drawOffset, getWidth(), getHeight() - drawOffset, cellPaint);
+                    }
+
+                }
+
+                //Else means we're a regular drawn cell (rectangular)
+            } else {
+
+                //If the preceding cell is on the same row we draw horizontally streched
+                if(precedingCellPosition.first == position.first) {
+                    canvas.drawRect(0, drawOffset, getWidth(), getHeight()-drawOffset, cellPaint);
+                } else {
+                    canvas.drawRect(drawOffset, 0, getWidth()-drawOffset, getHeight(), cellPaint);
+                }
+            }
         }
+
+        //Contour of the cell (Grid)
         cellPaint.setStyle(Paint.Style.STROKE);
         cellPaint.setColor(Color.BLACK);
-        canvas.drawRect(4, 4, getWidth()-4, getHeight()-4, cellPaint);
+        canvas.drawRect(0, 0, getWidth(), getHeight(), cellPaint);
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -85,5 +154,27 @@ public class CellView extends View {
 
     public boolean isUsed(){
         return this.isUsed;
+    }
+
+    public void setPrecedingCellPosition(Pair<Integer, Integer> pos){
+        this.precedingCellPosition = pos;
+    }
+
+    public void setNextCellPosition(Pair<Integer, Integer> pos){
+        this.nextCellPosition = pos;
+    }
+
+    public Pair<Integer, Integer> getPrecedingCellPosition(){
+        return precedingCellPosition;
+    }
+
+    public Pair<Integer, Integer> getNextCellPosition(){
+        return nextCellPosition;
+    }
+
+
+    public void emptyOldCellPositions(){
+        this.nextCellPosition = new Pair<>(-1, -1);
+        this.precedingCellPosition = new Pair<>(-1, -1);
     }
 }
