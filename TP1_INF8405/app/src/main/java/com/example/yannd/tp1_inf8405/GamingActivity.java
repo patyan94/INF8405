@@ -70,7 +70,7 @@ public class GamingActivity extends AppCompatActivity {
                 //This 'if' serves as protection against dragging in diagonal.
                 //Expl : If both the row and col indexes are DIFFERENT from the previous ones this means we moved diagonally. We don't allow it
                 if ((pastColIdx != colIdx && pastRowIdx != rowIdx) && currentColorDragged != Color.BLACK) {
-                    currentColorDragged = Color.BLACK;
+                    //currentColorDragged = Color.BLACK;
                     return false;
                 }
 
