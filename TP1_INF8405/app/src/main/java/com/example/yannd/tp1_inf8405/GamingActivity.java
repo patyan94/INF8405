@@ -28,7 +28,7 @@ public class GamingActivity extends AppCompatActivity {
     private ArrayList<CellView> selectedCells;
     private int pastColIdx;
     private int pastRowIdx;
-
+    private int currentLevel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +44,8 @@ public class GamingActivity extends AppCompatActivity {
         gameWidth = gridSize;
 
         //Temporary manual initialisation of the endpointCells array. This parameter will be fed depending on the state of the game and the grid size
-        endpointCells = new ArrayList<CellView>();
-        endpointCells.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(0,0)));
-        endpointCells.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(2,4)));
-        endpointCells.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(6,7)));
-        endpointCells.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(4,7)));
-        endpointCells.add(new CellView(this, Color.CYAN, true, new Pair<Integer, Integer>(6, 1)));
+        currentLevel = 1;
+        endpointCells = GetGrid(gridSize , currentLevel);
 
         //Constructing the game's grid & adding the endpoint cells to it
         this.fillTable();
@@ -76,8 +72,8 @@ public class GamingActivity extends AppCompatActivity {
 
                 //This is a flag used to only trigger the MOVE event when the position detected actually changes (Évite les doublons)
                 boolean ignoreMoveEvent = (colIdx == pastColIdx && rowIdx == pastRowIdx) ||
-                                           Math.abs(colIdx - pastColIdx)>1 ||
-                                           Math.abs(rowIdx - pastRowIdx)>1;
+                        Math.abs(colIdx - pastColIdx) > 1 ||
+                        Math.abs(rowIdx - pastRowIdx) > 1;
 
                 TableRow row = null;
                 CellView cell = null;
@@ -101,6 +97,7 @@ public class GamingActivity extends AppCompatActivity {
                         case MotionEvent.ACTION_UP:
                             GamingActivity.this.currentColorDragged = Color.BLACK;
                             GamingActivity.this.clearSelectedCells();
+                            CheckVictory();
                             return true;
                         case MotionEvent.ACTION_MOVE:
 
@@ -187,6 +184,23 @@ public class GamingActivity extends AppCompatActivity {
                 }
             }
         });
+        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
+        btnNextLevel.setVisibility(View.INVISIBLE);
+        btnNextLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GoToNextLevel();
+        }
+        });
+        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
+        btnRestartLevel.setVisibility(View.INVISIBLE);
+        btnRestartLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RestartLevel();
+            }
+        });
+
     }
 
     //Constructing the game's grid & adding the endpoint cells to it
@@ -231,5 +245,184 @@ public class GamingActivity extends AppCompatActivity {
             c.invalidate();
         }
         selectedCells.clear();
+    }
+
+    private ArrayList<CellView> GetGrid(int size , int level){
+     ArrayList<CellView > grid = new ArrayList<CellView>();
+        if(size == 7)
+        {
+            if(level ==1)
+
+            {
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(1,0)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(6,0)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(2,2)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(3,4)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(4,2)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(5,4)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(5,0)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(5,5)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,1)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(4,4)));
+            }
+            if(level == 2)
+            {
+
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(5,0)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(3,6)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(4,6)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(6,6)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(5,1)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(2,6)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(4,5)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(6,5)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,3)));//orange
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(2,5)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(1,1)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(5,2)));
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(1,5)));//brown
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(2,2)));
+
+            }
+            if(level == 3)
+            {
+
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(5,0)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(4,3)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(5,3)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(6,6)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(2,2)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(2,4)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(3,1)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(4,4)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,1)));//orange
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,4)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(2,1)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(4,5)));
+
+            }
+        }
+        if(size == 8)
+        {
+            if(level ==1)
+
+            {
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(1,5)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(1,7)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(0,4)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(5,4)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(3,0)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(3,6)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(1,0)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(2,2)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(4,3)));//orange
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,2)));//orange
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(3,5)));//light green
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(4,2)));//light green
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(1,6)));//brown
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(2,5)));//brown
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(7,7)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(2,7)));
+
+            }
+            if(level == 2)
+            {
+
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(5,5)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(6,2)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(4,3)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(6,1)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(0,5)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(3,5)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(1,6)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(3,6)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(1,4)));//orange
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(6,3)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(0,4)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(0,6)));
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(2,2)));//light green
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(4,2)));//light green
+
+            }
+            if(level == 3)
+            {
+
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(1,1)));
+                grid.add(new CellView(this, Color.BLUE, true, new Pair<Integer, Integer>(6,2)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(5,2)));
+                grid.add(new CellView(this, Color.RED, true, new Pair<Integer, Integer>(4,4)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(1,5)));
+                grid.add(new CellView(this, Color.YELLOW, true, new Pair<Integer, Integer>(5,3)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(0,3)));
+                grid.add(new CellView(this, Color.GREEN, true, new Pair<Integer, Integer>(3,0)));
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(1,3)));//orang
+                grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(3,4)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(1,4)));
+                grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(4,0)));
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(1,2)));//brown
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(3,3)));//brown
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(2,5)));//light green
+                grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(5,4)));//light green
+
+
+
+            }
+        }
+        return grid;
+    }
+
+    private void CheckVictory()
+    {
+        TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
+        boolean ended = true;
+        for(int i = 0; i < gameWidth; ++i)
+        {
+            for(int j = 0; j < gameHeight; ++j)
+            {
+                TableRow row = (TableRow) gameLayout.getChildAt(i);
+                CellView cell = (CellView) row.getChildAt(j);
+                if(!cell.isUsed()) {
+                    ended = false;
+                    break;
+                }
+            }
+        }
+        if(ended)
+        {
+            if(currentLevel <=3) {
+
+                Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
+                Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
+                btnNextLevel.setVisibility(View.VISIBLE);
+                btnRestartLevel.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+    private void GoToNextLevel()
+    {
+        if(currentLevel >= 3){
+            Intent intent = new Intent(GamingActivity.this, MainMenu.class);
+            GamingActivity.this.startActivity(intent);
+        }
+
+        endpointCells = GetGrid(gameHeight, ++currentLevel);
+        clearSelectedCells();
+        fillTable();
+
+        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
+        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
+        btnNextLevel.setVisibility(View.INVISIBLE);
+        btnRestartLevel.setVisibility(View.INVISIBLE);
+    }
+    private void RestartLevel()
+    {
+        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
+        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
+        btnNextLevel.setVisibility(View.INVISIBLE);
+        btnRestartLevel.setVisibility(View.INVISIBLE);
+
+        endpointCells = GetGrid(gameHeight, currentLevel);
+        clearSelectedCells();
+        fillTable();
     }
 }

@@ -26,4 +26,16 @@
         android:text="@string/resetBoard"
         android:id="@+id/buttonResetBoard" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restart"
+        android:id="@+id/buttonRestartLevel" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next Level"
+        android:id="@+id/buttonNextLevel" />
+
 </LinearLayout>

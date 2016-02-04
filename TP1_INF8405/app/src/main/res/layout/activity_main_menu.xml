@@ -14,8 +14,14 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PLAY"
-        android:id="@+id/playButton"
+        android:text="PLAY 7x7"
+        android:id="@+id/playButton7"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PLAY 8x8"
+        android:id="@+id/playButton8"
         android:layout_gravity="center_horizontal" />
 
     <Button
