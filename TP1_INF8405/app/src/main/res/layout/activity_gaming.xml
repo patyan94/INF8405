@@ -20,22 +20,30 @@
         android:padding="0dp"
         ></TableLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/resetBoard"
-        android:id="@+id/buttonResetBoard" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resetBoard"
+            android:id="@+id/buttonResetBoard"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next Level"
+            android:id="@+id/buttonNextLevel"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Restart"
+        android:text="Replay"
         android:id="@+id/buttonRestartLevel" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next Level"
-        android:id="@+id/buttonNextLevel" />
 
 </LinearLayout>

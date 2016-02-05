@@ -34,7 +34,9 @@ public class GamingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gaming);
 
-        selectedCells = new ArrayList<CellView>();
+        selectedCells = new ArrayList<>();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Gather the value passed by the mainMenu to know the size of the grid
         Intent intent = getIntent();
@@ -196,7 +198,7 @@ public class GamingActivity extends AppCompatActivity {
             }
         });
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
-        btnNextLevel.setVisibility(View.INVISIBLE);
+        btnNextLevel.setEnabled(false);
         btnNextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,7 +206,7 @@ public class GamingActivity extends AppCompatActivity {
         }
         });
         Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnRestartLevel.setVisibility(View.INVISIBLE);
+        btnRestartLevel.setEnabled(false);
         btnRestartLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -404,8 +406,8 @@ public class GamingActivity extends AppCompatActivity {
 
                 Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
                 Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-                btnNextLevel.setVisibility(View.VISIBLE);
-                btnRestartLevel.setVisibility(View.VISIBLE);
+                btnNextLevel.setEnabled(true);
+                btnRestartLevel.setEnabled(true);
             }
         }
     }
@@ -422,15 +424,15 @@ public class GamingActivity extends AppCompatActivity {
 
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
         Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnNextLevel.setVisibility(View.INVISIBLE);
-        btnRestartLevel.setVisibility(View.INVISIBLE);
+        btnNextLevel.setEnabled(false);
+        btnRestartLevel.setEnabled(false);
     }
     private void RestartLevel()
     {
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
         Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnNextLevel.setVisibility(View.INVISIBLE);
-        btnRestartLevel.setVisibility(View.INVISIBLE);
+        btnNextLevel.setEnabled(false);
+        btnRestartLevel.setEnabled(false);
 
         endpointCells = GetGrid(gameHeight, currentLevel);
         clearSelectedCells();
