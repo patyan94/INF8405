@@ -37,12 +37,41 @@ public class CellView extends View {
     {
         super.onDraw(canvas);
         cellPaint.reset();
+        int drawOffset = (int) (0.333 * getWidth());
 
         cellPaint.setColor(this.color);
         if(this.isEndpoint){
             canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, cellPaint);
+            if(isUsed){
+
+                //This Pair represent the position right before (if this endpoint closes the path) or right after (if this endpoint opens the path)
+                Pair<Integer, Integer> cellReferencePosition;
+
+                if(nextCellPosition.first != -1){
+                    cellReferencePosition = nextCellPosition;
+                }else{
+                    cellReferencePosition = precedingCellPosition;
+                }
+
+                //If the endpoint is on the same row as its preceding cell
+                if(cellReferencePosition.first == position.first){
+                    //If the preceding cell is on the next column on the right, the rectangle will be facing right
+                    if(cellReferencePosition.second > position.second){
+                        canvas.drawRect(getWidth()/2, drawOffset, getWidth(), getHeight() - drawOffset, cellPaint);
+                    }else{
+                        canvas.drawRect(0, drawOffset, getWidth()/2, getHeight() - drawOffset, cellPaint);
+                    }
+                    //Else, the endpoint is on the same column as its preceding cell
+                }else{
+                    //If the preceding cell is on the next row below, the rectangle will be facing down
+                    if(cellReferencePosition.first > position.first){
+                        canvas.drawRect(drawOffset, getHeight() / 2, getWidth() - drawOffset, getHeight(), cellPaint);
+                    }else{
+                        canvas.drawRect(drawOffset, 0, getWidth() - drawOffset, getHeight() / 2, cellPaint);
+                    }
+                }
+            }
         }else if(this.isUsed){
-            int drawOffset = (int) (0.333 * getWidth());
 
             //This first condition checks if the current cell is a "corner" between two other cells
             if(nextCellPosition.first != -1 && precedingCellPosition.first != -1 &&
@@ -171,7 +200,6 @@ public class CellView extends View {
     public Pair<Integer, Integer> getNextCellPosition(){
         return nextCellPosition;
     }
-
 
     public void emptyOldCellPositions(){
         this.nextCellPosition = new Pair<>(-1, -1);

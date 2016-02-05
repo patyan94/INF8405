@@ -107,6 +107,17 @@ public class GamingActivity extends AppCompatActivity {
                                 //Linking two endpoints of the same color
                                 if (cell.isEndpoint() && !cell.isUsed() && cell.getColor() == GamingActivity.this.currentColorDragged) {
                                     cell.setUsed(true);
+                                    selectedCells.add(cell);
+
+                                    //Setting up the position of the preceding cell inside the new cell
+                                    cell.setPrecedingCellPosition(GamingActivity.this.selectedCells.get(selectedCells.size() - 2).getPosition());
+                                    cell.invalidate();
+
+                                    //Setting up the position of the next cell inside the previous cell
+                                    CellView previousCell = GamingActivity.this.selectedCells.get(selectedCells.size() - 2);
+                                    previousCell.setNextCellPosition(cell.getPosition());
+                                    previousCell.invalidate();
+
                                     GamingActivity.this.selectedCells.clear(); //Clearing the temp array since the link is now permanent
                                     GamingActivity.this.currentColorDragged = Color.BLACK; //Meaning we stop dragging any color since it's been linked
                                     return true;
@@ -226,7 +237,7 @@ public class GamingActivity extends AppCompatActivity {
                 if(!endpointFound){
                     cell = new CellView(this, Color.BLACK, false, new Pair<Integer, Integer>(i, j));
                 }
-                cell.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                cell.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
                 cell.setPadding(5,5,5,5);
                 row.addView(cell);
             }
