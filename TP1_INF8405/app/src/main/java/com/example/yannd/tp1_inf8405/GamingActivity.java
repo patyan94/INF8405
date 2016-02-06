@@ -332,10 +332,13 @@ public class GamingActivity extends AppCompatActivity {
                 grid.add(new CellView(this, Color.rgb(255, 153, 0), true, new Pair<Integer, Integer>(5,2)));//orange
                 grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(3,5)));//light green
                 grid.add(new CellView(this, Color.rgb(152,251,152) , true, new Pair<Integer, Integer>(4,2)));//light green
-                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(1,6)));//brown
-                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(2,5)));//brown
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(0,0)));
+                grid.add(new CellView(this, Color.rgb(139,69,19), true, new Pair<Integer, Integer>(2,0)));
                 grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(7,7)));
                 grid.add(new CellView(this, Color.LTGRAY, true, new Pair<Integer, Integer>(2,7)));
+                grid.add(new CellView(this, Color.rgb(144, 171, 135), true, new Pair<Integer, Integer>(1,6)));
+                grid.add(new CellView(this, Color.rgb(144, 171, 135), true, new Pair<Integer, Integer>(2,5)));
+
 
             }
             if(level == 2)
