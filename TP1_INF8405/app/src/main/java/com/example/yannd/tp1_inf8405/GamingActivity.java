@@ -470,7 +470,7 @@ public class GamingActivity extends AppCompatActivity {
         {
             if(gridSize == 7)
                 GameData.getInstance().setLevel77(Math.min(3, currentLevel + 1));
-            else if(gridSize == 7)
+            else if(gridSize == 8)
                 GameData.getInstance().setLevel88(Math.min(3, currentLevel + 1));
             if(currentLevel <=3) {
 
@@ -504,7 +504,7 @@ public class GamingActivity extends AppCompatActivity {
     private void GoToNextLevel()
     {
         ++currentLevel;
-        if(currentLevel >= 3){
+        if(currentLevel > 3){
             if(gridSize ==8) {
                 LeaveGame();
             }
@@ -521,7 +521,7 @@ public class GamingActivity extends AppCompatActivity {
     private void StartCurrentLevel()
     {
         numberOfTubes = 0;
-        ((TextView)findViewById(R.id.nbrOfTubes)).setText(numberOfTubes + " Tubes connected");
+        ((TextView)findViewById(R.id.nbrOfTubes)).setText(numberOfTubes + "  Tubes connected");
 
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
         Button btnPrevLevel = (Button) findViewById(R.id.buttonPreviousLevel);
