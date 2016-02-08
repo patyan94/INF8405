@@ -25,7 +25,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LevelSelection"></activity>
+        <activity
+            android:name=".LevelSelection"
+            android:parentActivityName=".MainMenu"
+            android:screenOrientation="portrait">
+
+        </activity>
     </application>
 
 </manifest>

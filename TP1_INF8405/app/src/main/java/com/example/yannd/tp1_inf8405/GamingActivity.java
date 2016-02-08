@@ -91,7 +91,16 @@ public class GamingActivity extends AppCompatActivity {
                         case MotionEvent.ACTION_UP:
                             GamingActivity.this.currentColorDragged = Color.BLACK;
                             GamingActivity.this.clearSelectedCells();
-                            CheckVictory();
+                            if(CheckVictory()){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
+                                    builder.setMessage("Level completed. The next level is now unlocked.")
+                                            .setTitle("Victory!").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
                             return true;
                         case MotionEvent.ACTION_MOVE:
 
@@ -114,7 +123,7 @@ public class GamingActivity extends AppCompatActivity {
 
                                     GamingActivity.this.selectedCells.clear(); //Clearing the temp array since the link is now permanent
                                     GamingActivity.this.currentColorDragged = Color.BLACK; //Meaning we stop dragging any color since it's been linked
-                                    ((TextView) findViewById(R.id.nbrOfTubes)).setText(++numberOfTubes + "Tubes connected");
+                                    ((TextView) findViewById(R.id.nbrOfTubes)).setText(++numberOfTubes + " Tubes connected");
                                     return true;
                                 }
 
@@ -180,19 +189,25 @@ public class GamingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
-                builder.setMessage("You will lose this game's progress")
-                        .setTitle("Loading new level")
-                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                GoToNextLevel();
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                if(!CheckVictory()){
+                    builder.setMessage("You will lose this game's progress. Do you wish to continue?")
+                            .setTitle("Loading new level")
+                            .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    GoToNextLevel();
+                                }
+                            })
+                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }else{
+
+                    GoToNextLevel();
+
+                }
             }
         });
         Button btnRestartLevel = (Button) findViewById(R.id.buttonResetBoard);
@@ -435,7 +450,7 @@ public class GamingActivity extends AppCompatActivity {
     }
 
     // Verifies if the current grid is complete
-    private void CheckVictory()
+    private boolean CheckVictory()
     {
         TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
         boolean ended = true;
@@ -462,7 +477,11 @@ public class GamingActivity extends AppCompatActivity {
                 Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
                 btnNextLevel.setEnabled(true);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     private void GoToPreviousLevel()
@@ -502,7 +521,7 @@ public class GamingActivity extends AppCompatActivity {
     private void StartCurrentLevel()
     {
         numberOfTubes = 0;
-        ((TextView)findViewById(R.id.nbrOfTubes)).setText(numberOfTubes + "Tubes connected");
+        ((TextView)findViewById(R.id.nbrOfTubes)).setText(numberOfTubes + " Tubes connected");
 
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
         Button btnPrevLevel = (Button) findViewById(R.id.buttonPreviousLevel);

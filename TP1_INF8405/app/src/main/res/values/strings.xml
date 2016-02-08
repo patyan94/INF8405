@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">TP1_INF8405</string>
-    <string name="resetBoard">Réinitialiser</string>
+    <string name="resetBoard">Reset level</string>
 </resources>
