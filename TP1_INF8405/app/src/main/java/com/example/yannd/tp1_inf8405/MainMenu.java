@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -16,42 +17,34 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        // Capture our button from layout
-        Button button = (Button) findViewById(R.id.quitButton);
-        // Register the onClick listener with the implementation above
-        button.setOnClickListener(quitBtnListener);
+        // Button to leave the application
+        TextView txtView = (TextView) findViewById(R.id.quitButton);
+        txtView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
-        button = (Button) findViewById(R.id.playButton7);
-        button.setOnClickListener(startBtnListener7);
+        // Button to play with the 7x7 grids
+        txtView = (TextView) findViewById(R.id.playButton7);
+        txtView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainMenu.this, LevelSelection.class);
+                GameData.getInstance().setGridSize(7);
+                MainMenu.this.startActivity(intent);
+            }
+        });
 
-        button = (Button) findViewById(R.id.playButton8);
-        button.setOnClickListener(startBtnListener8);
+        // Button to play with the 8x8 grids
+        txtView = (TextView) findViewById(R.id.playButton8);
+        txtView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainMenu.this, LevelSelection.class);
+                GameData.getInstance().setGridSize(8);
+                MainMenu.this.startActivity(intent);
+            }
+        });
     }
-
-    private View.OnClickListener quitBtnListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            finish();
-        }
-    };
-
-    private View.OnClickListener startBtnListener7 = new View.OnClickListener() {
-        public void onClick(View v) {
-            //reference : http://stackoverflow.com/questions/4186021/how-to-start-new-activity-on-button-click
-
-            Intent intent = new Intent(MainMenu.this, GamingActivity.class);
-            intent.putExtra("size", 7); //Optional parameters : Size of the grid
-            MainMenu.this.startActivity(intent);
-        }
-    };
-    private View.OnClickListener startBtnListener8 = new View.OnClickListener() {
-        public void onClick(View v) {
-            //reference : http://stackoverflow.com/questions/4186021/how-to-start-new-activity-on-button-click
-
-            Intent intent = new Intent(MainMenu.this, GamingActivity.class);
-            intent.putExtra("size", 8); //Optional parameters : Size of the grid
-            MainMenu.this.startActivity(intent);
-        }
-    };
 }
 
 

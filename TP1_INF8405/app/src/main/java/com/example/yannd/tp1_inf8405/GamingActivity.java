@@ -1,34 +1,31 @@
 package com.example.yannd.tp1_inf8405;
 
-import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Queue;
 
 public class GamingActivity extends AppCompatActivity {
 
-    private int gameHeight;
-    private int gameWidth;
+    private int gridSize;
     private ArrayList<CellView> endpointCells;
     private int currentColorDragged = Color.BLACK;
     private ArrayList<CellView> selectedCells;
     private int pastColIdx;
     private int pastRowIdx;
     private int currentLevel;
+    private int numberOfTubes = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,29 +35,24 @@ public class GamingActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Gather the value passed by the mainMenu to know the size of the grid
+        // Gets the current grid size
+        gridSize = GameData.getInstance().getGridSize();
+
+
+        // Get the level to load
         Intent intent = getIntent();
-        int gridSize = intent.getIntExtra("size", 0); //DefaultValue set at zero.
-
-        gameHeight = gridSize;
-        gameWidth = gridSize;
-
-        //Temporary manual initialisation of the endpointCells array. This parameter will be fed depending on the state of the game and the grid size
-        currentLevel = 1;
-        endpointCells = GetGrid(gridSize , currentLevel);
-
-        //Constructing the game's grid & adding the endpoint cells to it
-        this.fillTable();
+        currentLevel = intent.getIntExtra("level", 0);
+        // Initialize the game grid
+        StartCurrentLevel();
 
         //Settings up the event listener for the game's mechanics
         TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
         gameLayout.setOnTouchListener(new View.OnTouchListener() {
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
-                int colWidth = gameLayout.getWidth() / GamingActivity.this.gameWidth;
-                int rowHeight = gameLayout.getHeight() / GamingActivity.this.gameHeight;
+                int colWidth = gameLayout.getWidth() / GamingActivity.this.gridSize;
+                int rowHeight = gameLayout.getHeight() / GamingActivity.this.gridSize;
 
                 int colIdx = (int) (event.getX() / colWidth);
                 int rowIdx = (int) (event.getY() / rowHeight);
@@ -80,7 +72,7 @@ public class GamingActivity extends AppCompatActivity {
                 TableRow row = null;
                 CellView cell = null;
                 //Checking that the coordinates do, in fact, point to a cell inside the layout
-                if (colIdx < GamingActivity.this.gameWidth && rowIdx < GamingActivity.this.gameHeight) {
+                if (colIdx < GamingActivity.this.gridSize && rowIdx < GamingActivity.this.gridSize) {
                     row = (TableRow) gameLayout.getChildAt(rowIdx);
                     cell = (CellView) row.getChildAt(colIdx);
                 }
@@ -122,6 +114,7 @@ public class GamingActivity extends AppCompatActivity {
 
                                     GamingActivity.this.selectedCells.clear(); //Clearing the temp array since the link is now permanent
                                     GamingActivity.this.currentColorDragged = Color.BLACK; //Meaning we stop dragging any color since it's been linked
+                                    ((TextView) findViewById(R.id.nbrOfTubes)).setText(++numberOfTubes + "Tubes connected");
                                     return true;
                                 }
 
@@ -175,56 +168,109 @@ public class GamingActivity extends AppCompatActivity {
             }
         });
 
-
-        Button btnReset = (Button) findViewById(R.id.buttonResetBoard);
-        btnReset.setOnClickListener(new View.OnClickListener() {
+        Button btnSelectLevel = (Button) findViewById(R.id.buttonSelectLevel);
+        btnSelectLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
-
-                for (int i = 0; i < gameHeight; i++) {
-                    TableRow row = (TableRow) gameLayout.getChildAt(i);
-
-                    for (int j = 0; j < gameWidth; j++) {
-                        CellView cell = (CellView) row.getChildAt(j);
-                        cell.setUsed(false);
-                        if (!cell.isEndpoint()) {
-                            cell.setColor(Color.BLACK);
-                        }
-                        cell.emptyOldCellPositions();
-                        cell.invalidate();
-                    }
-                }
+                LeaveGame();
             }
         });
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
-        btnNextLevel.setEnabled(false);
         btnNextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GoToNextLevel();
-        }
+                AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
+                builder.setMessage("You will lose this game's progress")
+                        .setTitle("Loading new level")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                GoToNextLevel();
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
         });
-        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnRestartLevel.setEnabled(false);
+        Button btnRestartLevel = (Button) findViewById(R.id.buttonResetBoard);
         btnRestartLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RestartLevel();
+                AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
+                builder.setMessage("You will lose this game's progress")
+                        .setTitle("Restarting game")
+                        .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                StartCurrentLevel();
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        Button btnPrevLevel = (Button) findViewById(R.id.buttonPreviousLevel);
+        btnPrevLevel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
+                builder.setMessage("You will lose this game's progress")
+                        .setTitle("Loading new level")
+                        .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                GoToPreviousLevel();
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        LeaveGame();
+    }
+
+    // Leaves the game and return to level selection
+    void LeaveGame()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GamingActivity.this);
+        builder.setMessage("You will lose this game's progress")
+                .setTitle("Leaving game")
+                .setPositiveButton("Leave", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    GamingActivity.this.finish();
+                                                }
+                                            })
+                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                }
+                                            });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     //Constructing the game's grid & adding the endpoint cells to it
     private void fillTable(){
         TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
         gameLayout.removeAllViews();
-        for(int i = 0; i < gameHeight; ++i)
+        for(int i = 0; i < gridSize; ++i)
         {
             TableRow row = new TableRow(this);
             row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-            for(int j = 0; j < gameWidth; ++j)
+            for(int j = 0; j < gridSize; ++j)
             {
                 CellView cell = null;
                 Pair<Integer, Integer> pos;
@@ -247,7 +293,7 @@ public class GamingActivity extends AppCompatActivity {
         }
     }
 
-
+    // Clears the temporary list of selected cells
     private void clearSelectedCells(){
         for(CellView c : this.selectedCells){
             c.setUsed(false);
@@ -260,6 +306,7 @@ public class GamingActivity extends AppCompatActivity {
         selectedCells.clear();
     }
 
+    // Returns the grd associated to the right level
     private ArrayList<CellView> GetGrid(int size , int level){
      ArrayList<CellView > grid = new ArrayList<CellView>();
         if(size == 7)
@@ -387,13 +434,14 @@ public class GamingActivity extends AppCompatActivity {
         return grid;
     }
 
+    // Verifies if the current grid is complete
     private void CheckVictory()
     {
         TableLayout gameLayout = (TableLayout)findViewById(R.id.gameLayout);
         boolean ended = true;
-        for(int i = 0; i < gameWidth; ++i)
+        for(int i = 0; i < gridSize; ++i)
         {
-            for(int j = 0; j < gameHeight; ++j)
+            for(int j = 0; j < gridSize; ++j)
             {
                 TableRow row = (TableRow) gameLayout.getChildAt(i);
                 CellView cell = (CellView) row.getChildAt(j);
@@ -405,39 +453,79 @@ public class GamingActivity extends AppCompatActivity {
         }
         if(ended)
         {
+            if(gridSize == 7)
+                GameData.getInstance().setLevel77(Math.min(3, currentLevel + 1));
+            else if(gridSize == 7)
+                GameData.getInstance().setLevel88(Math.min(3, currentLevel + 1));
             if(currentLevel <=3) {
 
                 Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
-                Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
                 btnNextLevel.setEnabled(true);
-                btnRestartLevel.setEnabled(true);
             }
         }
     }
+
+    private void GoToPreviousLevel()
+    {
+        if(currentLevel == 1){
+            if(gridSize == 8 && GameData.getInstance().getLevelsUnlocked77() >= 3) {
+                GameData.getInstance().setGridSize(7);
+                gridSize = 7;
+                currentLevel = 3;
+            }
+            else return;
+        }
+        else
+        {
+            --currentLevel;
+        }
+        StartCurrentLevel();
+    }
+
     private void GoToNextLevel()
     {
+        ++currentLevel;
         if(currentLevel >= 3){
-            Intent intent = new Intent(GamingActivity.this, MainMenu.class);
-            GamingActivity.this.startActivity(intent);
+            if(gridSize ==8) {
+                LeaveGame();
+            }
+            else
+            {
+                GameData.getInstance().setGridSize(8);
+                gridSize = 8;
+                currentLevel = 1;
+            }
+        }
+        StartCurrentLevel();
+    }
+
+    private void StartCurrentLevel()
+    {
+        numberOfTubes = 0;
+        ((TextView)findViewById(R.id.nbrOfTubes)).setText(numberOfTubes + "Tubes connected");
+
+        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
+        Button btnPrevLevel = (Button) findViewById(R.id.buttonPreviousLevel);
+        btnNextLevel.setEnabled(false);
+        btnPrevLevel.setEnabled(false);
+
+        if(gridSize == 8)
+        {
+            if(currentLevel < GameData.getInstance().getLevelsUnlocked88())
+                btnNextLevel.setEnabled(true);
+            if ((currentLevel == 1 && GameData.getInstance().getLevelsUnlocked77() >= 3) ||
+                    currentLevel > 1)
+                btnPrevLevel.setEnabled(true);
+        }
+        else if(gridSize == 7)
+        {
+            if(currentLevel < GameData.getInstance().getLevelsUnlocked77())
+                btnNextLevel.setEnabled(true);
+            if (currentLevel > 1)
+                btnPrevLevel.setEnabled(true);
         }
 
-        endpointCells = GetGrid(gameHeight, ++currentLevel);
-        clearSelectedCells();
-        fillTable();
-
-        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
-        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnNextLevel.setEnabled(false);
-        btnRestartLevel.setEnabled(false);
-    }
-    private void RestartLevel()
-    {
-        Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
-        Button btnRestartLevel = (Button) findViewById(R.id.buttonRestartLevel);
-        btnNextLevel.setEnabled(false);
-        btnRestartLevel.setEnabled(false);
-
-        endpointCells = GetGrid(gameHeight, currentLevel);
+        endpointCells = GetGrid(gridSize, currentLevel);
         clearSelectedCells();
         fillTable();
     }

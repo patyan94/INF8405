@@ -8,28 +8,40 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.yannd.tp1_inf8405.MainMenu"
+    android:background="@color/black"
     android:orientation="vertical">
 
-
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PLAY 7x7"
+        android:text="TUBES"
+        android:textStyle="bold|italic"
+        android:textColor="@color/white"
+        android:textSize="50dp"
+        android:layout_gravity="center_horizontal" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7x7"
         android:id="@+id/playButton7"
+        android:textColor="@color/yellow"
+        android:textSize="40dp"
         android:layout_gravity="center_horizontal" />
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PLAY 8x8"
+        android:text="8x8"
         android:id="@+id/playButton8"
+        android:textSize="40dp"
+        android:textColor="@color/orange"
         android:layout_gravity="center_horizontal" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="QUIT"
         android:id="@+id/quitButton"
-        android:layout_gravity="center_horizontal"
-        android:nestedScrollingEnabled="false" />
+        android:textSize="40dp"
+        android:textColor="@color/red"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>
