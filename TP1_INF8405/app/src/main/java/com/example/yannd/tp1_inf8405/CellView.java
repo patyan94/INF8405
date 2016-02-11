@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
 /**
  * Created by yannd on 2016-01-28.
+ *
+ * This class represent each cell of a game's grid. We exteend View, so taht you can overload onDraw, in order to
+ * draw the correct shape when a mtion is detected on the parent layout container.
  */
 public class CellView extends View {
 
@@ -21,6 +23,7 @@ public class CellView extends View {
     private Pair<Integer, Integer> precedingCellPosition;
     private Pair<Integer, Integer> nextCellPosition;
 
+    //Constructor
     public CellView(Context context, int color, boolean isEndpoint, Pair<Integer, Integer> position)
     {
         super(context);
@@ -33,6 +36,7 @@ public class CellView extends View {
         this.nextCellPosition = new Pair<>(-1, -1);
     }
 
+    //Main part of this class, this method defines if and how the current cell will be drawn on the screen
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
@@ -40,6 +44,8 @@ public class CellView extends View {
         int drawOffset = (int) (0.333 * getWidth());
 
         cellPaint.setColor(this.color);
+
+        //If the cell is an endpoint, it's a dot on start, and a more particular shape if it has been linked to another cell
         if(this.isEndpoint){
             canvas.drawCircle(getWidth() / 2, getHeight() / 2, getHeight() / 3, cellPaint);
             if(isUsed){
@@ -71,6 +77,9 @@ public class CellView extends View {
                     }
                 }
             }
+
+        // If the cell isn't an endpoint, it will be drawn only if it's being traced or has been linked
+        // It deals with different shapes, either a straight vertical or horizontal line, or one of the four type of corners
         }else if(this.isUsed){
 
             //This first condition checks if the current cell is a "corner" between two other cells
@@ -81,7 +90,7 @@ public class CellView extends View {
                 // +--
                 // |
 
-                // AND
+                // OR
 
                 //   |
                 // --+
@@ -106,7 +115,7 @@ public class CellView extends View {
                 // --+
                 //   |
 
-                // AND
+                // OR
 
                 // |
                 // +--
@@ -128,10 +137,10 @@ public class CellView extends View {
 
                 }
 
-                //Else means we're a regular drawn cell (rectangular)
+            //Else means we're a regular drawn cell (rectangular) horitzontal or vertical
             } else {
 
-                //If the preceding cell is on the same row we draw horizontally streched
+                    //If the preceding cell is on the same row we draw horizontally streched
                 if(precedingCellPosition.first == position.first) {
                     canvas.drawRect(0, drawOffset, getWidth(), getHeight()-drawOffset, cellPaint);
                 } else {
@@ -146,6 +155,7 @@ public class CellView extends View {
         canvas.drawRect(0, 0, getWidth(), getHeight(), cellPaint);
     }
 
+    //This function is used to make sure the cells are always a square
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int size = 0;
@@ -160,6 +170,10 @@ public class CellView extends View {
         }
         setMeasuredDimension(size, size);
     }
+
+    /*
+     * Getters and setters
+     */
 
     public Pair<Integer, Integer> getPosition(){
         return this.position;

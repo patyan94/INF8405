@@ -26,6 +26,7 @@ public class GamingActivity extends AppCompatActivity {
     private int pastRowIdx;
     private int currentLevel;
     private int numberOfTubes = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +46,7 @@ public class GamingActivity extends AppCompatActivity {
         // Initialize the game grid
         StartCurrentLevel();
 
-        //Settings up the event listener for the game's mechanics
+        //Settings up the event listener of the container for the game's mechanics
         TableLayout gameLayout = (TableLayout) findViewById(R.id.gameLayout);
         gameLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -79,6 +80,7 @@ public class GamingActivity extends AppCompatActivity {
 
                 if (cell != null) {
                     switch (event.getAction()) {
+                        //Action of press on the screen => Selection of a free endpoint?
                         case MotionEvent.ACTION_DOWN:
                             if (cell.isEndpoint() && !cell.isUsed()) {
                                 GamingActivity.this.currentColorDragged = cell.getColor();
@@ -88,6 +90,7 @@ public class GamingActivity extends AppCompatActivity {
                                 pastColIdx = colIdx;
                             }
                             return true;
+                        //Action of a release of the finger from the screen => Creation of a path between two endpoints? And Victory?
                         case MotionEvent.ACTION_UP:
                             GamingActivity.this.currentColorDragged = Color.BLACK;
                             GamingActivity.this.clearSelectedCells();
@@ -102,21 +105,24 @@ public class GamingActivity extends AppCompatActivity {
                                     dialog.show();
                                 }
                             return true;
+
+                        //Action of dragging, of course always afetr a ACTION_DOWN and before an ACTION_UP => This event is the one that draws cells under certain conditions the same color as the endpoints selected, if any.
                         case MotionEvent.ACTION_MOVE:
 
                             //We ignore move events when we previously detect that it is the same cell that has been triggered
                             //This allows us to detect if we have to remove cells from the path (if the player is stepping back from the path)
                             if (!ignoreMoveEvent) {
+
                                 //Linking two endpoints of the same color
                                 if (cell.isEndpoint() && !cell.isUsed() && cell.getColor() == GamingActivity.this.currentColorDragged) {
                                     cell.setUsed(true);
                                     selectedCells.add(cell);
 
-                                    //Setting up the position of the preceding cell inside the new cell
+                                    //Setting up the position of the preceding cell inside the new cell (Used to draw corners correctly)
                                     cell.setPrecedingCellPosition(GamingActivity.this.selectedCells.get(selectedCells.size() - 2).getPosition());
                                     cell.invalidate();
 
-                                    //Setting up the position of the next cell inside the previous cell
+                                    //Setting up the position of the next cell inside the previous cell (Used to draw corners correctly)
                                     CellView previousCell = GamingActivity.this.selectedCells.get(selectedCells.size() - 2);
                                     previousCell.setNextCellPosition(cell.getPosition());
                                     previousCell.invalidate();
@@ -129,7 +135,9 @@ public class GamingActivity extends AppCompatActivity {
 
                                 //Drawing of the path under certain conditions
                                 if (!cell.isEndpoint() && !cell.isUsed()) {
-                                    if (GamingActivity.this.currentColorDragged != Color.BLACK) { //If the currentColorBeing dragged is black this means there's no endpoint being dragged right now
+
+                                    //If the currentColorBeing dragged is black this means there's no endpoint being dragged right now
+                                    if (GamingActivity.this.currentColorDragged != Color.BLACK) {
                                         cell.setColor(GamingActivity.this.currentColorDragged);
                                         cell.setUsed(true);
                                         selectedCells.add(cell);
@@ -137,10 +145,10 @@ public class GamingActivity extends AppCompatActivity {
                                         pastRowIdx = rowIdx;
                                         pastColIdx = colIdx;
 
-                                        //Setting up the position of the preceding cell inside the new cell
+                                        //Setting up the position of the preceding cell inside the new cell (Used to draw corners correctly)
                                         cell.setPrecedingCellPosition(GamingActivity.this.selectedCells.get(selectedCells.size() - 2).getPosition());
 
-                                        //Setting up the position of the next cell inside the previous cell
+                                        //Setting up the position of the next cell inside the previous cell (Used to draw corners correctly)
                                         CellView previousCell = GamingActivity.this.selectedCells.get(selectedCells.size() - 2);
                                         previousCell.setNextCellPosition(cell.getPosition());
                                         previousCell.invalidate(); // Forcing the prev. cell to re-draw if we want a corner to appear
@@ -149,6 +157,7 @@ public class GamingActivity extends AppCompatActivity {
                                     }
                                 } else {
                                     //This part is used to remove the path when the user "backs-up" over previously painted cells.
+
                                     if (selectedCells.contains(cell) && !cell.isEndpoint()) {
                                         int count = selectedCells.size() - selectedCells.indexOf(cell);
                                         while (count-- > 0) {
@@ -160,7 +169,7 @@ public class GamingActivity extends AppCompatActivity {
                                         }
                                         return true;
                                     }
-                                    //This condition is used to detect if we cross another color already placed
+                                    //This condition is used to detect if we cross another color already placed - Then we can't draw anymore
                                     if (cell.getColor() != Color.BLACK) {
                                         return true;
                                     }
@@ -176,6 +185,10 @@ public class GamingActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        /*
+        *Actions listeners of the UI's button for next level, restart, etc.
+         */
 
         Button btnSelectLevel = (Button) findViewById(R.id.buttonSelectLevel);
         btnSelectLevel.setOnClickListener(new View.OnClickListener() {
@@ -484,6 +497,7 @@ public class GamingActivity extends AppCompatActivity {
         return false;
     }
 
+    // Goes to the previous level of the current difficulty
     private void GoToPreviousLevel()
     {
         if(currentLevel == 1){
@@ -501,6 +515,7 @@ public class GamingActivity extends AppCompatActivity {
         StartCurrentLevel();
     }
 
+    // Goes to the next level of the current difficulty
     private void GoToNextLevel()
     {
         ++currentLevel;
