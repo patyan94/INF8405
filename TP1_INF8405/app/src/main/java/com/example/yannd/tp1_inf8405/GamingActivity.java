@@ -16,14 +16,19 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+/**
+ * Created by yannd on 2016-01-28.
+ *
+ * This class the activity that serves to play
+ */
 public class GamingActivity extends AppCompatActivity {
 
     private int gridSize;
-    private ArrayList<CellView> endpointCells;
+    private ArrayList<CellView> endpointCells; // Circles of the grid
     private int currentColorDragged = Color.BLACK;
-    private ArrayList<CellView> selectedCells;
-    private int pastColIdx;
-    private int pastRowIdx;
+    private ArrayList<CellView> selectedCells; // Cells that are being drawn upon
+    private int pastColIdx; // last cell column that was drawn
+    private int pastRowIdx; // last cell row that was draawn
     private int currentLevel;
     private int numberOfTubes = 0;
 
@@ -190,6 +195,7 @@ public class GamingActivity extends AppCompatActivity {
         *Actions listeners of the UI's button for next level, restart, etc.
          */
 
+        // Button select levels brings back to level selection
         Button btnSelectLevel = (Button) findViewById(R.id.buttonSelectLevel);
         btnSelectLevel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +203,7 @@ public class GamingActivity extends AppCompatActivity {
                 LeaveGame();
             }
         });
+        // Button next level loads the next lvel if it is unlocked
         Button btnNextLevel = (Button) findViewById(R.id.buttonNextLevel);
         btnNextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,6 +230,7 @@ public class GamingActivity extends AppCompatActivity {
                 }
             }
         });
+        // Button restart level resets the current grid
         Button btnRestartLevel = (Button) findViewById(R.id.buttonResetBoard);
         btnRestartLevel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,6 +251,7 @@ public class GamingActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+        // Button prvious level loads the previous valid level
         Button btnPrevLevel = (Button) findViewById(R.id.buttonPreviousLevel);
         btnPrevLevel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,6 +275,7 @@ public class GamingActivity extends AppCompatActivity {
 
     }
 
+    // On back pressed pop up to leave the game
     @Override
     public void onBackPressed() {
         LeaveGame();
@@ -533,6 +543,7 @@ public class GamingActivity extends AppCompatActivity {
         StartCurrentLevel();
     }
 
+    // Loads the current level according to grid size, level and endpoints
     private void StartCurrentLevel()
     {
         numberOfTubes = 0;

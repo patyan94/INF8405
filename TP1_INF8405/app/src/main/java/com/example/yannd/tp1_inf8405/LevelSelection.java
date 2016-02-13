@@ -7,6 +7,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Created by yannd on 2016-01-28.
+ *
+ * This class the activity to select a level for a selected grid size
+ */
 public class LevelSelection extends AppCompatActivity {
 
     @Override
