@@ -12,7 +12,7 @@
     tools:context="com.example.yannd.tp2_inf8405.Settings">
 
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/email"
         android:text=""
         android:hint="Username"
         android:layout_width="match_parent"

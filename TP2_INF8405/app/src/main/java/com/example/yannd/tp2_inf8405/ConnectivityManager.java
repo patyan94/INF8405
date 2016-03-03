@@ -16,4 +16,5 @@ public class ConnectivityManager {
         // TODO
         return false;
     }
+
 }

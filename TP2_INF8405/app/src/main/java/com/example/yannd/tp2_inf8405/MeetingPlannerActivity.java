@@ -10,4 +10,8 @@ public class MeetingPlannerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_planner);
     }
+
+    public void CreateEvent(){
+        //TODO creates an event to the next available time, according to everyone's known location
+    }
 }
