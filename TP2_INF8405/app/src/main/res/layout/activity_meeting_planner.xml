@@ -11,13 +11,19 @@
     tools:context="com.example.yannd.tp2_inf8405.MeetingPlannerActivity">
 
     <Button
+        android:id="@+id/create_meeting_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create new Meeting"/>
     <ListView
-        android:id="@+id/ScheduledMeetings"
+        android:id="@+id/scheduledMeetings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </com.google.android.gms.maps.MapView>
 
 </LinearLayout>

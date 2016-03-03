@@ -8,13 +8,13 @@ import java.util.HashSet;
  */
 public class Group {
     private String groupName;
-    private HashSet<String> groupMembers;
+    private HashSet<UserProfile> groupMembers;
 
-    public HashSet<String> getGroupMembers() {
+    public HashSet<UserProfile> getGroupMembers() {
         return groupMembers;
     }
 
-    public void setGroupMembers(HashSet<String> groupMembers) {
+    public void setGroupMembers(HashSet<UserProfile> groupMembers) {
         this.groupMembers = groupMembers;
     }
 

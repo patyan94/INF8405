@@ -100,11 +100,11 @@ public class LoginPage extends AppCompatActivity {
     private void Login() {
         if(!groupExists.isChecked())
         {
-            DatabaseManager.CreateGroup(groupName.getText().toString());
+            DatabaseManager.CreateGroup(groupName.toString());
         }
-        DatabaseManager.AddGroupMember(groupName.getText().toString(), email.getText().toString());
-        UserProfile.setCurrentUser(DatabaseManager.GetUserProfile(email.getText().toString()));
-        UserProfile.setCurrentGroupName(groupName.getText().toString());
+        DatabaseManager.AddGroupMember(groupName.toString(), email.toString());
+        UserProfile.setCurrentUser(DatabaseManager.GetUserProfile(email.toString()));
+        UserProfile.setCurrentGroupName(groupName.toString());
         Intent intent = new Intent(this, MeetingPlannerActivity.class);
         startActivity(intent);
     }
