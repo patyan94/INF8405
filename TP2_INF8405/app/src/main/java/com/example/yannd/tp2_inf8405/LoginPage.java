@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.util.BitSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginPage extends AppCompatActivity {
 
@@ -41,7 +43,14 @@ public class LoginPage extends AppCompatActivity {
         signinOptions = (LinearLayout)findViewById(R.id.signin_options);
 
         loginButton.setEnabled(false);
-        //signinOptions.setVisibility(View.INVISIBLE);
+        signinOptions.setVisibility(View.INVISIBLE);
+
+        meetingOrganizer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckEntryFields();
+            }
+        });
         email.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -50,11 +59,7 @@ public class LoginPage extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean userProfileExists = count > 4 && DatabaseManager.userProfileExists(s.toString());
-                signinOptions.setVisibility(userProfileExists ? View.INVISIBLE : View.VISIBLE);
-                signinButton.setEnabled(groupName.length() > 4);
-                loginButton.setVisibility(userProfileExists ? View.VISIBLE : View.INVISIBLE);
-                loginButton.setEnabled(groupName.length() > 4);
+                CheckEntryFields();
             }
 
             @Override
@@ -70,9 +75,7 @@ public class LoginPage extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                groupExists.setChecked(count > 0 && DatabaseManager.groupExists(s.toString()));
-                signinButton.setEnabled(count > 4);
-                loginButton.setEnabled(count > 4);
+                CheckEntryFields();
             }
 
             @Override
@@ -122,4 +125,26 @@ public class LoginPage extends AppCompatActivity {
         Login();
     }
 
+    boolean IsEmailValid()
+    {
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email.getText());
+        return matcher.matches();
+    }
+    boolean IsGroupNameValid(){
+        return groupName.getText().toString().length() >= 3;
+    }
+
+    void CheckEntryFields() {
+        boolean validEmail = IsEmailValid();
+        boolean userProfileExists =  validEmail && DatabaseManager.userProfileExists(email.toString());
+        boolean groupExists = DatabaseManager.groupExists(groupName.toString());
+        boolean validGroupName = IsGroupNameValid();
+
+        signinOptions.setVisibility(userProfileExists ? View.INVISIBLE : View.VISIBLE);
+        loginButton.setVisibility(userProfileExists ? View.VISIBLE : View.INVISIBLE);
+        signinButton.setEnabled(validEmail && validGroupName && (groupExists || meetingOrganizer.isChecked()));
+        loginButton.setEnabled(validEmail && validGroupName&& (groupExists || meetingOrganizer.isChecked()));
+    }
 }
