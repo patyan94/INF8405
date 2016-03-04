@@ -3,9 +3,11 @@ package com.example.yannd.tp2_inf8405;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.util.Pair;
 
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,35 +16,26 @@ import java.util.Set;
 
 
 public class UserProfile implements LocationListener {
-    public static UserProfile currentUser;
-    public static String currentGroupName;
     private boolean meetingOrganizer;
-    private BitSet preferences;
+    private List<String> preferences;
     private String username;
-    private Location location;
+    private Pair<Double, Double> location;
 
-    public Location getLocation() {
+    public UserProfile(){  }
+
+    public UserProfile(boolean organizer, String username){
+        this.meetingOrganizer = organizer;
+        this.username = username;
+        this.location = new Pair<>(0.0, 0.0);
+    }
+
+    public Pair<Double, Double> getLocation() {
         return location;
     }
 
-    public static String getCurrentGroupName() {
-        return currentGroupName;
+    public void setLocation(double lng, double lat){
+        location = new Pair<Double, Double>(lng, lat);
     }
-
-    public static void setCurrentGroupName(String currentGroupName) {
-        UserProfile.currentGroupName = currentGroupName;
-    }
-
-
-    public static UserProfile getCurrentUser() {
-        return currentUser;
-    }
-
-    public static void setCurrentUser(UserProfile currentUser) {
-        UserProfile.currentUser = currentUser;
-    }
-
-
 
     public boolean isMeetingOrganizer() {
         return meetingOrganizer;
@@ -61,12 +54,11 @@ public class UserProfile implements LocationListener {
         this.username = username;
     }
 
-    public void setPreferences(BitSet preferences) {
+    public void setPreferences(List<String> preferences) {
         this.preferences = preferences;
     }
 
-    public BitSet getPreferences() {
-
+    public List<String> getPreferences() {
         return preferences;
     }
 
@@ -76,16 +68,13 @@ public class UserProfile implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 }

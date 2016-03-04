@@ -12,6 +12,7 @@
     tools:context="com.example.yannd.tp2_inf8405.LoginPage">
 
     ---Credentials
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,24 +23,19 @@
                 android:hint="Email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
             <EditText
                 android:id="@+id/group_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Group Name"/>
-            <CheckBox
-                android:id="@+id/group_exists"
-                android:clickable="false"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Group Exists"/>
-        </LinearLayout>
+        ---LoginButton
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:enabled="false"/>
     </LinearLayout>
 
     ---Signin options
@@ -59,7 +55,8 @@
         ---Meeting places selection
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="27dp"
+            android:gravity="bottom"
             android:text="Preferred meeting places" />
             <LinearLayout
                 android:layout_width="match_parent"
@@ -114,12 +111,7 @@
             android:id="@+id/signin_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Signin"/>
+            android:text="Signin"
+            android:enabled="false"/>
     </LinearLayout>
-    ---LoginButton
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Login"/>
 </LinearLayout>
