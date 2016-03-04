@@ -19,22 +19,31 @@ public class UserProfile implements LocationListener {
     private boolean meetingOrganizer;
     private List<String> preferences;
     private String username;
-    private Pair<Double, Double> location;
+    private double latitude;
+    private double longitude;
 
     public UserProfile(){  }
 
     public UserProfile(boolean organizer, String username){
         this.meetingOrganizer = organizer;
         this.username = username;
-        this.location = new Pair<>(0.0, 0.0);
     }
 
-    public Pair<Double, Double> getLocation() {
-        return location;
+    //ICI je separe longitude et latitude pcq firebase supporte pas les pair ou l'object location directement, c'est bien plus simple comme ca
+    public double getLatitude() {
+        return this.latitude;
     }
 
-    public void setLocation(double lng, double lat){
-        location = new Pair<Double, Double>(lng, lat);
+    public double getLongitude() {
+        return this.longitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public boolean isMeetingOrganizer() {

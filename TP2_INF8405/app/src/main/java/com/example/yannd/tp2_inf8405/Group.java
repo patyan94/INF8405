@@ -11,8 +11,7 @@ public class Group {
     private String groupName;
     private List<UserProfile> groupMembers;
 
-    public Group(){
-    }
+    public Group(){  }
 
     public Group(String name){
         this.groupName = name;
@@ -37,7 +36,8 @@ public class Group {
             //If it does, we update it instead of add another entry in the list
             if(user.getUsername().equalsIgnoreCase(member.getUsername())){
                 user.setMeetingOrganizer(member.isMeetingOrganizer());
-                user.setLocation(member.getLocation().first, member.getLocation().second);
+                user.setLatitude(member.getLatitude());
+                user.setLongitude(member.getLongitude());
                 user.setPreferences(member.getPreferences());
                 return;
             }

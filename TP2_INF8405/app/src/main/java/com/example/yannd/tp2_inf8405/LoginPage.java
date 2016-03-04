@@ -19,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.firebase.client.Firebase;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LoginPage extends AppCompatActivity {
 
@@ -65,7 +67,6 @@ public class LoginPage extends AppCompatActivity {
                     loginButton.setEnabled(false);
                     signinButton.setEnabled(false);
                 }
-
             }
         });
         groupName.addTextChangedListener(new TextWatcher() {
@@ -73,6 +74,7 @@ public class LoginPage extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) { }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
                 if( groupName.length() > 2 && email.length() > 2){
                     loginButton.setEnabled(true);
                     signinButton.setEnabled(true);
@@ -120,7 +122,7 @@ public class LoginPage extends AppCompatActivity {
                 Intent intent = new Intent(this, MeetingPlannerActivity.class);
                 startActivity(intent);
             }else{
-                Toast.makeText(getApplicationContext(), "This user isn't in " + group.getGroupName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "This email address isn't registered in " + group.getGroupName() + ". You must sign in first.", Toast.LENGTH_SHORT).show();
             }
         }else{
             Toast.makeText(getApplicationContext(), "This group doesn't exist", Toast.LENGTH_SHORT).show();
