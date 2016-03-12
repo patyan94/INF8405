@@ -5,20 +5,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.firebase.client.Firebase;
+
+import org.w3c.dom.Text;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,30 +63,42 @@ public class LoginPage extends AppCompatActivity {
         signinButton.setEnabled(false);
 
         email.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void afterTextChanged(Editable s) { }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if( email.length() > 2 && groupName.length() > 2){
+                if (email.length() > 2 && groupName.length() > 2) {
                     loginButton.setEnabled(true);
                     signinButton.setEnabled(true);
-                }else{
+                } else {
                     loginButton.setEnabled(false);
                     signinButton.setEnabled(false);
                 }
             }
         });
         groupName.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void afterTextChanged(Editable s) { }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if( groupName.length() > 2 && email.length() > 2){
+                if (groupName.length() > 2 && email.length() > 2) {
                     loginButton.setEnabled(true);
                     signinButton.setEnabled(true);
-                }else{
+                } else {
                     loginButton.setEnabled(false);
                     signinButton.setEnabled(false);
                 }
@@ -97,11 +117,9 @@ public class LoginPage extends AppCompatActivity {
                 Signin();
             }
         });
-
     }
 
     private void Login() {
-
         String groupNameString = groupName.getText().toString();
         String emailString = email.getText().toString();
 
