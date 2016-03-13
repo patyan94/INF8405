@@ -3,12 +3,7 @@ package com.example.yannd.tp2_inf8405;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.util.Pair;
-
-import java.util.BitSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by yannd on 2016-03-03.

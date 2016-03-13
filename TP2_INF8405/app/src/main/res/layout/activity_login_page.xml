@@ -19,13 +19,11 @@
         android:orientation="vertical">
             <EditText
                 android:id="@+id/email"
-                android:text="a@a.c"
                 android:hint="Email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <EditText
                 android:id="@+id/group_name"
-                android:text="aaa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

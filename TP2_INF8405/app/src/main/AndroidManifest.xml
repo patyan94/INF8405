@@ -40,7 +40,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAQ9dXeGuQ-t0nTlTwwyIfucrSXTDNrLjA" />
+            android:value="@string/google_api_key" />
 
         <activity android:name=".MeetingPlannerActivity"></activity>
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
