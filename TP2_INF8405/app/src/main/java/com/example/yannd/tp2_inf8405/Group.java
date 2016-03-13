@@ -10,6 +10,15 @@ import java.util.List;
 public class Group {
     private String groupName;
     private List<UserProfile> groupMembers;
+    private List<MeetingEvent> groupEvents;
+
+    public List<MeetingEvent> getGroupEvents() {
+        return groupEvents;
+    }
+
+    public void setGroupEvents(List<MeetingEvent> groupEvents) {
+        this.groupEvents = groupEvents;
+    }
 
     public Group(){  }
 
@@ -23,6 +32,10 @@ public class Group {
 
     public void setGroupMembers(List<UserProfile> groupMembers) {
         this.groupMembers = groupMembers;
+    }
+
+    public void AddEvent(MeetingEvent event){
+        groupEvents.add(event);
     }
 
     public void addOrUpdateGroupMember(UserProfile member){
