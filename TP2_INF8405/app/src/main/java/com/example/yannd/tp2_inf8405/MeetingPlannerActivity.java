@@ -140,7 +140,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             currentProfile.setLongitude(location.getLongitude());
             currentProfile.setLatitude(location.getLatitude());
             Group currentGroup = DataManager.getInstance().getCurrentGroup();
-            currentGroup.addOrUpdateGroupMember(currentProfile);
+            DataManager.getInstance().addOrUpdateUser(currentProfile);
         }
     }
 }

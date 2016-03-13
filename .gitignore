@@ -30,3 +30,5 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+TP2_INF8405/app/src/debug/res/values/google_maps_api.xml
