@@ -8,6 +8,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class DataManager {
         currentUser = new UserProfile();
         groupList = new ArrayList<Group>();
 
-        // Event listener used to keep a 1 to 1 relation between the current group and the one in the Firebase database
+        // Event listener used to keep a 1 to 1 relation between the groupList and the one in the Firebase database
         firebaseRef.child("groups").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -44,7 +45,7 @@ public class DataManager {
                     newList.add(tempGroup);
 
                     //If the current group concerned has changed, we update it's content (Members)
-                    if(tempGroup.getGroupName().equalsIgnoreCase(currentGroup.getGroupName())){
+                    if (tempGroup.getGroupName().equalsIgnoreCase(currentGroup.getGroupName())) {
                         currentGroup.setGroupMembers(tempGroup.getGroupMembers());
                     }
                 }
@@ -90,9 +91,11 @@ public class DataManager {
 
     public UserProfile getUser(String username)
     {
-        for(UserProfile up : currentGroup.getGroupMembers()){
-            if(up.getUsername().equalsIgnoreCase(username)){
-                return up;
+        if(currentGroup.getGroupMembers() != null){
+            for(UserProfile up : currentGroup.getGroupMembers()){
+                if(up.getUsername().equalsIgnoreCase(username)){
+                    return up;
+                }
             }
         }
         return null;

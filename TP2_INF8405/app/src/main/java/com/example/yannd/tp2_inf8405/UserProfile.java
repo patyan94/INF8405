@@ -3,16 +3,16 @@ package com.example.yannd.tp2_inf8405;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import java.util.Calendar;
 import java.util.List;
 
 /**
  * Created by yannd on 2016-03-03.
  */
-
-
 public class UserProfile implements LocationListener {
     private boolean meetingOrganizer;
     private List<String> preferences;
+    private List<Calendar> availabilities;
     private String username;
     private double latitude;
     private double longitude;
@@ -24,7 +24,15 @@ public class UserProfile implements LocationListener {
         this.username = username;
     }
 
-    //ICI je separe longitude et latitude pcq firebase supporte pas les pair ou l'object location directement, c'est bien plus simple comme ca
+    public List<Calendar> getAvailabilities(){
+        return availabilities;
+    }
+
+    public void setAvailabilities(List<Calendar> availabilities){
+        this.availabilities = availabilities;
+    }
+
+    //ICI je separe longitude et latitude pcq firebase supporte pas les pair ou l'object Location directement
     public double getLatitude() {
         return this.latitude;
     }

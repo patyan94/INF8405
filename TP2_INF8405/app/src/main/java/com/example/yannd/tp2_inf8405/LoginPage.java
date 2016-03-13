@@ -5,30 +5,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.firebase.client.Firebase;
-
-import org.w3c.dom.Text;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class LoginPage extends AppCompatActivity {
 
@@ -42,9 +30,13 @@ public class LoginPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
-        //Initializing the Firebase library at start
+        //Initializing the Firebase library and the DataManager singleton at start
+        //Important if we want the firebase callbacks in the DataManager to be initialized asap
         Firebase.setAndroidContext(this);
         DataManager.getInstance();
+
+        //Initliazing app context of the calendar manager singleton...
+        CalendarManager.getInstance().setApplicationContext(getApplicationContext());
 
         preferences = new CheckBox[PREFERENCES.NUMBER_OF_PREFERENCES.getValue()];
         meetingOrganizer = (CheckBox)findViewById(R.id.meeting_organizer);

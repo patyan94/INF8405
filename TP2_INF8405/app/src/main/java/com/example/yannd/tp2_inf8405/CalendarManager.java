@@ -1,6 +1,7 @@
 package com.example.yannd.tp2_inf8405;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,16 +22,19 @@ public class CalendarManager {
     private static CalendarManager instance = null;
     private Context appCtx = null;
 
-    private CalendarManager(Context ctx) {
-        appCtx = ctx;
+    private CalendarManager() {
     }
 
-    public static CalendarManager getInstance(Context applicationContext) {
+    public static CalendarManager getInstance() {
         if (instance == null) {
-            instance = new CalendarManager(applicationContext);
+            instance = new CalendarManager();
         }
-        instance.appCtx = applicationContext;
         return instance;
+    }
+
+    //Call this on the object returned by getInstance as early as possible in the application code
+    public void setApplicationContext(Context applicationContext){
+        appCtx = applicationContext;
     }
 
     /*
@@ -41,7 +45,7 @@ public class CalendarManager {
         calStart.set(2016, 0, 10); //Note that months start from 0 (January)
         calEnd.set(2016, 0, 17); //Note that months start from 0 (January)
 
-        CalendarManager.getInstance(getApplicationContext()).getAvailabilities(calStart, calEnd);
+        CalendarManager.getInstance().getAvailabilities(calStart, calEnd);
 
     This exemple will return a list of Calendar objects, one per day that is available to book an event
     This is basic, since if there is already something booked on a day (at any time), the ENTIRE day won't be available (excluded from the returned list)
@@ -120,7 +124,7 @@ public class CalendarManager {
         Calendar end = Calendar.getInstance();
         end.set(2016, 2, 28, 15, 30);
 
-        CalendarManager.getInstance(getApplicationContext()).addEventToCalendar(start, end, "Meeting 1", "Description du meeting #1 .. .. ..");
+        CalendarManager.getInstance().addEventToCalendar(start, end, "Meeting 1", "Description du meeting #1 .. .. ..");
 
     This method adds the event to the main calendar of the app user.
     Note : It may take a minute or two for the event to sync with the desktop version of google calendar
