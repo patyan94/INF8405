@@ -65,11 +65,11 @@ public class EventRowAdapter extends BaseAdapter{
             meetingPlaceAdress.setText(event.getFinalPlace().getVicinity());
             meetingPlaceName.setText(event.getFinalPlace().getName());
             meetingDate.setText("TODO MEETING DATE");
-            vi.findViewById(R.id.votingRadioGroup).setVisibility(View.INVISIBLE);
+            vi.findViewById(R.id.votingRadioGroup).setVisibility(View.GONE);
             vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.VISIBLE);
         }
         else{
-            vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.INVISIBLE);
+            vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.GONE);
             vi.findViewById(R.id.votingRadioGroup).setVisibility(View.VISIBLE);
 
             RadioButton firstPlaceRadioButton = (RadioButton)vi.findViewById(R.id.firstPlaceRadioButton);
