@@ -1,8 +1,9 @@
 package com.example.yannd.tp2_inf8405;
 
-import android.app.usage.UsageEvents;
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,17 +22,26 @@ import java.util.logging.Logger;
  */
 public class PlaceFinder extends AsyncTask {
     private final int NUM_PLACES = 3;
+    Context appContext;
     /* Params :
      0 : places string
      1 : Location location
      2 : radius int
      3 : event
+     4 : context
     */
     @Override
     protected Object doInBackground(Object[] params) {
+        appContext = (Context)params[4];
         MeetingEvent event = (MeetingEvent)params[3];
         event.setPlaces(FindPlaces((String)params[0], (Location)params[1], (int)params[2]));
         return event;
+    }
+
+    @Override
+    protected void onPostExecute(Object event) {
+        ((MeetingEvent)event).notifyObservers();
+        // Add Event to Datamanager
     }
 
     // Function to return an array of plausible meeting places
@@ -48,8 +58,8 @@ public class PlaceFinder extends AsyncTask {
             JSONArray array = object.getJSONArray("results");
 
             // Augmente le rayon de recherche si on a pas assez de places
-            if(array.length() < NUM_PLACES)
-                return FindPlaces(placeSpecification, location, radius * 2);
+            //if(array.length() < NUM_PLACES)
+              //  return FindPlaces(placeSpecification, location, radius * 2);
 
             for (int i = 0; i < NUM_PLACES; i++) {
                 try {
@@ -70,16 +80,16 @@ public class PlaceFinder extends AsyncTask {
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/place/search/json?");
 
-        urlString.append("&location=");
+        urlString.append("location=");
         urlString.append(Double.toString(latitude));
         urlString.append(",");
         urlString.append(Double.toString(longitude));
         urlString.append("&radius="+radius);
-        urlString.append("&sensor=false&key=" + R.string.google_server_key);
+        urlString.append("&sensor=false&key=" + "AIzaSyDXBEWnKX7wRE3uwU-Is97v14Y_XcVvqxg");
         urlString.append("&rankby=distance");
 
         if (!places.equals("")) {
-            urlString.append("&types=" + places);
+           urlString.append("&types=" + places);
         }
         return urlString.toString();
     }

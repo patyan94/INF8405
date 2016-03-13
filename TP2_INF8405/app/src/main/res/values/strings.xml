@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TP2_INF8405</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="google_server_key">AIzaSyDPwiIVC-qg91RgpZ8u92xdozNbGI38bm0</string>
+    <string name="google_server_key">AIzaSyDXBEWnKX7wRE3uwU-Is97v14Y_XcVvqxg</string>
     <string name="title_activity_meeting_organizer">Map</string>
 </resources>

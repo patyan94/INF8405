@@ -18,14 +18,23 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.SortedMap;
 import java.util.concurrent.ExecutionException;
 
 public class MeetingPlannerActivity extends FragmentActivity
-        implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
     private static final int eventRadius = 10000;//m
     Button createMeetingButton;
@@ -56,18 +65,42 @@ public class MeetingPlannerActivity extends FragmentActivity
                 CreateMeeting();
             }
         });
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(MeetingPlannerActivity.this);
         //scheduledMeetingsList = (ListView) findViewById(R.id.scheduledMeetings)
     //mLocationRequest = new LocationRequest();
     }
 
     private String GetPlacesPreferences(){
-        return null;
+
+
+        ArrayList<String> preferences = new ArrayList<>();
+        Group currentGroup = DataManager.getInstance().getCurrentGroup();
+        List<UserProfile> groupMembers = currentGroup.getGroupMembers();
+        for (UserProfile u : groupMembers) {
+            for(String pref : u.getPreferences()){
+                String lowerCasePref = pref.toLowerCase();
+                if(!preferences.contains(lowerCasePref))
+                {
+                    preferences.add(lowerCasePref);
+                return lowerCasePref;
+                }
+            }
+        }
+        StringBuilder prefStr = new StringBuilder();
+
+        for(int i = 0; i < preferences.size(); ++i){
+            prefStr.append(preferences.get(i));
+            if(i<preferences.size()-1)
+                prefStr.append('|');
+        }
+        return prefStr.toString();
     }
 
     // Function to create a meeting, by finding the plausible places for the vote and the date
     private void CreateMeeting(){
         MeetingEvent event = new MeetingEvent();
-
+        event.addObserver(this);
         event.setMeetingName(((EditText)findViewById(R.id.meetingName)).getText().toString());
         String places = GetPlacesPreferences();
         Location location = GetCentralLocation();
@@ -75,7 +108,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         // TODO find date
 
         try {
-            event = (MeetingEvent) new PlaceFinder().execute(places, location, eventRadius).get();
+            event = (MeetingEvent) new PlaceFinder().execute(places, location, eventRadius, event, getApplicationContext()).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -104,9 +137,24 @@ public class MeetingPlannerActivity extends FragmentActivity
         return location;
     }
 
+    void ShowUserPositionsOnMap(){
+        map.clear();
+
+        Group currentGroup = DataManager.getInstance().getCurrentGroup();
+        List<UserProfile> groupMembers = currentGroup.getGroupMembers();
+        for (UserProfile u : groupMembers) {
+            MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(u.getLatitude(), u.getLongitude()))
+                                                             .title(u.getUsername())
+                                                             .snippet(u.getUsername());
+            map.addMarker(markerOptions);
+        }
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        ShowUserPositionsOnMap();
+
     }
 
     @Override
@@ -149,5 +197,11 @@ public class MeetingPlannerActivity extends FragmentActivity
             Group currentGroup = DataManager.getInstance().getCurrentGroup();
             DataManager.getInstance().addOrUpdateUser(currentProfile);
         }
+    }
+
+    // Receives a Meeting Event
+    @Override
+    public void update(Observable observable, Object data) {
+
     }
 }
