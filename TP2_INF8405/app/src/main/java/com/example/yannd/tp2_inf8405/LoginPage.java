@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -121,6 +122,7 @@ public class LoginPage extends AppCompatActivity {
             DataManager.getInstance().setCurrentGroup(group);
             UserProfile user = DataManager.getInstance().getUser(emailString);
             if(user != null){
+
                 DataManager.getInstance().setCurrentUser(user);
 
                 //Unchecking all the checkboxes, in case we come back to it

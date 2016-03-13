@@ -13,6 +13,10 @@ public class Group {
     private List<MeetingEvent> groupEvents;
 
     public List<MeetingEvent> getGroupEvents() {
+        if(groupEvents == null)
+        {
+            groupEvents = new ArrayList<>();
+        }
         return groupEvents;
     }
 
@@ -65,6 +69,7 @@ public class Group {
                 user.setLatitude(member.getLatitude());
                 user.setLongitude(member.getLongitude());
                 user.setPreferences(member.getPreferences());
+                user.setAvailabilities(member.getAvailabilities());
                 return;
             }
         }

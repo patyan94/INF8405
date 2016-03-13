@@ -142,6 +142,7 @@ public class DataManager {
     public void setCurrentUser(UserProfile user)
     {
         this.currentUser = user;
+        this.currentUser.startAvailabilitesRefreshTask();
     }
 
 }

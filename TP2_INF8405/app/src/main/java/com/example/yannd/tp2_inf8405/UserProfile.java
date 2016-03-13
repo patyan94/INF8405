@@ -3,6 +3,9 @@ package com.example.yannd.tp2_inf8405;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -16,6 +19,8 @@ public class UserProfile implements LocationListener {
     private String username;
     private double latitude;
     private double longitude;
+    private final Handler handler = new Handler();
+
 
     public UserProfile(){  }
 
@@ -74,6 +79,7 @@ public class UserProfile implements LocationListener {
         return preferences;
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
     }
@@ -88,5 +94,34 @@ public class UserProfile implements LocationListener {
 
     @Override
     public void onProviderDisabled(String provider) {
+    }
+
+
+    //Task running each 5 minutes after we log in, in order to keep our availabilites updated in a 5 minutes window
+    Runnable mHandlerTask = new Runnable()
+    {
+        @Override
+        public void run() {
+            Calendar start = Calendar.getInstance();
+            Calendar end = (Calendar) start.clone();
+            end.add(Calendar.DAY_OF_YEAR, 7);
+            List<Calendar> newAvailabilities = CalendarManager.getInstance().getAvailabilities(start, end);
+            UserProfile.this.setAvailabilities(newAvailabilities);
+
+            for(Calendar c : UserProfile.this.getAvailabilities()){
+                Log.d("DEBUG", c.toString());
+            }
+
+            //Updating Firebase
+            DataManager.getInstance().addOrUpdateUser(UserProfile.this);
+
+            //Update each 5 minutes
+            handler.postDelayed(mHandlerTask, 1000 * 60 * 5);
+        }
+    };
+
+
+    public void startAvailabilitesRefreshTask(){
+        mHandlerTask.run(); // Start updating the availabilites each 5 minutes
     }
 }
