@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.firebase.client.Firebase;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,7 +37,6 @@ import java.util.concurrent.ExecutionException;
 public class MeetingPlannerActivity extends FragmentActivity
         implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
-    private static final int eventRadius = 10000;//m
     Button createMeetingButton;
     LocationRequest mLocationRequest;
     ListView scheduledMeetingsList;
@@ -56,6 +56,9 @@ public class MeetingPlannerActivity extends FragmentActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_planner);
+
+        Firebase.setAndroidContext(this);
+        DataManager.getInstance();
 
         // Creates a meeting when we click on the createMeeting button
         createMeetingButton = (Button) findViewById(R.id.create_meeting_button);
@@ -108,7 +111,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         // TODO find date
 
         try {
-            event = (MeetingEvent) new PlaceFinder().execute(places, location, eventRadius, event, getApplicationContext()).get();
+            event = (MeetingEvent) new PlaceFinder().execute(places, location, event, getApplicationContext()).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -202,6 +205,6 @@ public class MeetingPlannerActivity extends FragmentActivity
     // Receives a Meeting Event
     @Override
     public void update(Observable observable, Object data) {
-
+        int a = 0;
     }
 }

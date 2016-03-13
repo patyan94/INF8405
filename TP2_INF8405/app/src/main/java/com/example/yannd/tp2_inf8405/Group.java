@@ -40,8 +40,8 @@ public class Group {
 
     public void addOrUpdateEvent(MeetingEvent event){
 
-        if(groupMembers == null){
-            groupMembers = new ArrayList<>();
+        if(groupEvents == null){
+            groupEvents = new ArrayList<>();
         }
 
         for(MeetingEvent me : groupEvents){

@@ -3,6 +3,7 @@ package com.example.yannd.tp2_inf8405;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 import org.json.JSONArray;
@@ -26,15 +27,14 @@ public class PlaceFinder extends AsyncTask {
     /* Params :
      0 : places string
      1 : Location location
-     2 : radius int
-     3 : event
-     4 : context
+     2 : event
+     3 : context
     */
     @Override
     protected Object doInBackground(Object[] params) {
-        appContext = (Context)params[4];
-        MeetingEvent event = (MeetingEvent)params[3];
-        event.setPlaces(FindPlaces((String)params[0], (Location)params[1], (int)params[2]));
+        appContext = (Context)params[3];
+        MeetingEvent event = (MeetingEvent)params[2];
+        event.setPlaces(FindPlaces((String)params[0], (Location)params[1]));
         return event;
     }
 
@@ -45,21 +45,18 @@ public class PlaceFinder extends AsyncTask {
     }
 
     // Function to return an array of plausible meeting places
-    public ArrayList<EventPlace> FindPlaces(String placeSpecification, Location location, int radius) {
+    public ArrayList<EventPlace> FindPlaces(String placeSpecification, Location location) {
 
 
-        String urlString = createPlaceSearchUrl(location.getLatitude(), location.getLongitude(), radius, placeSpecification);
+        String urlString = createPlaceSearchUrl(location.getLatitude(), location.getLongitude(), placeSpecification);
         ArrayList<EventPlace> arrayList = new ArrayList<EventPlace>();
         try {
+            Log.v("URL", urlString);
             String json = getResponse(urlString);
 
             System.out.println(json);
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
-
-            // Augmente le rayon de recherche si on a pas assez de places
-            //if(array.length() < NUM_PLACES)
-              //  return FindPlaces(placeSpecification, location, radius * 2);
 
             for (int i = 0; i < NUM_PLACES; i++) {
                 try {
@@ -76,7 +73,7 @@ public class PlaceFinder extends AsyncTask {
     }
 
 
-    private String createPlaceSearchUrl(double latitude, double longitude, int radius, String places) {
+    private String createPlaceSearchUrl(double latitude, double longitude, String places) {
         StringBuilder urlString = new StringBuilder(
                 "https://maps.googleapis.com/maps/api/place/search/json?");
 
@@ -84,7 +81,6 @@ public class PlaceFinder extends AsyncTask {
         urlString.append(Double.toString(latitude));
         urlString.append(",");
         urlString.append(Double.toString(longitude));
-        urlString.append("&radius="+radius);
         urlString.append("&sensor=false&key=" + "AIzaSyDXBEWnKX7wRE3uwU-Is97v14Y_XcVvqxg");
         urlString.append("&rankby=distance");
 

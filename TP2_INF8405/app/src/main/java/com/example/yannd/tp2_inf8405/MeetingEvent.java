@@ -32,6 +32,8 @@ public class MeetingEvent extends Observable {
             else
                 plc.UnVote(username);
         }
+        ChooseFinalPlace();
+        setChanged();
     }
 
     void ChooseFinalPlace(){
@@ -50,6 +52,7 @@ public class MeetingEvent extends Observable {
 
     public void setMeetingName(String meetingName) {
         this.meetingName = meetingName;
+        setChanged();
     }
 
     public List<EventPlace> getPlaces() {
@@ -58,6 +61,7 @@ public class MeetingEvent extends Observable {
 
     public void setPlaces(List<EventPlace> places) {
         Places = places;
+        setChanged();
     }
 
     public EventPlace getFinalPlace() {
@@ -66,6 +70,7 @@ public class MeetingEvent extends Observable {
 
     public void setFinalPlace(EventPlace finalPlace) {
         FinalPlace = finalPlace;
+        setChanged();
     }
 
     public void ConfirmEvent(){
