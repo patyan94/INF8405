@@ -6,11 +6,12 @@ import com.google.android.gms.location.places.Place;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 /**
  * Created by yannd on 2016-03-03.
  */
-public class MeetingEvent {
+public class MeetingEvent extends Observable {
     String meetingName;
     List<EventPlace> Places = new ArrayList<EventPlace>();
     EventPlace FinalPlace = null;
