@@ -8,7 +8,6 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -44,9 +43,18 @@ public class DataManager {
                     //We store all the groups in this array
                     newList.add(tempGroup);
 
-                    //If the current group concerned has changed, we update it's content (Members)
+                    //If the current group concerned has changed, we update it's content (Members and groupEvents)
                     if (tempGroup.getGroupName().equalsIgnoreCase(currentGroup.getGroupName())) {
                         currentGroup.setGroupMembers(tempGroup.getGroupMembers());
+
+                        //For each meeting in the "new" version of the currentGroup, we add or update it to the currentGroup
+                        for(MeetingEvent me : tempGroup.getGroupEvents()){
+                            currentGroup.addOrUpdateEvent(me);
+
+                            //So here, bascially, we should 'react' to the changes to each MeetingEvent. Here or in 'addOrUpdateEvent' or further down,
+                            //in order to detect if a user action is required depending on the state or the meeting. Ex : a new event is added and the user must vote.
+                            //or even, all the users have voted and the organiser must analyse all the votes in order to finalize the meeting adding.
+                        }
                     }
                 }
 
@@ -104,6 +112,14 @@ public class DataManager {
     public void addOrUpdateUser(UserProfile user){
 
         currentGroup.addOrUpdateGroupMember(user);
+
+        //Sync with DB
+        firebaseRef.child("groups").child(currentGroup.getGroupName()).setValue(currentGroup);
+    }
+
+    public void addOrUpdateEvent(MeetingEvent event){
+
+        currentGroup.addOrUpdateEvent(event);
 
         //Sync with DB
         firebaseRef.child("groups").child(currentGroup.getGroupName()).setValue(currentGroup);

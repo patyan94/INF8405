@@ -10,6 +10,15 @@ import java.util.List;
 public class Group {
     private String groupName;
     private List<UserProfile> groupMembers;
+    private List<MeetingEvent> groupEvents;
+
+    public List<MeetingEvent> getGroupEvents() {
+        return groupEvents;
+    }
+
+    public void setGroupEvents(List<MeetingEvent> groupEvents) {
+        this.groupEvents = groupEvents;
+    }
 
     public Group(){  }
 
@@ -23,6 +32,23 @@ public class Group {
 
     public void setGroupMembers(List<UserProfile> groupMembers) {
         this.groupMembers = groupMembers;
+    }
+
+    public void addOrUpdateEvent(MeetingEvent event){
+
+        if(groupMembers == null){
+            groupMembers = new ArrayList<>();
+        }
+
+        for(MeetingEvent me : groupEvents){
+            if(me.getMeetingName().equalsIgnoreCase(event.getMeetingName())){
+                me.setPlaces(event.getPlaces());
+                me.setFinalPlace(event.getFinalPlace());
+                return;
+            }
+        }
+
+        groupEvents.add(event);
     }
 
     public void addOrUpdateGroupMember(UserProfile member){

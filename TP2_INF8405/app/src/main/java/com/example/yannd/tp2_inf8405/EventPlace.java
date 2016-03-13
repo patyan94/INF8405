@@ -3,13 +3,16 @@ package com.example.yannd.tp2_inf8405;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Created by yannd on 2016-03-10.
  */
-public class MyPlace {
+public class EventPlace {
+    private List<String> Votes = new ArrayList<String>();
     private String id;
     private String icon;
     private String name;
@@ -17,6 +20,22 @@ public class MyPlace {
     private Double latitude;
     private Double longitude;
 
+    public int GetVoteCount(){return Votes.size();}
+    public void Vote(String username){
+        if(Votes.contains(username)){
+            return;
+        }
+        Votes.add(username);
+    }
+    public void UnVote(String username){
+        if(!Votes.contains(username)){
+            return;
+        }
+        Votes.remove(username);
+    }
+
+    public List<String> getVotes() { return Votes; }
+    public void setVotes(List<String> votes) { Votes = votes; }
     public String getId() {
         return id;
     }
@@ -54,9 +73,9 @@ public class MyPlace {
         this.vicinity = vicinity;
     }
 
-    static MyPlace jsonToPlaceReference(JSONObject placeReference) {
+    static EventPlace jsonToPlaceReference(JSONObject placeReference) {
         try {
-            MyPlace result = new MyPlace();
+            EventPlace result = new EventPlace();
             JSONObject geometry = (JSONObject) placeReference.get("geometry");
             JSONObject location = (JSONObject) geometry.get("location");
             result.setLatitude((Double) location.get("lat"));
@@ -67,7 +86,7 @@ public class MyPlace {
             result.setId(placeReference.getString("id"));
             return result;
         } catch (JSONException ex) {
-            Logger.getLogger(MyPlace.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EventPlace.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

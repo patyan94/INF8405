@@ -4,13 +4,12 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.android.gms.appindexing.AppIndex;
@@ -34,7 +33,6 @@ public class MeetingPlannerActivity extends FragmentActivity
     ListView scheduledMeetingsList;
     GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
-    ArrayList<MyPlace> mPlaces;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +60,22 @@ public class MeetingPlannerActivity extends FragmentActivity
     //mLocationRequest = new LocationRequest();
     }
 
+    private String GetPlacesPreferences(){
+        return null;
+    }
+
     // Function to create a meeting, by finding the plausible places for the vote and the date
     private void CreateMeeting(){
-        String places = "";
+        MeetingEvent event = new MeetingEvent();
+
+        event.setMeetingName(((EditText)findViewById(R.id.meetingName)).getText().toString());
+        String places = GetPlacesPreferences();
         Location location = GetCentralLocation();
+
         // TODO find date
+
         try {
-            mPlaces = (ArrayList<MyPlace>) new PlaceFincer().execute(places, location, eventRadius).get();
+            event = (MeetingEvent) new PlaceFinder().execute(places, location, eventRadius).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -140,7 +147,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             currentProfile.setLongitude(location.getLongitude());
             currentProfile.setLatitude(location.getLatitude());
             Group currentGroup = DataManager.getInstance().getCurrentGroup();
-            currentGroup.addOrUpdateGroupMember(currentProfile);
+            DataManager.getInstance().addOrUpdateUser(currentProfile);
         }
     }
 }

@@ -10,11 +10,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.yannd.tp2_inf8405.MeetingPlannerActivity">
 
-    <Button
-        android:id="@+id/create_meeting_button"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create new Meeting"/>
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/meetingName"
+            android:hint="Meeting Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/create_meeting_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create new Meeting"/>
+    </LinearLayout>
     <ListView
         android:id="@+id/scheduledMeetings"
         android:layout_width="match_parent"

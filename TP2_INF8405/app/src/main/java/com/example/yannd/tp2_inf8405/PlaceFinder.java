@@ -1,5 +1,6 @@
 package com.example.yannd.tp2_inf8405;
 
+import android.app.usage.UsageEvents;
 import android.location.Location;
 import android.os.AsyncTask;
 
@@ -18,24 +19,27 @@ import java.util.logging.Logger;
 /**
  * Created by yannd on 2016-03-13.
  */
-public class PlaceFincer extends AsyncTask {
-
+public class PlaceFinder extends AsyncTask {
+    private final int NUM_PLACES = 3;
     /* Params :
      0 : places string
      1 : Location location
      2 : radius int
+     3 : event
     */
     @Override
     protected Object doInBackground(Object[] params) {
-        return FindPlaces((String)params[0], (Location)params[1], (int)params[2]);
+        MeetingEvent event = (MeetingEvent)params[3];
+        event.setPlaces(FindPlaces((String)params[0], (Location)params[1], (int)params[2]));
+        return event;
     }
 
     // Function to return an array of plausible meeting places
-    public ArrayList<MyPlace> FindPlaces(String placeSpecification, Location location, int radius) {
+    public ArrayList<EventPlace> FindPlaces(String placeSpecification, Location location, int radius) {
 
 
         String urlString = createPlaceSearchUrl(location.getLatitude(), location.getLongitude(), radius, placeSpecification);
-        ArrayList<MyPlace> arrayList = new ArrayList<MyPlace>();
+        ArrayList<EventPlace> arrayList = new ArrayList<EventPlace>();
         try {
             String json = getResponse(urlString);
 
@@ -43,10 +47,13 @@ public class PlaceFincer extends AsyncTask {
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
 
+            // Augmente le rayon de recherche si on a pas assez de places
+            if(array.length() < NUM_PLACES)
+                return FindPlaces(placeSpecification, location, radius * 2);
 
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < NUM_PLACES; i++) {
                 try {
-                    MyPlace place = MyPlace.jsonToPlaceReference((JSONObject) array.get(i));
+                    EventPlace place = EventPlace.jsonToPlaceReference((JSONObject) array.get(i));
                     arrayList.add(place);
                 } catch (Exception e) {
                 }
