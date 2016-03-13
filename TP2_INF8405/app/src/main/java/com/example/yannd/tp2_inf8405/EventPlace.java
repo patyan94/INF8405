@@ -20,6 +20,9 @@ public class EventPlace {
     private Double latitude;
     private Double longitude;
 
+    public boolean hasVoted(String username){
+        return Votes.contains(username);
+    }
     public int GetVoteCount(){return Votes.size();}
     public void Vote(String username){
         if(Votes.contains(username)){

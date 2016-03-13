@@ -12,6 +12,16 @@ public class Group {
     private List<UserProfile> groupMembers;
     private List<MeetingEvent> groupEvents;
 
+    public boolean ContainsEvent(String name)
+    {
+        for(MeetingEvent ev : groupEvents)
+        {
+            if(ev.getMeetingName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
     public List<MeetingEvent> getGroupEvents() {
         if(groupEvents == null)
         {
