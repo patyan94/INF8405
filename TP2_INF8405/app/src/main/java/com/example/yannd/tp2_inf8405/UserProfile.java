@@ -108,10 +108,6 @@ public class UserProfile implements LocationListener {
             List<Calendar> newAvailabilities = CalendarManager.getInstance().getAvailabilities(start, end);
             UserProfile.this.setAvailabilities(newAvailabilities);
 
-            for(Calendar c : UserProfile.this.getAvailabilities()){
-                Log.d("DEBUG", c.toString());
-            }
-
             //Updating Firebase
             DataManager.getInstance().addOrUpdateUser(UserProfile.this);
 
