@@ -1,30 +1,35 @@
 package com.example.yannd.tp2_inf8405;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by Sacha on 2016-03-10.
  */
 public class CalendarManager {
     private static CalendarManager instance = null;
-    private Context applicationContext = null;
+    private Context appCtx = null;
 
     private CalendarManager(Context ctx) {
-        applicationContext = ctx;
+        appCtx = ctx;
     }
 
     public static CalendarManager getInstance(Context applicationContext) {
         if (instance == null) {
             instance = new CalendarManager(applicationContext);
         }
+        instance.appCtx = applicationContext;
         return instance;
     }
 
@@ -60,7 +65,7 @@ public class CalendarManager {
 
         //Ici on va chercher les évènements du calendrier de la personne durant l'interval ddonné en paramètre
         Cursor cursor = null;
-        if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             return null;
         }
 
@@ -71,7 +76,7 @@ public class CalendarManager {
 
         String selection = "((dtstart >= " + dateStart.getTime().getTime() + ") AND (dtend <= " + dateEnd.getTime().getTime() + "))";
 
-        cursor = applicationContext.getContentResolver().query(Uri.parse("content://com.android.calendar/events"), projection, selection, null, null);
+        cursor = appCtx.getContentResolver().query(Uri.parse("content://com.android.calendar/events"), projection, selection, null, null);
 
         //Pour chaque event, on modifie la liste de disponibilités en conséquence, de manière à exclure toutes les journées qui ont déje un evenement
         while(cursor.moveToNext()){
@@ -101,9 +106,47 @@ public class CalendarManager {
     }
 
     //Used to convert timestamp from calendar query to an actual Calendar object
-    public Calendar getCalendar(long timestamp) {
+    private Calendar getCalendar(long timestamp) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timestamp);
         return calendar;
+    }
+
+    /*
+    Example :
+
+        Calendar start = Calendar.getInstance();
+        start.set(2016, 2, 28, 7, 45);
+        Calendar end = Calendar.getInstance();
+        end.set(2016, 2, 28, 15, 30);
+
+        CalendarManager.getInstance(getApplicationContext()).addEventToCalendar(start, end, "Meeting 1", "Description du meeting #1 .. .. ..");
+
+    This method adds the event to the main calendar of the app user.
+    Note : It may take a minute or two for the event to sync with the desktop version of google calendar
+     */
+    public void addEventToCalendar(Calendar start, Calendar end, String title, String description){
+        long startTime = start.getTimeInMillis();
+        long endTime = end.getTimeInMillis();
+
+        int calId = 1; //We're using the default/main calendar of the user
+
+        ContentResolver cr = appCtx.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(CalendarContract.Events.DTSTART, startTime);
+        values.put(CalendarContract.Events.DTEND, endTime);
+        values.put(CalendarContract.Events.TITLE, title);
+        values.put(CalendarContract.Events.DESCRIPTION, description);
+        values.put(CalendarContract.Events.CALENDAR_ID, calId);
+        TimeZone tz = TimeZone.getDefault();
+        values.put(CalendarContract.Events.EVENT_TIMEZONE, tz.getID());
+
+        //Required check, even though the manifest file does have the correct permission
+        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        cr.insert(CalendarContract.Events.CONTENT_URI, values);
+
     }
 }

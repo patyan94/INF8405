@@ -117,6 +117,7 @@ public class LoginPage extends AppCompatActivity {
                 Signin();
             }
         });
+
     }
 
     private void Login() {
