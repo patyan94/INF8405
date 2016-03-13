@@ -20,10 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
-    <com.google.android.gms.maps.MapView
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </com.google.android.gms.maps.MapView>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
