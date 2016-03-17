@@ -1,20 +1,24 @@
 package com.example.yannd.tp2_inf8405;
 
-/**
- * Created by yannd on 2016-02-18.
- */
 public class ConnectivityManager {
     public boolean IsDataNetworkAvailable(){
-    // TODO
-        return false;
+        boolean mobileDataEnabled;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);		// Connecting to connectivity service
+        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);						// Getting mobile data informations
+        mobileDataEnabled = networkInfo != null && networkInfo.isConnected();				// Check mobile data is connected or not and information is not null
+        return mobileDataEnabled;
     }
     public boolean IsWiFiNetworkAvailable(){
-        // TODO
-        return false;
+        boolean wifiEnabled;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);						// Getting wifi informations
+        wifiEnabled = networkInfo != null && networkInfo.isConnected();								// Check wifi is connected or not
+        return wifiEnabled;
     }
     public boolean IsGPSNetworkAvailable(){
-        // TODO
-        return false;
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);		// Connecting to GPS serivice
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);				// Checking GPS is on or not
+        return isGPSEnabled;
     }
 
 }
