@@ -8,7 +8,10 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yannd on 2016-02-18.
@@ -61,6 +64,7 @@ public class DataManager {
                 //We empty the list and replace it with the newest version
                 groupList.clear();
                 groupList.addAll(newList);
+                CreateCalendarEvent();
             }
 
             @Override
@@ -68,6 +72,48 @@ public class DataManager {
                 Log.d("ERROR", firebaseError.getMessage());
             }
         });
+    }
+
+    private void CreateCalendarEvent(){
+
+        if(getCurrentGroup() == null || getCurrentGroup().getGroupEvents() == null) return;
+
+        List<MeetingEvent> events = getCurrentGroup().getGroupEvents();
+
+        for(MeetingEvent event : events) {
+            if(event.getFinalPlace() == null) continue;
+
+            HashMap<Calendar, Integer> mapAv = new HashMap<>();
+            List<UserProfile> users = DataManager.getInstance().getCurrentGroup().getGroupMembers();
+            for (UserProfile u : users) {
+                for (Calendar c : u.getAvailabilities()) {
+                    if (mapAv.containsKey(c)) {
+                        mapAv.put(c, mapAv.get(c) + 1);
+                    } else {
+                        mapAv.put(c, 1);
+                    }
+                }
+            }
+
+            int maxValue = -1;
+            Calendar finaldate = null;
+            for (Map.Entry<Calendar, Integer> e : mapAv.entrySet()) {
+                if (e.getValue() > maxValue) {
+                    maxValue = e.getValue();
+                    finaldate = e.getKey();
+                }
+            }
+
+            Calendar finalDate2 = (Calendar) finaldate.clone();
+            finalDate2.add(Calendar.HOUR_OF_DAY, 1);
+
+            CalendarManager.getInstance()
+                    .addEventToCalendar(
+                            finaldate,
+                            finalDate2,
+                            event.getMeetingName(),
+                            event.getFinalPlace().getName() + " : " + event.getFinalPlace().getVicinity() );
+        }
     }
 
     public static DataManager getInstance(){

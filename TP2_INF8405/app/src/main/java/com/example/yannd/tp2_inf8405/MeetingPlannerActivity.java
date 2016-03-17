@@ -29,9 +29,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.SortedMap;
@@ -143,8 +145,6 @@ public class MeetingPlannerActivity extends FragmentActivity
         event.setMeetingName(((EditText)findViewById(R.id.meetingName)).getText().toString());
         String places = GetPlacesPreferences();
         Location location = GetCentralLocation();
-
-        // TODO find date
 
         try {
             event = (MeetingEvent) new PlaceFinder().execute(places, location, event, getApplicationContext()).get();

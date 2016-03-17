@@ -20,7 +20,6 @@ public class EventRowAdapter extends BaseAdapter{
     private static LayoutInflater inflater = null;
 
     public EventRowAdapter(Context context, List<MeetingEvent> events) {
-        // TODO Auto-generated constructor stub
         this.context = context;
         this.events = (ArrayList)events;
         inflater = (LayoutInflater) context
