@@ -1,6 +1,9 @@
 package com.example.yannd.tp2_inf8405;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,8 +31,14 @@ public class LoginPage extends AppCompatActivity {
     private LinearLayout signinOptions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RessourceMonitor.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
+
+
+
+        Intent batteryStatus = registerReceiver(RessourceMonitor.getInstance(), new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        RessourceMonitor.getInstance().SetInitialBatteryLevel(batteryStatus);
 
         //Initializing the Firebase library and the DataManager singleton at start
         //Important if we want the firebase callbacks in the DataManager to be initialized asap
@@ -101,12 +110,14 @@ public class LoginPage extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
                 Login();
             }
         });
         signinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
                 Signin();
             }
         });
@@ -132,6 +143,7 @@ public class LoginPage extends AppCompatActivity {
                 }
 
                 //We start the next activity
+                Toast.makeText(getApplicationContext(), "Login/Signin battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, MeetingPlannerActivity.class);
                 startActivity(intent);
             }else{
@@ -140,6 +152,7 @@ public class LoginPage extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(), "This group doesn't exist", Toast.LENGTH_SHORT).show();
         }
+        Toast.makeText(getApplicationContext(), "Login/Signin battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
     }
 
     private void Signin() {
@@ -192,5 +205,33 @@ public class LoginPage extends AppCompatActivity {
 
         Login();
     }
+    @Override
+    public void onBackPressed() {
+        String batteryLevelMessage =
+                new String("Battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetTotalBatteryUsage()));
+        ShowBatteryUsage("Application battery usage", batteryLevelMessage, true);
+    }
 
+
+
+    void ShowBatteryUsage(String title, String message, boolean leavePage) {
+        final boolean leave = leavePage;
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginPage.this);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (leave) finish();
+            }
+        });
+        if(leave)
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // do nothing
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 }

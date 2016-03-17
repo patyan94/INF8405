@@ -1,6 +1,8 @@
 package com.example.yannd.tp2_inf8405;
 
 import android.Manifest;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -14,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.google.android.gms.appindexing.AppIndex;
@@ -72,6 +75,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         createMeetingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
                 CreateMeeting();
             }
         });
@@ -260,5 +264,6 @@ public class MeetingPlannerActivity extends FragmentActivity
             DataManager.getInstance().addOrUpdateEvent((MeetingEvent) observable);
             meetingName.setText("");
         }
+        Toast.makeText(getApplicationContext(), "Create meeting battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
     }
 }

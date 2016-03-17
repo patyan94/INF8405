@@ -6,17 +6,26 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
+import java.util.Set;
+
 /**
  * Created by Gol on 2016-02-25.
  */
 
 public class RessourceMonitor extends BroadcastReceiver {
 
+    static private RessourceMonitor mInstance = null;
     private float lastBatteryLevel;
-    private float initialBatteryLevel;
+    private Float initialBatteryLevel;
     private Intent batteryStatus;
 
-    public RessourceMonitor(){
+    static public RessourceMonitor getInstance(){
+        if(mInstance == null)
+            mInstance = new RessourceMonitor();
+        return mInstance;
+    }
+
+    private RessourceMonitor(){
         lastBatteryLevel =0f;
         initialBatteryLevel = 0f;
         batteryStatus = new Intent();
@@ -26,11 +35,12 @@ public class RessourceMonitor extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         this.batteryStatus = context.registerReceiver(null, ifilter);
+        if(initialBatteryLevel != null) initialBatteryLevel = GetCurrentBatteryLevel();
     }
 
-    public void SetInitialBatteryLevel(float level)
-    {
-        initialBatteryLevel = level;
+    void SetInitialBatteryLevel(Intent batteryStatus){
+        this.batteryStatus = batteryStatus;
+        initialBatteryLevel = GetCurrentBatteryLevel();
     }
 
     public float GetCurrentBatteryLevel()
