@@ -44,8 +44,6 @@ public class LoginPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
-
-
         Intent batteryStatus = registerReceiver(RessourceMonitor.getInstance(), new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         RessourceMonitor.getInstance().SetInitialBatteryLevel(batteryStatus);
 
