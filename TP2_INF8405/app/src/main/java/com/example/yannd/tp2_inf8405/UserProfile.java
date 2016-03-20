@@ -1,11 +1,15 @@
 package com.example.yannd.tp2_inf8405;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.List;
 
@@ -13,6 +17,8 @@ import java.util.List;
  * Created by yannd on 2016-03-03.
  */
 public class UserProfile implements LocationListener {
+    private String encodedUserProfileImage;
+
     private boolean meetingOrganizer;
     private List<String> preferences;
     private List<Calendar> availabilities;
@@ -37,6 +43,30 @@ public class UserProfile implements LocationListener {
         this.availabilities = availabilities;
     }
 
+
+    public void setUserProfileImage(Bitmap image){
+        ByteArrayOutputStream baos =new  ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        encodedUserProfileImage = Base64.encodeToString(b, Base64.DEFAULT);
+    }
+    public Bitmap getUserProfileImage(){
+        try {
+            byte [] encodeByte=Base64.decode(encodedUserProfileImage,Base64.DEFAULT);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
+    public String getEncodedUserProfileImage() {
+        return encodedUserProfileImage;
+    }
+
+    public void setEncodedUserProfileImage(String encodedUserProfileImage) {
+        this.encodedUserProfileImage = encodedUserProfileImage;
+    }
     //ICI je separe longitude et latitude pcq firebase supporte pas les pair ou l'object Location directement
     public double getLatitude() {
         return this.latitude;
