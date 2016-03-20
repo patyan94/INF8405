@@ -220,13 +220,7 @@ public class MeetingPlannerActivity extends FragmentActivity
                 LatLngBounds bounds = boundsBuilder.build();
                 Log.d("DEBUG", "BOUNDS : " + bounds.toString());
 
-                int padding; // offset from edges of the map in pixels
-                if(groupMembers.size() > 1){
-                    padding = 1000;
-                }else{
-                    padding = 250;
-                }
-
+                int padding = 250;
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.animateCamera(cu);
             }
