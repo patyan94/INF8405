@@ -1,10 +1,10 @@
 package com.example.yannd.tp2_inf8405;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -27,11 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -48,7 +45,7 @@ import java.util.Observer;
 public class MeetingPlannerActivity extends FragmentActivity
         implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
-    Button createMeetingButton;
+    Button createMeetingButton, settingsButton;
     EditText meetingName;
     LocationRequest mLocationRequest;
     ListView scheduledMeetingsList;
@@ -71,6 +68,15 @@ public class MeetingPlannerActivity extends FragmentActivity
 
         // Initialize Firebase for this context
         Firebase.setAndroidContext(this);
+
+        settingsButton = (Button)findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MeetingPlannerActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // Creates a meeting when we click on the createMeeting button
         createMeetingButton = (Button) findViewById(R.id.create_meeting_button);
@@ -217,7 +223,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             }
             try {
                 LatLngBounds bounds = boundsBuilder.build();
-                int padding = 1000; // offset from edges of the map in pixels
+                int padding = 10; // offset from edges of the map in pixels
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.animateCamera(cu);
             }
