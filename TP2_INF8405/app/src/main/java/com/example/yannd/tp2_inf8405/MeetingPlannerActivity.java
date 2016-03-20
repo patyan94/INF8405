@@ -26,6 +26,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -175,7 +177,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             boundsBuilder.include(new LatLng(u.getLatitude(), u.getLongitude()));
         }
         LatLngBounds bounds = boundsBuilder.build();
-        int padding = 0; // offset from edges of the map in pixels
+        int padding = 10;
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         map.animateCamera(cu);
     }
