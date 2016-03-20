@@ -194,16 +194,22 @@ public class LoginPage extends AppCompatActivity {
         Group group = DataManager.getInstance().getGroup(groupNameString);
         if(group != null){
 
-            //If the groud already exist and this user want to signin as an organizer
-            //we can't let that happen since there cannont be more than one
-            if(isOrganizer){
-                Toast.makeText(getApplicationContext(), "There's is already an organizer for this group.", Toast.LENGTH_SHORT).show();
+            UserProfile user = DataManager.getInstance().getUser(emailString);
+            if(user != null){
+                Toast.makeText(getApplicationContext(), "This email address is already registered in " + group.getGroupName() + ".", Toast.LENGTH_SHORT).show();
                 return;
-            }
+            }else{
+                //If the group already exist and this user want to signin as an organizer
+                //we can't let that happen since there cannont be more than one
+                if(isOrganizer){
+                    Toast.makeText(getApplicationContext(), "There's is already an organizer for this group.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            //If it does, then we can simply make it our current group and add this new user to it
-            DataManager.getInstance().setCurrentGroup(group);
-            DataManager.getInstance().addOrUpdateUser(newProfile);
+                //If it does, then we can simply make it our current group and add this new user to it
+                DataManager.getInstance().setCurrentGroup(group);
+                DataManager.getInstance().addOrUpdateUser(newProfile);
+            }
 
         }else{
             if(isOrganizer){
