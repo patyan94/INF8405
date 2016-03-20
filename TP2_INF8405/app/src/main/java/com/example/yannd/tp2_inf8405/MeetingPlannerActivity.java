@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -223,12 +224,11 @@ public class MeetingPlannerActivity extends FragmentActivity
             }
             try {
                 LatLngBounds bounds = boundsBuilder.build();
-                int padding = 10; // offset from edges of the map in pixels
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.animateCamera(cu);
             }
             catch (Exception e){
-
+                Log.d("DEBUG", e.toString() + "!");
             }
         }
     }

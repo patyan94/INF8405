@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.List;
@@ -42,14 +44,16 @@ public class UserProfile implements LocationListener {
     public void setAvailabilities(List<Calendar> availabilities){
         this.availabilities = availabilities;
     }
-
-
+    @JsonIgnore
     public void setUserProfileImage(Bitmap image){
-        ByteArrayOutputStream baos =new  ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.WEBP, 50, baos);
-        byte [] b=baos.toByteArray();
-        encodedUserProfileImage = "";//com.firebase.client.utilities.Base64.encodeBytes(b);
+        ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.WEBP, 100, bYtE); //On pourrait essayer d'autre CompressFormat si jamais le décodage marche pas.
+        //image.recycle();
+        byte[] byteArray = bYtE.toByteArray();
+        String imageFile = com.firebase.client.utilities.Base64.encodeBytes(byteArray);
+        encodedUserProfileImage = imageFile;
     }
+    @JsonIgnore
     public Bitmap getUserProfileImage(){
         try {
             byte[] decodedByte = com.firebase.client.utilities.Base64.decode(encodedUserProfileImage);

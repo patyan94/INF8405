@@ -82,6 +82,7 @@ public class Group {
                 user.setLongitude(member.getLongitude());
                 user.setPreferences(member.getPreferences());
                 user.setAvailabilities(member.getAvailabilities());
+                user.setEncodedUserProfileImage(member.getEncodedUserProfileImage());
                 return;
             }
         }
