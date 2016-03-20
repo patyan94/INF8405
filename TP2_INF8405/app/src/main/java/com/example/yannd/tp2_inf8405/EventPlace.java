@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by yannd on 2016-03-10.
+ * This class represent a place and its caracteristics
  */
 public class EventPlace {
     private List<String> Votes = new ArrayList<String>();
@@ -20,16 +21,23 @@ public class EventPlace {
     private Double latitude;
     private Double longitude;
 
+    // Returns true if a user has voted for this place
     public boolean hasVoted(String username){
         return Votes.contains(username);
     }
+
+    // Returns the number of users who voted for this place
     public int GetVoteCount(){return Votes.size();}
+
+    // Adds user to the list of user who voted for this place
     public void Vote(String username){
         if(Votes.contains(username)){
             return;
         }
         Votes.add(username);
     }
+
+    // Removes a user from the list of users who voted for this place
     public void UnVote(String username){
         if(!Votes.contains(username)){
             return;
@@ -76,6 +84,7 @@ public class EventPlace {
         this.vicinity = vicinity;
     }
 
+    // Create an EventPlace from a Json object
     static EventPlace jsonToPlaceReference(JSONObject placeReference) {
         try {
             EventPlace result = new EventPlace();
@@ -94,6 +103,7 @@ public class EventPlace {
         return null;
     }
 
+    // Creates a JSON string from an Event place object
     @Override
     public String toString() {
         return "Place{" + "id=" + id + ", icon=" + icon + ", name=" + name + ", latitude=" + latitude + ", longitude=" + longitude + '}';

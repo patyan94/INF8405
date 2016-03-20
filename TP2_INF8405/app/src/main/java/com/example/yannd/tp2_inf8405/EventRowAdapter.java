@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Created by yannd on 2016-03-13.
+ * This class represents puts an EventPlace in a ListView row
  */
 public class EventRowAdapter extends BaseAdapter{
     ArrayList<MeetingEvent> events;
