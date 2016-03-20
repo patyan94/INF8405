@@ -47,7 +47,7 @@ public class UserProfile implements LocationListener {
     @JsonIgnore
     public void setUserProfileImage(Bitmap image){
         ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.WEBP, 100, bYtE);
+        image.compress(Bitmap.CompressFormat.WEBP, 100, bYtE); //On pourrait essayer d'autre CompressFormat si jamais le décodage marche pas.
         //image.recycle();
         byte[] byteArray = bYtE.toByteArray();
         String imageFile = com.firebase.client.utilities.Base64.encodeBytes(byteArray);
