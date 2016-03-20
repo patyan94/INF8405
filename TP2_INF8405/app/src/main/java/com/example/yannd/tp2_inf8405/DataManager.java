@@ -87,29 +87,6 @@ public class DataManager {
         for(MeetingEvent event : events) {
             if(event.getFinalPlace() == null) continue;
             if(event.getDate() != null) continue;
-
-            HashMap<Calendar, Integer> mapAv = new HashMap<>();
-            List<UserProfile> users = DataManager.getInstance().getCurrentGroup().getGroupMembers();
-            for (UserProfile u : users) {
-                for (Calendar c : u.getAvailabilities()) {
-                    if (mapAv.containsKey(c)) {
-                        mapAv.put(c, mapAv.get(c) + 1);
-                    } else {
-                        mapAv.put(c, 1);
-                    }
-                }
-            }
-
-            int maxValue = -1;
-            Calendar finaldate = null;
-            for (Map.Entry<Calendar, Integer> e : mapAv.entrySet()) {
-                if (e.getValue() > maxValue) {
-                    maxValue = e.getValue();
-                    finaldate = e.getKey();
-                    event.setDate(finaldate);
-                }
-            }
-
             addEventToUserCalendar(event);
         }
     }

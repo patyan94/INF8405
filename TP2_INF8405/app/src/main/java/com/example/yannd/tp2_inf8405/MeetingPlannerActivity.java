@@ -35,7 +35,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -90,13 +93,13 @@ public class MeetingPlannerActivity extends FragmentActivity
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                boolean enableCreation = false;
-                enableCreation = (count >= 3) && !DataManager.getInstance().getCurrentGroup().ContainsEvent(s.toString());
-                createMeetingButton.setEnabled(enableCreation);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                boolean enableCreation = false;
+                enableCreation = (s.length() >= 3) && !DataManager.getInstance().getCurrentGroup().ContainsEvent(s.toString());
+                createMeetingButton.setEnabled(enableCreation);
 
             }
         });
@@ -131,6 +134,33 @@ public class MeetingPlannerActivity extends FragmentActivity
         return prefStr.toString();
     }
 
+    void SetEventDate(MeetingEvent event){
+        if(DataManager.getInstance().getCurrentGroup() == null || DataManager.getInstance().getCurrentGroup().getGroupEvents() == null) return;
+
+        List<MeetingEvent> events = DataManager.getInstance().getCurrentGroup().getGroupEvents();
+
+        HashMap<Calendar, Integer> mapAv = new HashMap<>();
+        List<UserProfile> users = DataManager.getInstance().getCurrentGroup().getGroupMembers();
+        for (UserProfile u : users) {
+            for (Calendar c : u.getAvailabilities()) {
+                if (mapAv.containsKey(c)) {
+                    mapAv.put(c, mapAv.get(c) + 1);
+                } else {
+                    mapAv.put(c, 1);
+                }
+            }
+        }
+        int maxValue = -1;
+        Calendar finaldate = null;
+        for (Map.Entry<Calendar, Integer> e : mapAv.entrySet()) {
+            if (e.getValue() > maxValue) {
+                maxValue = e.getValue();
+                finaldate = e.getKey();
+                event.setDate(finaldate);
+            }
+        }
+    }
+
     // Function to create a meeting, by finding the plausible places for the vote and the date
     private void CreateMeeting(){
         MeetingEvent event = new MeetingEvent();
@@ -138,7 +168,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         event.setMeetingName(((EditText) findViewById(R.id.meetingName)).getText().toString());
         String places = GetPlacesPreferences();
         Location location = GetCentralLocation();
-
+        SetEventDate(event);
         // Async function to create the event
         new PlaceFinder().execute(places, location, event, getApplicationContext());
     }
@@ -184,12 +214,16 @@ public class MeetingPlannerActivity extends FragmentActivity
                         .snippet(u.getUsername());
                 map.addMarker(markerOptions);
                 boundsBuilder.include(new LatLng(u.getLatitude(), u.getLongitude()));
+            }
+            try {
+                LatLngBounds bounds = boundsBuilder.build();
+                int padding = 1000; // offset from edges of the map in pixels
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                map.animateCamera(cu);
+            }
+            catch (Exception e){
 
             }
-            LatLngBounds bounds = boundsBuilder.build();
-            int padding = 10; // offset from edges of the map in pixels
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            map.animateCamera(cu);
         }
     }
 

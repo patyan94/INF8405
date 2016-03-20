@@ -61,12 +61,12 @@ public class EventRowAdapter extends BaseAdapter{
 
         MeetingEvent event = (MeetingEvent)getItem(position);
         EventPlace place;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy, hh:mm");
+        meetingDate.setText(sdf.format(event.getDate().getTime()));
         if(event.getFinalPlace() != null){
 
             meetingPlaceAdress.setText(event.getFinalPlace().getVicinity());
             meetingPlaceName.setText(event.getFinalPlace().getName());
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss dd-MM-yyyy");
-            meetingDate.setText(sdf.format(event.getDate().getTime()));
             vi.findViewById(R.id.votingRadioGroup).setVisibility(View.GONE);
             vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.VISIBLE);
         }

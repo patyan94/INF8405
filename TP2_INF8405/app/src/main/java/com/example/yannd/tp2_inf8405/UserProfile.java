@@ -17,7 +17,6 @@ import java.util.List;
  * Created by yannd on 2016-03-03.
  */
 public class UserProfile implements LocationListener {
-    private String encodedUserProfileImage;
 
     private boolean meetingOrganizer;
     private List<String> preferences;
@@ -25,6 +24,7 @@ public class UserProfile implements LocationListener {
     private String username;
     private double latitude;
     private double longitude;
+    private String encodedUserProfileImage;
     private final Handler handler = new Handler();
 
 
@@ -46,14 +46,14 @@ public class UserProfile implements LocationListener {
 
     public void setUserProfileImage(Bitmap image){
         ByteArrayOutputStream baos =new  ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.PNG,100, baos);
+        image.compress(Bitmap.CompressFormat.WEBP, 50, baos);
         byte [] b=baos.toByteArray();
-        encodedUserProfileImage = Base64.encodeToString(b, Base64.DEFAULT);
+        encodedUserProfileImage = "";//com.firebase.client.utilities.Base64.encodeBytes(b);
     }
     public Bitmap getUserProfileImage(){
         try {
-            byte [] encodeByte=Base64.decode(encodedUserProfileImage,Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            byte[] decodedByte = com.firebase.client.utilities.Base64.decode(encodedUserProfileImage);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
             return bitmap;
         } catch(Exception e) {
             return null;
