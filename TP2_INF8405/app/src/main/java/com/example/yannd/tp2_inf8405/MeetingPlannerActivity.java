@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,17 +22,20 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ExecutionException;
 
 /*
 * This activity permits to create an event, vote for a place and see the events and people on the map
@@ -161,17 +163,31 @@ public class MeetingPlannerActivity extends FragmentActivity
     }
 
     // Show the users positions on the map
-    void ShowUserPositionsOnMap(){
+    void ShowUserPositionsOnMap() {
         map.clear();
         Group currentGroup = DataManager.getInstance().getCurrentGroup();
         List<UserProfile> groupMembers = currentGroup.getGroupMembers();
-        if(groupMembers != null){
+        if (groupMembers != null) {
             for (UserProfile u : groupMembers) {
                 MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(u.getLatitude(), u.getLongitude()))
                         .title(u.getUsername())
                         .snippet(u.getUsername());
                 map.addMarker(markerOptions);
             }
+
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+            for (UserProfile u : groupMembers) {
+                MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(u.getLatitude(), u.getLongitude()))
+                        .title(u.getUsername())
+                        .snippet(u.getUsername());
+                map.addMarker(markerOptions);
+                boundsBuilder.include(new LatLng(u.getLatitude(), u.getLongitude()));
+
+            }
+            LatLngBounds bounds = boundsBuilder.build();
+            int padding = 0; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            map.animateCamera(cu);
         }
     }
 
