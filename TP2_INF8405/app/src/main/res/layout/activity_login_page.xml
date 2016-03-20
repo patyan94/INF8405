@@ -57,11 +57,17 @@
                 android:layout_height="100dp"
                 android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
                 android:id="@+id/profilePicture"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/set_profile_picture_button"
-                android:text="Set Profile picture"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/set_profile_picture_button"
+                    android:text="Set Profile picture"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
         </LinearLayout>
         <CheckBox
             android:id="@+id/meeting_organizer"
@@ -131,8 +137,4 @@
             android:text="Signin"
             android:enabled="false"/>
     </LinearLayout>
-    <TextView
-        android:id="@+id/textViewTest"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </LinearLayout>
