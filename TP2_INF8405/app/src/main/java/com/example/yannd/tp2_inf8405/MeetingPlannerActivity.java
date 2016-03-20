@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -164,11 +165,13 @@ public class MeetingPlannerActivity extends FragmentActivity
         map.clear();
         Group currentGroup = DataManager.getInstance().getCurrentGroup();
         List<UserProfile> groupMembers = currentGroup.getGroupMembers();
-        for (UserProfile u : groupMembers) {
-            MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(u.getLatitude(), u.getLongitude()))
-                                                             .title(u.getUsername())
-                                                             .snippet(u.getUsername());
-            map.addMarker(markerOptions);
+        if(groupMembers != null){
+            for (UserProfile u : groupMembers) {
+                MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(u.getLatitude(), u.getLongitude()))
+                        .title(u.getUsername())
+                        .snippet(u.getUsername());
+                map.addMarker(markerOptions);
+            }
         }
     }
 
@@ -212,7 +215,7 @@ public class MeetingPlannerActivity extends FragmentActivity
     // Updates the user's location
     @Override
     public void onLocationChanged(Location location) {
-        if(location != null){
+        if(location != null && (location.getLatitude() != 0 && location.getLongitude() != 0) && DataManager.getInstance().getCurrentGroup() != null && DataManager.getInstance().getCurrentUser() != null){
             UserProfile currentProfile = DataManager.getInstance().getCurrentUser();
             currentProfile.setLongitude(location.getLongitude());
             currentProfile.setLatitude(location.getLatitude());

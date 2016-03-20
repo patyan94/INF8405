@@ -7,6 +7,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -52,11 +53,11 @@ public class DataManager {
 
                         //For each meeting in the "new" version of the currentGroup, we add or update it to the currentGroup
                         for(MeetingEvent me : tempGroup.getGroupEvents()){
-                            currentGroup.addOrUpdateEvent(me);
+                            boolean newMeeting = currentGroup.addOrUpdateEvent(me);
 
-                            //So here, bascially, we should 'react' to the changes to each MeetingEvent. Here or in 'addOrUpdateEvent' or further down,
-                            //in order to detect if a user action is required depending on the state or the meeting. Ex : a new event is added and the user must vote.
-                            //or even, all the users have voted and the organiser must analyse all the votes in order to finalize the meeting adding.
+                            if(newMeeting){
+                                addEventToUserCalendar(me);
+                            }
                         }
                     }
                 }
@@ -64,7 +65,10 @@ public class DataManager {
                 //We empty the list and replace it with the newest version
                 groupList.clear();
                 groupList.addAll(newList);
-                CreateCalendarEvent();
+
+                if(currentUser != null && currentUser.isMeetingOrganizer()){
+                    CreateCalendarEvent();
+                }
             }
 
             @Override
@@ -82,6 +86,7 @@ public class DataManager {
 
         for(MeetingEvent event : events) {
             if(event.getFinalPlace() == null) continue;
+            if(event.getDate() != null) continue;
 
             HashMap<Calendar, Integer> mapAv = new HashMap<>();
             List<UserProfile> users = DataManager.getInstance().getCurrentGroup().getGroupMembers();
@@ -101,19 +106,28 @@ public class DataManager {
                 if (e.getValue() > maxValue) {
                     maxValue = e.getValue();
                     finaldate = e.getKey();
+                    event.setDate(finaldate);
                 }
             }
 
-            Calendar finalDate2 = (Calendar) finaldate.clone();
-            finalDate2.add(Calendar.HOUR_OF_DAY, 1);
-
-            CalendarManager.getInstance()
-                    .addEventToCalendar(
-                            finaldate,
-                            finalDate2,
-                            event.getMeetingName(),
-                            event.getFinalPlace().getName() + " : " + event.getFinalPlace().getVicinity() );
+            addEventToUserCalendar(event);
         }
+    }
+
+    private void addEventToUserCalendar(MeetingEvent event){
+
+        Calendar finalDate = event.getDate();
+
+        Calendar finalDate2 = (Calendar) finalDate.clone();
+        finalDate2.add(Calendar.HOUR_OF_DAY, 1);
+
+        CalendarManager.getInstance()
+                .addEventToCalendar(
+                        finalDate,
+                        finalDate2,
+                        event.getMeetingName(),
+                        "Meeting created by the INF8405_TP2 application!",
+                        event.getFinalPlace().getName() + " : " + event.getFinalPlace().getVicinity());
     }
 
     public static DataManager getInstance(){

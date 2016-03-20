@@ -48,7 +48,7 @@ public class Group {
         this.groupMembers = groupMembers;
     }
 
-    public void addOrUpdateEvent(MeetingEvent event){
+    public boolean addOrUpdateEvent(MeetingEvent event){
 
         if(groupEvents == null){
             groupEvents = new ArrayList<>();
@@ -58,11 +58,13 @@ public class Group {
             if(me.getMeetingName().equalsIgnoreCase(event.getMeetingName())){
                 me.setPlaces(event.getPlaces());
                 me.setFinalPlace(event.getFinalPlace());
-                return;
+                me.setDate(event.getDate());
+                return false; // Meens that we updated an event, not created it
             }
         }
 
         groupEvents.add(event);
+        return true;
     }
 
     public void addOrUpdateGroupMember(UserProfile member){

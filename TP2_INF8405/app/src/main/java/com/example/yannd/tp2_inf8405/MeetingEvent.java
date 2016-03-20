@@ -5,6 +5,7 @@ import android.provider.ContactsContract;
 import com.google.android.gms.location.places.Place;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Observable;
 
@@ -15,6 +16,7 @@ public class MeetingEvent extends Observable {
     String meetingName;
     List<EventPlace> Places = new ArrayList<EventPlace>();
     EventPlace FinalPlace = null;
+    Calendar date;
 
     public int GetTotalVotes(){
         int count = 0;
@@ -44,6 +46,14 @@ public class MeetingEvent extends Observable {
                     FinalPlace = plc;
             }
         }
+    }
+
+    public Calendar getDate(){
+        return date;
+    }
+
+    public void setDate(Calendar newDate){
+        date = newDate;
     }
 
     public String getMeetingName() {

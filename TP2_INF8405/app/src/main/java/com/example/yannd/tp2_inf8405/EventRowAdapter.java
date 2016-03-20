@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +65,8 @@ public class EventRowAdapter extends BaseAdapter{
 
             meetingPlaceAdress.setText(event.getFinalPlace().getVicinity());
             meetingPlaceName.setText(event.getFinalPlace().getName());
-            meetingDate.setText("TODO MEETING DATE");
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss dd-MM-yyyy");
+            meetingDate.setText(sdf.format(event.getDate().getTime()));
             vi.findViewById(R.id.votingRadioGroup).setVisibility(View.GONE);
             vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.VISIBLE);
         }

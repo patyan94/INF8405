@@ -108,7 +108,6 @@ public class CalendarManager {
         return availabilitesList;
 
     }
-
     //Used to convert timestamp from calendar query to an actual Calendar object
     private Calendar getCalendar(long timestamp) {
         Calendar calendar = Calendar.getInstance();
@@ -129,7 +128,7 @@ public class CalendarManager {
     This method adds the event to the main calendar of the app user.
     Note : It may take a minute or two for the event to sync with the desktop version of google calendar
      */
-    public void addEventToCalendar(Calendar start, Calendar end, String title, String description){
+    public void addEventToCalendar(Calendar start, Calendar end, String title, String description, String location){
         long startTime = start.getTimeInMillis();
         long endTime = end.getTimeInMillis();
 
@@ -141,6 +140,7 @@ public class CalendarManager {
         values.put(CalendarContract.Events.DTEND, endTime);
         values.put(CalendarContract.Events.TITLE, title);
         values.put(CalendarContract.Events.DESCRIPTION, description);
+        values.put(CalendarContract.Events.EVENT_LOCATION, location);
         values.put(CalendarContract.Events.CALENDAR_ID, calId);
         TimeZone tz = TimeZone.getDefault();
         values.put(CalendarContract.Events.EVENT_TIMEZONE, tz.getID());
