@@ -4,6 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,9 +17,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,10 +31,12 @@ import com.firebase.client.Firebase;
 
 public class LoginPage extends AppCompatActivity {
 
+    private final int SELECT_PHOTO = 1;
     private EditText email, groupName;
     private CheckBox meetingOrganizer;
     private CheckBox[] preferences;
-    private Button loginButton, signinButton;
+    private Button loginButton, signinButton, setProfilePictureButton;
+    private ImageView profilePicture;
     private LinearLayout signinOptions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,8 @@ public class LoginPage extends AppCompatActivity {
         loginButton = (Button)findViewById(R.id.login_button);
         signinButton = (Button)findViewById(R.id.signin_button);
         signinOptions = (LinearLayout)findViewById(R.id.signin_options);
+        setProfilePictureButton = (Button)findViewById(R.id.set_profile_picture_button);
+        profilePicture = (ImageView)findViewById(R.id.profilePicture);
         loginButton.setEnabled(false);
         signinButton.setEnabled(false);
 
@@ -110,18 +121,23 @@ public class LoginPage extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
                 Login();
             }
         });
         signinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
                 Signin();
             }
         });
 
+        setProfilePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+            }
+        });
     }
 
     private void Login() {
@@ -143,7 +159,6 @@ public class LoginPage extends AppCompatActivity {
                 }
 
                 //We start the next activity
-                Toast.makeText(getApplicationContext(), "Login/Signin battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, MeetingPlannerActivity.class);
                 startActivity(intent);
             }else{
@@ -152,7 +167,6 @@ public class LoginPage extends AppCompatActivity {
         }else{
             Toast.makeText(getApplicationContext(), "This group doesn't exist", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getApplicationContext(), "Login/Signin battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
     }
 
     private void Signin() {
@@ -162,6 +176,8 @@ public class LoginPage extends AppCompatActivity {
         boolean isOrganizer = meetingOrganizer.isChecked();
 
         UserProfile newProfile = new UserProfile(isOrganizer, emailString);
+
+        newProfile.setUserProfileImage(((BitmapDrawable)profilePicture.getDrawable()).getBitmap());
 
         //We check that there's at least two preferences selected
         List<String> userPreferences = new ArrayList<String>();
@@ -233,5 +249,25 @@ public class LoginPage extends AppCompatActivity {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        switch(requestCode) {
+            case SELECT_PHOTO:
+                if(resultCode == RESULT_OK){
+                    try {
+                        final Uri imageUri = imageReturnedIntent.getData();
+                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                        profilePicture.setImageBitmap(selectedImage);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+        }
     }
 }
