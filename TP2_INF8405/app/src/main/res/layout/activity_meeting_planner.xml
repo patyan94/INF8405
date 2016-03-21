@@ -8,15 +8,14 @@
     android:background="@color/colorPrimary"
     tools:context="com.example.yannd.tp2_inf8405.MeetingPlannerActivity">
 
-
     <Button
         android:id="@+id/settings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:text="Settings"
+        android:text="User Profile Settings"
         android:textColor="@color/white"
-        android:background="@color/colorPrimaryDark"/>
+        android:background="@drawable/button_border"/>
     <LinearLayout
         android:paddingTop="5dp"
         android:layout_width="match_parent"
@@ -36,15 +35,21 @@
             android:layout_height="wrap_content"
             android:text="Create new Meeting"
             android:textColor="@color/white"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="@drawable/button_border"/>
     </LinearLayout>
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp"/>
     <ListView
         android:id="@+id/scheduledMeetings"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:padding="8dp"
-        android:background="@color/colorPrimaryLight">
+        android:background="@drawable/layout_border">
     </ListView>
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="10dp"/>
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/mapFragment"

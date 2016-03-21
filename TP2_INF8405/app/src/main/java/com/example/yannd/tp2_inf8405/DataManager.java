@@ -53,11 +53,7 @@ public class DataManager {
 
                         //For each meeting in the "new" version of the currentGroup, we add or update it to the currentGroup
                         for(MeetingEvent me : tempGroup.getGroupEvents()){
-                            boolean newMeeting = currentGroup.addOrUpdateEvent(me);
-
-                            if(newMeeting){
-                                addEventToUserCalendar(me);
-                            }
+                            currentGroup.addOrUpdateEvent(me);
                         }
                     }
                 }
@@ -65,10 +61,6 @@ public class DataManager {
                 //We empty the list and replace it with the newest version
                 groupList.clear();
                 groupList.addAll(newList);
-
-                if(currentUser != null && currentUser.isMeetingOrganizer()){
-                    CreateCalendarEvent();
-                }
             }
 
             @Override
@@ -76,19 +68,6 @@ public class DataManager {
                 Log.d("ERROR", firebaseError.getMessage());
             }
         });
-    }
-
-    private void CreateCalendarEvent(){
-
-        if(getCurrentGroup() == null || getCurrentGroup().getGroupEvents() == null) return;
-
-        List<MeetingEvent> events = getCurrentGroup().getGroupEvents();
-
-        for(MeetingEvent event : events) {
-            if(event.getFinalPlace() == null) continue;
-            if(event.getDate() != null) continue;
-            addEventToUserCalendar(event);
-        }
     }
 
     private void addEventToUserCalendar(MeetingEvent event){
@@ -157,6 +136,10 @@ public class DataManager {
     public void addOrUpdateEvent(MeetingEvent event){
 
         currentGroup.addOrUpdateEvent(event);
+
+        if(event.getFinalPlace() != null){
+            addEventToUserCalendar(event);
+        }
 
         //Sync with DB
         firebaseRef.child("groups").child(currentGroup.getGroupName()).setValue(currentGroup);

@@ -30,7 +30,6 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity {
 
     private final int SELECT_PHOTO = 1;
-    private CheckBox meetingOrganizer;
     private CheckBox[] preferences;
     private Button setProfilePictureButton, saveButton;
     private ImageView profilePicture;
@@ -47,7 +46,6 @@ public class SettingsActivity extends AppCompatActivity {
         CalendarManager.getInstance().setApplicationContext(getApplicationContext());
 
         preferences = new CheckBox[PREFERENCES.NUMBER_OF_PREFERENCES.getValue()];
-        meetingOrganizer = (CheckBox)findViewById(R.id.meeting_organizer);
         preferences[PREFERENCES.PARK.getValue()] = (CheckBox)findViewById(R.id.park_checkbox);
         preferences[PREFERENCES.BAR.getValue()] = (CheckBox)findViewById(R.id.bar_checkbox);
         preferences[PREFERENCES.RESTAURANT.getValue()] = (CheckBox)findViewById(R.id.restaurant_checkbox);
@@ -62,7 +60,8 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Save();
-                Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "User profile updated", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
         setProfilePictureButton.setOnClickListener(new View.OnClickListener() {
@@ -83,9 +82,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void Save() {
-
-        boolean isOrganizer = meetingOrganizer.isChecked();
-
         UserProfile newProfile = DataManager.getInstance().getCurrentUser();
 
         newProfile.setUserProfileImage(((BitmapDrawable)profilePicture.getDrawable()).getBitmap());
@@ -102,7 +98,6 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         newProfile.setPreferences(userPreferences);
-        newProfile.setMeetingOrganizer(isOrganizer);
         DataManager.getInstance().addOrUpdateUser(newProfile);
     }
     @Override

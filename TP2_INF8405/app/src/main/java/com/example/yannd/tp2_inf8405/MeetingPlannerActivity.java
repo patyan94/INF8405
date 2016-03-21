@@ -10,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -24,9 +26,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -52,7 +56,7 @@ import java.util.Observer;
 * This activity permits to create an event, vote for a place and see the events and people on the map
 */
 public class MeetingPlannerActivity extends FragmentActivity
-        implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
+        implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
     final int SELECT_PHOTO = 1;
     MeetingEvent eventBeingModified = null;
@@ -91,6 +95,17 @@ public class MeetingPlannerActivity extends FragmentActivity
 
         // Creates a meeting when we click on the createMeeting button
         createMeetingButton = (Button) findViewById(R.id.create_meeting_button);
+        meetingName = (EditText)findViewById(R.id.meetingName);
+
+        //If the current user of the app isn't the organizer, we don't allow to create any events
+        if(DataManager.getInstance().getCurrentUser().isMeetingOrganizer()){
+            createMeetingButton.setVisibility(View.VISIBLE);
+            meetingName.setVisibility(View.VISIBLE);
+        }else{
+            createMeetingButton.setVisibility(View.GONE);
+            meetingName.setVisibility(View.GONE);
+        }
+
         createMeetingButton.setEnabled(false);
         createMeetingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +116,6 @@ public class MeetingPlannerActivity extends FragmentActivity
         });
 
         // Enables the create meeting button if the event name has at least 3 characters
-        meetingName = (EditText)findViewById(R.id.meetingName);
         meetingName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -121,11 +135,27 @@ public class MeetingPlannerActivity extends FragmentActivity
             }
         });
 
-
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(MeetingPlannerActivity.this);
         scheduledMeetingsList = (ListView) findViewById(R.id.scheduledMeetings);
         scheduledMeetingsList.setAdapter(new EventRowAdapter(this, getApplicationContext(), (ArrayList) DataManager.getInstance().getCurrentGroup().getGroupEvents()));
+    }
+
+    protected void onResume(){
+        super.onResume();
+
+        // Creates a meeting when we click on the createMeeting button
+        createMeetingButton = (Button) findViewById(R.id.create_meeting_button);
+        meetingName = (EditText)findViewById(R.id.meetingName);
+
+        //If the current user of the app isn't the organizer, we don't allow to create any events
+        if(DataManager.getInstance().getCurrentUser().isMeetingOrganizer()){
+            createMeetingButton.setVisibility(View.VISIBLE);
+            meetingName.setVisibility(View.VISIBLE);
+        }else{
+            createMeetingButton.setVisibility(View.GONE);
+            meetingName.setVisibility(View.GONE);
+        }
     }
 
     // Returns a string containing the places types that at least one group member liked
@@ -187,6 +217,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         String places = GetPlacesPreferences();
         Location location = GetCentralLocation();
         SetEventDate(event);
+        event.setDescription("Meeting created by the INF8405-TP2 app!");
         // Async function to create the event
         new PlaceFinder().execute(places, location, event, getApplicationContext());
     }
@@ -331,7 +362,7 @@ public class MeetingPlannerActivity extends FragmentActivity
     // Picks a photo for an event
     public void SetEventPhoto(MeetingEvent event){
         eventBeingModified = event;
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
     }
 
@@ -360,5 +391,45 @@ public class MeetingPlannerActivity extends FragmentActivity
         });
 
         builder.show();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mGoogleApiClient.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "MeetingPlanner Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.yannd.tp2_inf8405/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "MeetingPlanner Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.yannd.tp2_inf8405/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
+        mGoogleApiClient.disconnect();
     }
 }

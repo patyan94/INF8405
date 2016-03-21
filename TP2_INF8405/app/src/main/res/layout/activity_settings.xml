@@ -32,21 +32,19 @@
                 android:maxWidth="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
-                android:id="@+id/profilePicture"/>
+                android:id="@+id/profilePicture"
+                android:layout_gravity="center"
+                android:padding="3dp"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/set_profile_picture_button"
                 android:text="Set Profile picture"
                 android:textColor="@color/white"
-                android:background="@color/colorPrimaryDark"/>
+                android:background="@drawable/button_border"
+                android:layout_gravity="center"
+                android:layout_weight="1"/>
         </LinearLayout>
-        <CheckBox
-            android:id="@+id/meeting_organizer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Meeting organizer"
-            android:textColor="@color/white"/>
 
         ---Meeting places selection
         <TextView
@@ -118,6 +116,6 @@
             android:layout_height="wrap_content"
             android:text="Save"
             android:textColor="@color/white"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="@drawable/button_border"/>
     </LinearLayout>
 </LinearLayout>

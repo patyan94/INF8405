@@ -71,7 +71,8 @@
                 android:maxWidth="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
-                android:id="@+id/profilePicture"/>
+                android:id="@+id/profilePicture"
+                android:padding="3dp"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
