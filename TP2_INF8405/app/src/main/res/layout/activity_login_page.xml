@@ -4,11 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:padding="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     tools:context="com.example.yannd.tp2_inf8405.LoginPage">
 
     ---Credentials
@@ -16,38 +14,59 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
             <EditText
                 android:id="@+id/email"
                 android:hint="Email"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_grey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <EditText
                 android:id="@+id/group_name"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_grey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Group Name"/>
+            </LinearLayout>
         ---LoginButton
         <Button
             android:id="@+id/login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimaryDark"
             android:text="Login"
-            android:enabled="false"/>
+            android:textColor="@color/white"/>
     </LinearLayout>
+
+    <View
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black"/>
 
     ---Signin options
     <LinearLayout
         android:id="@+id/signin_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/colorPrimaryLight"
+        android:layout_weight="1">
         ---Groups selection
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="10dp">
             <ImageView
                 android:layout_width="100dp"
                 android:minHeight="100dp"
@@ -57,28 +76,30 @@
                 android:layout_height="100dp"
                 android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
                 android:id="@+id/profilePicture"/>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/set_profile_picture_button"
-                    android:text="Set Profile picture"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
-            </RelativeLayout>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/set_profile_picture_button"
+                android:text="Set Profile picture"
+                android:textColor="@color/white"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"/>
         </LinearLayout>
         <CheckBox
             android:id="@+id/meeting_organizer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Meeting organizer"/>
+            android:text="Meeting organizer"
+            android:textColor="@color/white"/>
 
         ---Meeting places selection
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="27dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20dp"
             android:gravity="bottom"
             android:text="Preferred meeting places" />
             <LinearLayout
@@ -94,17 +115,20 @@
                         android:id="@+id/bar_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bar"/>
+                        android:text="Bar"
+                        android:textColor="@color/white"/>
                     <CheckBox
                         android:id="@+id/cafe_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cafe"/>
+                        android:text="Cafe"
+                        android:textColor="@color/white"/>
                     <CheckBox
                         android:id="@+id/library_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Library"/>
+                        android:text="Library"
+                        android:textColor="@color/white"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -115,17 +139,20 @@
                         android:id="@+id/park_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Park"/>
+                        android:text="Park"
+                        android:textColor="@color/white"/>
                     <CheckBox
                         android:id="@+id/restaurant_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Restaurant"/>
+                        android:text="Restaurant"
+                        android:textColor="@color/white"/>
                     <CheckBox
                         android:id="@+id/university_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="University"/>
+                        android:text="University"
+                        android:textColor="@color/white"/>
                 </LinearLayout>
 
         </LinearLayout>
@@ -135,6 +162,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Signin"
-            android:enabled="false"/>
+            android:textColor="@color/white"
+            android:background="@color/colorPrimaryDark"/>
     </LinearLayout>
 </LinearLayout>

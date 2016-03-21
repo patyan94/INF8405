@@ -9,18 +9,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     tools:context="com.example.yannd.tp2_inf8405.SettingsActivity">
 
     <LinearLayout
         android:id="@+id/signin_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1">
         ---Groups selection
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
             <ImageView
                 android:layout_width="100dp"
                 android:minHeight="100dp"
@@ -34,24 +37,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/set_profile_picture_button"
-                android:text="Set Profile picture"/>
+                android:text="Set Profile picture"
+                android:textColor="@color/white"
+                android:background="@color/colorPrimaryDark"/>
         </LinearLayout>
         <CheckBox
             android:id="@+id/meeting_organizer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Meeting organizer"/>
+            android:text="Meeting organizer"
+            android:textColor="@color/white"/>
 
         ---Meeting places selection
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="27dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="20dp"
             android:gravity="bottom"
             android:text="Preferred meeting places" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_weight="5">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -61,17 +71,20 @@
                     android:id="@+id/bar_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bar"/>
+                    android:text="Bar"
+                    android:textColor="@color/white"/>
                 <CheckBox
                     android:id="@+id/cafe_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cafe"/>
+                    android:text="Cafe"
+                    android:textColor="@color/white"/>
                 <CheckBox
                     android:id="@+id/library_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Library"/>
+                    android:text="Library"
+                    android:textColor="@color/white"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -82,17 +95,20 @@
                     android:id="@+id/park_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Park"/>
+                    android:text="Park"
+                    android:textColor="@color/white"/>
                 <CheckBox
                     android:id="@+id/restaurant_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Restaurant"/>
+                    android:text="Restaurant"
+                    android:textColor="@color/white"/>
                 <CheckBox
                     android:id="@+id/university_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="University"/>
+                    android:text="University"
+                    android:textColor="@color/white"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -100,6 +116,8 @@
             android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"/>
+            android:text="Save"
+            android:textColor="@color/white"
+            android:background="@color/colorPrimaryDark"/>
     </LinearLayout>
 </LinearLayout>

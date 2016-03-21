@@ -10,20 +10,27 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TextView
             android:textColor="@color/dark"
             android:id="@+id/meetingName"
             android:text="MeetingName"
             android:textAlignment="center"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <TextView
-            android:textColor="@color/dark"
-            android:id="@+id/meetingDate"
-            android:text="jj-mm-YYY hh:mm"
-            android:textAlignment="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <TextView
+                android:textColor="@color/dark"
+                android:id="@+id/meetingDate"
+                android:text="jj-mm-YYY hh:mm"
+                android:textAlignment="center"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/confirmedEventLocation"
             android:orientation="vertical"
@@ -34,14 +41,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="100dp"
-                    android:minHeight="100dp"
-                    android:minWidth="100dp"
-                    android:maxHeight="100dp"
-                    android:maxWidth="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="50dp"
+                    android:minHeight="50dp"
+                    android:minWidth="50dp"
+                    android:maxHeight="50dp"
+                    android:maxWidth="50dp"
+                    android:layout_height="50dp"
                     android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
                     android:id="@+id/eventPhoto"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:textColor="@color/dark"
+                        android:text="Description : "
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:textColor="@color/dark"
+                        android:id="@+id/description_view"
+                        android:text="description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
                 <TextView
                     android:layout_weight="1"
                     android:textColor="@color/dark"
@@ -58,23 +83,6 @@
                     android:layout_gravity="bottom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-            </LinearLayout>
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:textColor="@color/dark"
-                    android:text="Description : "
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-                <TextView
-                    android:textColor="@color/dark"
-                    android:id="@+id/description_view"
-                    android:text="description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-                </LinearLayout>
             <LinearLayout
                 android:id="@+id/organizer_fields"
                 android:orientation="horizontal"

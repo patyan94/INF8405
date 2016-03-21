@@ -79,7 +79,7 @@ public class EventRowAdapter extends BaseAdapter{
         final MeetingEvent event = (MeetingEvent)getItem(position);
         EventPlace place;
         // Initialize meeting date view
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMMMM-yyyy, hh:mm aaa");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, hh:mm aaa");
         meetingDate.setText(sdf.format(event.getDate().getTime()));
 
         boolean isMeetinOrganizer = DataManager.getInstance().getCurrentUser().isMeetingOrganizer();
