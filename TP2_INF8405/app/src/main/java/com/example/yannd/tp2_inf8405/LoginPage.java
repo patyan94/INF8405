@@ -45,7 +45,6 @@ public class LoginPage extends AppCompatActivity {
         setContentView(R.layout.activity_login_page);
 
         Intent batteryStatus = registerReceiver(RessourceMonitor.getInstance(), new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        RessourceMonitor.getInstance().SetInitialBatteryLevel(batteryStatus);
 
         //Initializing the Firebase library and the DataManager singleton at start
         //Important if we want the firebase callbacks in the DataManager to be initialized asap
