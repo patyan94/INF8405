@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* This class modifies the infos of a user*/
 public class SettingsActivity extends AppCompatActivity {
 
     private final int SELECT_PHOTO = 1;
