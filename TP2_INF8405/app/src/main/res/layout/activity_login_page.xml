@@ -41,17 +41,14 @@
             android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimaryDark"
             android:text="Login"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:background="@drawable/button_border"/>
     </LinearLayout>
 
-    <View
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/black"/>
+    <Space
+        android:layout_width="1dp"
+        android:layout_height="30dp"/>
 
     ---Signin options
     <LinearLayout
@@ -59,14 +56,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/colorPrimaryLight"
-        android:layout_weight="1">
+        android:background="@drawable/layout_border"
+        android:padding="10dp">
         ---Groups selection
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:layout_height="wrap_content">
             <ImageView
                 android:layout_width="100dp"
                 android:minHeight="100dp"
@@ -84,8 +80,13 @@
                 android:textColor="@color/white"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/colorPrimaryDark"/>
+                android:background="@drawable/button_border"/>
         </LinearLayout>
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="20dp"/>
+
         <CheckBox
             android:id="@+id/meeting_organizer"
             android:layout_width="match_parent"
@@ -102,6 +103,9 @@
             android:textSize="20dp"
             android:gravity="bottom"
             android:text="Preferred meeting places" />
+            <Space
+            android:layout_width="1dp"
+             android:layout_height="20dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -156,13 +160,15 @@
                 </LinearLayout>
 
         </LinearLayout>
-
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="20dp"/>
         <Button
             android:id="@+id/signin_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Signin"
             android:textColor="@color/white"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="@drawable/button_border"/>
     </LinearLayout>
 </LinearLayout>
