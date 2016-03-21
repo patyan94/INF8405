@@ -333,9 +333,11 @@ public class MeetingPlannerActivity extends FragmentActivity
         if(observable.getClass() == MeetingEvent.class) {
             DataManager.getInstance().addOrUpdateEvent((MeetingEvent) observable);
             meetingName.setText("");
+            if(((MeetingEvent)observable).getFinalPlace() == null)
+                Toast.makeText(getApplicationContext(), "Create meeting battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
+            scheduledMeetingsList.invalidateViews();
         }
-        Toast.makeText(getApplicationContext(), "Create meeting battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
-    }
+       }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {

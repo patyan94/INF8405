@@ -32,6 +32,8 @@ public class MeetingEvent extends Observable {
         byte[] byteArray = bYtE.toByteArray();
         String imageFile = com.firebase.client.utilities.Base64.encodeBytes(byteArray);
         encodedPhoto = imageFile;
+        setChanged();
+        notifyObservers();
     }
     @JsonIgnore
     public Bitmap getGetDecodedImage(){
@@ -50,6 +52,8 @@ public class MeetingEvent extends Observable {
 
     public void setDescription(String description) {
         this.description = description;
+        setChanged();
+        notifyObservers();
     }
 
     public String getEncodedPhoto() {
@@ -58,6 +62,8 @@ public class MeetingEvent extends Observable {
 
     public void setEncodedPhoto(String encodedPhoto) {
         this.encodedPhoto = encodedPhoto;
+        setChanged();
+        notifyObservers();
     }
 
     public int GetTotalVotes(){
@@ -78,6 +84,7 @@ public class MeetingEvent extends Observable {
         }
         ChooseFinalPlace();
         setChanged();
+        notifyObservers();
     }
 
     void ChooseFinalPlace(){
@@ -96,6 +103,8 @@ public class MeetingEvent extends Observable {
 
     public void setDate(Calendar newDate){
         date = newDate;
+        setChanged();
+        notifyObservers();
     }
 
     public String getMeetingName() {
@@ -105,6 +114,7 @@ public class MeetingEvent extends Observable {
     public void setMeetingName(String meetingName) {
         this.meetingName = meetingName;
         setChanged();
+        notifyObservers();
     }
 
     public List<EventPlace> getPlaces() {
@@ -114,6 +124,7 @@ public class MeetingEvent extends Observable {
     public void setPlaces(List<EventPlace> places) {
         Places = places;
         setChanged();
+        notifyObservers();
     }
 
     public EventPlace getFinalPlace() {
@@ -123,9 +134,6 @@ public class MeetingEvent extends Observable {
     public void setFinalPlace(EventPlace finalPlace) {
         FinalPlace = finalPlace;
         setChanged();
-    }
-
-    public void ConfirmEvent(){
-
+        notifyObservers();
     }
 }
