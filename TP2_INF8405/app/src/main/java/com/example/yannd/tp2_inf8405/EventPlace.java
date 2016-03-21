@@ -17,7 +17,7 @@ public class EventPlace {
     private String id;
     private String icon;
     private String name;
-    private String vicinity;
+    private String vicinity;// Address
     private Double latitude;
     private Double longitude;
 

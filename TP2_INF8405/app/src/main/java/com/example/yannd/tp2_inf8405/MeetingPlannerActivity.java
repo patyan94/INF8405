@@ -55,7 +55,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
     final int SELECT_PHOTO = 1;
-    public MeetingEvent eventBeingModified = null;
+    MeetingEvent eventBeingModified = null;
     Button createMeetingButton, settingsButton;
     EditText meetingName;
     LocationRequest mLocationRequest;
@@ -95,7 +95,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         createMeetingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RessourceMonitor.getInstance().SaveCurrentBatteryUsage();
+                RessourceMonitor.getInstance().SaveCurrentBatteryLevel();
                 CreateMeeting();
             }
         });
@@ -151,6 +151,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         return prefStr.toString();
     }
 
+    // Choose a suitable date for an event
     void SetEventDate(MeetingEvent event){
         if(DataManager.getInstance().getCurrentGroup() == null || DataManager.getInstance().getCurrentGroup().getGroupEvents() == null) return;
 
@@ -232,6 +233,7 @@ public class MeetingPlannerActivity extends FragmentActivity
                 map.addMarker(markerOptions);
                 boundsBuilder.include(new LatLng(u.getLatitude(), u.getLongitude()));
             }
+            // Bounds the map around the users positions
             try {
                 LatLngBounds bounds = boundsBuilder.build();
                 int padding = 250;
@@ -326,10 +328,18 @@ public class MeetingPlannerActivity extends FragmentActivity
         }
     }
 
+    // Picks a photo for an event
+    public void SetEventPhoto(MeetingEvent event){
+        eventBeingModified = event;
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+    }
+
+    // Shows a dialog to modify the description of an event
     public void ShowEventDescriptionChangeDialog(MeetingEvent e){
         final MeetingEvent event = e;
         AlertDialog.Builder builder = new AlertDialog.Builder(MeetingPlannerActivity.this);
-        builder.setTitle("Title");
+        builder.setTitle("Description");
 
         final EditText input = new EditText(MeetingPlannerActivity.this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);

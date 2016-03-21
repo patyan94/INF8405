@@ -111,19 +111,19 @@
             android:layout_height="wrap_content">
             <Button
                 android:textColor="@color/dark"
-                android:id="@+id/firstPlaceRadioButton"
+                android:id="@+id/firstPlaceButton"
                 android:text="First place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <Button
                 android:textColor="@color/dark"
-                android:id="@+id/secondPlaceRadioButton"
+                android:id="@+id/secondPlaceButton"
                 android:text="Second place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <Button
                 android:textColor="@color/dark"
-                android:id="@+id/thirdPlaceRadioButton"
+                android:id="@+id/thirdPlaceButton"
                 android:text="Third place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

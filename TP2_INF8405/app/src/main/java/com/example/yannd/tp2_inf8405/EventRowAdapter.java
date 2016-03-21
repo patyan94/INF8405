@@ -1,31 +1,18 @@
 package com.example.yannd.tp2_inf8405;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,7 +20,7 @@ import java.util.List;
  * This class represents puts an EventPlace in a ListView row
  */
 public class EventRowAdapter extends BaseAdapter{
-    final int SELECT_PHOTO = 1;
+    final int SELECT_PHOTO = 1; // Id for photo picking activity
     ArrayList<MeetingEvent> events;
     MeetingPlannerActivity parentActivity;
     Context context;
@@ -78,11 +65,11 @@ public class EventRowAdapter extends BaseAdapter{
 
         final MeetingEvent event = (MeetingEvent)getItem(position);
         EventPlace place;
+
         // Initialize meeting date view
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, hh:mm aaa");
         meetingDate.setText(sdf.format(event.getDate().getTime()));
 
-        boolean isMeetinOrganizer = DataManager.getInstance().getCurrentUser().isMeetingOrganizer();
         if(event.getFinalPlace() != null){
 
             LinearLayout meetingOrganizerFields = (LinearLayout)vi.findViewById(R.id.organizer_fields);
@@ -90,25 +77,29 @@ public class EventRowAdapter extends BaseAdapter{
 
             descriptionView.setText(event.getDescription() != null ? event.getDescription() : "");
             ImageView eventPhoto = (ImageView)vi.findViewById(R.id.eventPhoto);
+
+            // Shows the event photo only if there is one
             eventPhoto.setVisibility(event.getGetDecodedImage() != null ? View.VISIBLE : View.GONE);
             if(event.getGetDecodedImage() != null)
                 eventPhoto.setImageBitmap(event.getGetDecodedImage());
+
             // Change desription and add photo only for the organizer
-            meetingOrganizerFields.setVisibility(isMeetinOrganizer ? View.VISIBLE : View.GONE);
+            meetingOrganizerFields.setVisibility(DataManager.getInstance().getCurrentUser().isMeetingOrganizer() ? View.VISIBLE : View.GONE);
 
             meetingPlaceAdress.setText(event.getFinalPlace().getVicinity());
             meetingPlaceName.setText(event.getFinalPlace().getName());
             vi.findViewById(R.id.votingGroup).setVisibility(View.GONE);
             vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.VISIBLE);
 
+            // Pick a picture for the event
             vi.findViewById(R.id.add_photo_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentActivity.eventBeingModified = event;
-                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    parentActivity.startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+                    parentActivity.SetEventPhoto(event);
                 }
             });
+
+            // Changes the description of the event
             vi.findViewById(R.id.change_description_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -117,22 +108,23 @@ public class EventRowAdapter extends BaseAdapter{
             });
         }
         else{
+            // Sets the listeners for the votes
             vi.findViewById(R.id.confirmedEventLocation).setVisibility(View.GONE);
             vi.findViewById(R.id.votingGroup).setVisibility(View.VISIBLE);
 
-            final Button firstPlaceRadioButton = (Button)vi.findViewById(R.id.firstPlaceRadioButton);
-            final Button secondPlaceRadioButton = (Button)vi.findViewById(R.id.secondPlaceRadioButton);
-            final Button thirdPlaceRadioButton= (Button)vi.findViewById(R.id.thirdPlaceRadioButton);
+            final Button firstPlaceButton = (Button)vi.findViewById(R.id.firstPlaceButton);
+            final Button secondPlaceButton = (Button)vi.findViewById(R.id.secondPlaceButton);
+            final Button thirdPlaceButton= (Button)vi.findViewById(R.id.thirdPlaceButton);
 
             place = event.getPlaces().get(0);
-            firstPlaceRadioButton.setText(place.getName() + " : " + place.getVicinity());
-            firstPlaceRadioButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
-            firstPlaceRadioButton.setOnClickListener(new View.OnClickListener() {
+            firstPlaceButton.setText(place.getName() + " : " + place.getVicinity());
+            firstPlaceButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
+            firstPlaceButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    firstPlaceRadioButton.setEnabled(false);
-                    secondPlaceRadioButton.setEnabled(true);
-                    thirdPlaceRadioButton.setEnabled(true);
+                    firstPlaceButton.setEnabled(false);
+                    secondPlaceButton.setEnabled(true);
+                    thirdPlaceButton.setEnabled(true);
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(0), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);
@@ -140,14 +132,14 @@ public class EventRowAdapter extends BaseAdapter{
             });
 
             place = event.getPlaces().get(1);
-            secondPlaceRadioButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
-            secondPlaceRadioButton.setText(place.getName() + " : " + place.getVicinity());
-            secondPlaceRadioButton.setOnClickListener(new View.OnClickListener() {
+            secondPlaceButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
+            secondPlaceButton.setText(place.getName() + " : " + place.getVicinity());
+            secondPlaceButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    firstPlaceRadioButton.setEnabled(true);
-                    secondPlaceRadioButton.setEnabled(false);
-                    thirdPlaceRadioButton.setEnabled(true);
+                    firstPlaceButton.setEnabled(true);
+                    secondPlaceButton.setEnabled(false);
+                    thirdPlaceButton.setEnabled(true);
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(1), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);
@@ -155,14 +147,14 @@ public class EventRowAdapter extends BaseAdapter{
             });
 
             place = event.getPlaces().get(2);
-            thirdPlaceRadioButton.setText(place.getName() + " : " + place.getVicinity());
-            thirdPlaceRadioButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
-            thirdPlaceRadioButton.setOnClickListener(new View.OnClickListener() {
+            thirdPlaceButton.setText(place.getName() + " : " + place.getVicinity());
+            thirdPlaceButton.setEnabled(!place.hasVoted(DataManager.getInstance().getCurrentUser().getUsername()));
+            thirdPlaceButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    firstPlaceRadioButton.setEnabled(true);
-                    secondPlaceRadioButton.setEnabled(true);
-                    thirdPlaceRadioButton.setEnabled(false);
+                    firstPlaceButton.setEnabled(true);
+                    secondPlaceButton.setEnabled(true);
+                    thirdPlaceButton.setEnabled(false);
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(2), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);

@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by yannd on 2016-03-13.
+ * This class finds a list of places around a point and returns the 3 closest places
  */
 public class PlaceFinder extends AsyncTask {
     private final int NUM_PLACES = 3;
@@ -47,8 +48,8 @@ public class PlaceFinder extends AsyncTask {
     // Function to return an array of plausible meeting places
     public ArrayList<EventPlace> FindPlaces(String placeSpecification, Location location) {
 
-
         String urlString = createPlaceSearchUrl(location.getLatitude(), location.getLongitude(), placeSpecification);
+
         ArrayList<EventPlace> arrayList = new ArrayList<EventPlace>();
         try {
             Log.v("URL", urlString);
@@ -58,6 +59,7 @@ public class PlaceFinder extends AsyncTask {
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
 
+            // Picks the 3 closest places
             for (int i = 0; i < NUM_PLACES; i++) {
                 try {
                     EventPlace place = EventPlace.jsonToPlaceReference((JSONObject) array.get(i));

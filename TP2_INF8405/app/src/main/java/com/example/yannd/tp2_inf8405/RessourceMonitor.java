@@ -10,6 +10,7 @@ import java.util.Set;
 
 /**
  * Created by Gol on 2016-02-25.
+ * This classes monitors the battery usage for all the application and for some actions
  */
 
 public class RessourceMonitor extends BroadcastReceiver {
@@ -26,7 +27,7 @@ public class RessourceMonitor extends BroadcastReceiver {
     }
 
     private RessourceMonitor(){
-        lastBatteryLevel =0f;
+        lastBatteryLevel = 0f;
         initialBatteryLevel = 0f;
         batteryStatus = new Intent();
     }
@@ -38,11 +39,7 @@ public class RessourceMonitor extends BroadcastReceiver {
         if(initialBatteryLevel != null) initialBatteryLevel = GetCurrentBatteryLevel();
     }
 
-    void SetInitialBatteryLevel(Intent batteryStatus){
-        this.batteryStatus = batteryStatus;
-        initialBatteryLevel = GetCurrentBatteryLevel();
-    }
-
+    // Returns the current battery level
     public float GetCurrentBatteryLevel()
     {
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
@@ -52,14 +49,19 @@ public class RessourceMonitor extends BroadcastReceiver {
         return batteryPct;
     }
 
+    // Returns the battery usage for all the app
     public float GetTotalBatteryUsage()
     {
         return  GetCurrentBatteryLevel() - initialBatteryLevel;
     }
-    public void SaveCurrentBatteryUsage()
+
+    // Saves the current battery level
+    public void SaveCurrentBatteryLevel()
     {
         this.lastBatteryLevel = this.GetCurrentBatteryLevel();
     }
+
+    // Returns the battery usage since the last save
     public float GetLastBatteryUsage()
     {
         float latestBatteryLevel = GetCurrentBatteryLevel();
