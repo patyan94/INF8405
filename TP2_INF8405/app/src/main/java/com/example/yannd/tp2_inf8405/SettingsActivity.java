@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     private final int SELECT_PHOTO = 1;
     private CheckBox meetingOrganizer;
     private CheckBox[] preferences;
-    private Button loginButton, signinButton, setProfilePictureButton;
+    private Button setProfilePictureButton, saveButton;
     private ImageView profilePicture;
 
     @Override
@@ -52,13 +52,17 @@ public class SettingsActivity extends AppCompatActivity {
         preferences[PREFERENCES.LIBRARY.getValue()] = (CheckBox)findViewById(R.id.library_checkbox);
         preferences[PREFERENCES.CAFE.getValue()] = (CheckBox)findViewById(R.id.cafe_checkbox);
         preferences[PREFERENCES.UNIVERSITY.getValue()] = (CheckBox)findViewById(R.id.university_checkbox);
-        loginButton = (Button)findViewById(R.id.login_button);
-        signinButton = (Button)findViewById(R.id.signin_button);
         setProfilePictureButton = (Button)findViewById(R.id.set_profile_picture_button);
+        saveButton = (Button)findViewById(R.id.save_button);
         profilePicture = (ImageView)findViewById(R.id.profilePicture);
-        loginButton.setEnabled(false);
-        signinButton.setEnabled(false);
 
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Save();
+                Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
+            }
+        });
         setProfilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +70,14 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivityForResult(photoPickerIntent, SELECT_PHOTO);
             }
         });
+        UserProfile currentUser = DataManager.getInstance().getCurrentUser();
+        profilePicture.setImageBitmap(currentUser.getUserProfileImage());
+
+        List<String> prefs = currentUser.getPreferences();
+
+        for(CheckBox prefCheckBox : preferences){
+            prefCheckBox.setChecked(prefs.contains(prefCheckBox.getText().toString()));
+        }
     }
 
     private void Save() {
@@ -83,40 +95,13 @@ public class SettingsActivity extends AppCompatActivity {
                 userPreferences.add(preferences[i].getText().toString());
             }
         }
-        if(userPreferences.size() < 2){
-            Toast.makeText(getApplicationContext(), "Please specify at least two locations preferences.", Toast.LENGTH_SHORT).show();
+        if(userPreferences.size() < 3){
+            Toast.makeText(getApplicationContext(), "Please specify at least three locations preferences.", Toast.LENGTH_SHORT).show();
             return;
         }
         newProfile.setPreferences(userPreferences);
-
-        //We check if the group already exists
-        Group group = DataManager.getInstance().getGroup(groupNameString);
-        if(group != null){
-
-            //If the groud already exist and this user want to signin as an organizer
-            //we can't let that happen since there cannont be more than one
-            if(isOrganizer){
-                Toast.makeText(getApplicationContext(), "There's is already an organizer for this group.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            //If it does, then we can simply make it our current group and add this new user to it
-            DataManager.getInstance().setCurrentGroup(group);
-            DataManager.getInstance().addOrUpdateUser(newProfile);
-
-        }else{
-            if(isOrganizer){
-                //Creating a new group
-                DataManager.getInstance().createGroup(groupNameString);
-                //Adding the user to the new group
-                DataManager.getInstance().addOrUpdateUser(newProfile);
-            }else{
-                Toast.makeText(getApplicationContext(), "This group doesn't exist. You must be the meeting organizer if you want to create it.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        Login();
+        newProfile.setMeetingOrganizer(isOrganizer);
+        DataManager.getInstance().addOrUpdateUser(newProfile);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {

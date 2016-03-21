@@ -1,14 +1,20 @@
 package com.example.yannd.tp2_inf8405;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -46,6 +54,8 @@ import java.util.Observer;
 public class MeetingPlannerActivity extends FragmentActivity
         implements OnMapReadyCallback, com.google.android.gms.location.LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener , Observer{
 
+    final int SELECT_PHOTO = 1;
+    public MeetingEvent eventBeingModified = null;
     Button createMeetingButton, settingsButton;
     EditText meetingName;
     LocationRequest mLocationRequest;
@@ -115,7 +125,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(MeetingPlannerActivity.this);
         scheduledMeetingsList = (ListView) findViewById(R.id.scheduledMeetings);
-        scheduledMeetingsList.setAdapter(new EventRowAdapter(getApplicationContext(), (ArrayList) DataManager.getInstance().getCurrentGroup().getGroupEvents()));
+        scheduledMeetingsList.setAdapter(new EventRowAdapter(this, getApplicationContext(), (ArrayList) DataManager.getInstance().getCurrentGroup().getGroupEvents()));
     }
 
     // Returns a string containing the places types that at least one group member liked
@@ -224,6 +234,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             }
             try {
                 LatLngBounds bounds = boundsBuilder.build();
+                int padding = 250;
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.animateCamera(cu);
             }
@@ -291,5 +302,53 @@ public class MeetingPlannerActivity extends FragmentActivity
             meetingName.setText("");
         }
         Toast.makeText(getApplicationContext(), "Create meeting battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+
+        switch(requestCode) {
+            case SELECT_PHOTO:
+                if(resultCode == RESULT_OK){
+                    try {
+                        final Uri imageUri = imageReturnedIntent.getData();
+                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                        eventBeingModified.setDecodedPhoto(selectedImage);
+                        DataManager.getInstance().addOrUpdateEvent(eventBeingModified);
+                        eventBeingModified = null;
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+        }
+    }
+
+    public void ShowEventDescriptionChangeDialog(MeetingEvent e){
+        final MeetingEvent event = e;
+        AlertDialog.Builder builder = new AlertDialog.Builder(MeetingPlannerActivity.this);
+        builder.setTitle("Title");
+
+        final EditText input = new EditText(MeetingPlannerActivity.this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                event.setDescription(input.getText().toString());
+                DataManager.getInstance().addOrUpdateEvent(event);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }

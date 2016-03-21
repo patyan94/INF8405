@@ -59,6 +59,8 @@ public class Group {
                 me.setPlaces(event.getPlaces());
                 me.setFinalPlace(event.getFinalPlace());
                 me.setDate(event.getDate());
+                me.setDescription(event.getDescription());
+                me.setEncodedPhoto(event.getEncodedPhoto());
                 return false; // Meens that we updated an event, not created it
             }
         }

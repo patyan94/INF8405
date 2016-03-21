@@ -14,56 +14,111 @@
             android:textColor="@color/dark"
             android:id="@+id/meetingName"
             android:text="MeetingName"
-            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView
             android:textColor="@color/dark"
             android:id="@+id/meetingDate"
             android:text="jj-mm-YYY hh:mm"
-            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
             android:id="@+id/confirmedEventLocation"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:layout_weight="1"
-                android:textColor="@color/dark"
-                android:id="@+id/meetingPlaceName"
-                android:text="Place Name"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:layout_weight="1"
-                android:textColor="@color/dark"
-                android:id="@+id/meetingPlaceAdress"
-                android:text="Meeting Adress"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="100dp"
+                    android:minHeight="100dp"
+                    android:minWidth="100dp"
+                    android:maxHeight="100dp"
+                    android:maxWidth="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/common_google_signin_btn_icon_dark_disabled"
+                    android:id="@+id/eventPhoto"/>
+                <TextView
+                    android:layout_weight="1"
+                    android:textColor="@color/dark"
+                    android:id="@+id/meetingPlaceName"
+                    android:text="Place Name"
+                    android:layout_gravity="bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_weight="1"
+                    android:textColor="@color/dark"
+                    android:id="@+id/meetingPlaceAdress"
+                    android:text="Meeting Adress"
+                    android:layout_gravity="bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textColor="@color/dark"
+                    android:text="Description : "
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:textColor="@color/dark"
+                    android:id="@+id/description_view"
+                    android:text="description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                </LinearLayout>
+            <LinearLayout
+                android:id="@+id/organizer_fields"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:layout_weight="1"
+                    android:textColor="@color/dark"
+                    android:id="@+id/change_description_button"
+                    android:hint="Change Description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:layout_weight="1"
+                    android:textColor="@color/dark"
+                    android:id="@+id/add_photo_button"
+                    android:hint="Set Photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
         </LinearLayout>
-        <RadioGroup
-            android:id="@+id/votingRadioGroup"
+        <LinearLayout
+            android:id="@+id/votingGroup"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <RadioButton
+            <Button
                 android:textColor="@color/dark"
                 android:id="@+id/firstPlaceRadioButton"
                 android:text="First place"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <RadioButton
+            <Button
                 android:textColor="@color/dark"
                 android:id="@+id/secondPlaceRadioButton"
                 android:text="Second place"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <RadioButton
+            <Button
                 android:textColor="@color/dark"
                 android:id="@+id/thirdPlaceRadioButton"
                 android:text="Third place"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-        </RadioGroup>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

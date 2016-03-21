@@ -73,6 +73,7 @@ public class LoginPage extends AppCompatActivity {
         loginButton.setEnabled(false);
         signinButton.setEnabled(false);
 
+        profilePicture.setVisibility(View.GONE);
         email.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -175,7 +176,13 @@ public class LoginPage extends AppCompatActivity {
 
         UserProfile newProfile = new UserProfile(isOrganizer, emailString);
 
-        newProfile.setUserProfileImage(((BitmapDrawable)profilePicture.getDrawable()).getBitmap());
+        try {
+            newProfile.setUserProfileImage(((BitmapDrawable) profilePicture.getDrawable()).getBitmap());
+        }
+        catch (Exception e){
+            Toast.makeText(getApplicationContext(), "Please select a valid profile picture from your device.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //We check that there's at least two preferences selected
         List<String> userPreferences = new ArrayList<String>();
@@ -184,8 +191,8 @@ public class LoginPage extends AppCompatActivity {
                 userPreferences.add(preferences[i].getText().toString());
             }
         }
-        if(userPreferences.size() < 2){
-            Toast.makeText(getApplicationContext(), "Please specify at least two locations preferences.", Toast.LENGTH_SHORT).show();
+        if(userPreferences.size() < 3){
+            Toast.makeText(getApplicationContext(), "Please specify at least three locations preferences.", Toast.LENGTH_SHORT).show();
             return;
         }
         newProfile.setPreferences(userPreferences);
@@ -267,6 +274,7 @@ public class LoginPage extends AppCompatActivity {
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
                         profilePicture.setImageBitmap(selectedImage);
+                        profilePicture.setVisibility(View.VISIBLE);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
