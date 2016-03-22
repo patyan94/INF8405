@@ -125,6 +125,7 @@ public class MeetingEvent extends Observable {
     public void setFinalPlace(EventPlace finalPlace) {
         FinalPlace = finalPlace;
         setChanged();
+        notifyObservers();
     }
 
     public void ConfirmEvent(){
