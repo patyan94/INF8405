@@ -267,7 +267,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             // Bounds the map around the users positions
             try {
                 LatLngBounds bounds = boundsBuilder.build();
-                int padding = 1000;
+                int padding = 250;
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 map.animateCamera(cu);
             }
