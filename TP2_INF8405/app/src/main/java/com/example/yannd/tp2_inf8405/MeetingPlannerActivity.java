@@ -211,6 +211,7 @@ public class MeetingPlannerActivity extends FragmentActivity
 
     // Function to create a meeting, by finding the plausible places for the vote and the date
     private void CreateMeeting(){
+        meetingName.clearFocus();
         MeetingEvent event = new MeetingEvent();
         event.addObserver(this);
         event.setMeetingName(((EditText) findViewById(R.id.meetingName)).getText().toString());
@@ -333,6 +334,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         if(observable.getClass() == MeetingEvent.class) {
             DataManager.getInstance().addOrUpdateEvent((MeetingEvent) observable);
             meetingName.setText("");
+            scheduledMeetingsList.requestFocus();
         }
         Toast.makeText(getApplicationContext(), "Create meeting battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
     }
@@ -360,16 +362,17 @@ public class MeetingPlannerActivity extends FragmentActivity
     }
 
     // Picks a photo for an event
-    public void SetEventPhoto(MeetingEvent event){
+    public void SetEventPhoto(MeetingEvent event, EventRowAdapter adapter){
         eventBeingModified = event;
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-        event.notifyObservers();
+        adapter.notifyDataSetChanged();
     }
 
     // Shows a dialog to modify the description of an event
-    public void ShowEventDescriptionChangeDialog(MeetingEvent e){
+    public void ShowEventDescriptionChangeDialog(MeetingEvent e, EventRowAdapter a){
         final MeetingEvent event = e;
+        final EventRowAdapter adapter = a;
         AlertDialog.Builder builder = new AlertDialog.Builder(MeetingPlannerActivity.this);
         builder.setTitle("Description");
 
@@ -382,7 +385,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             public void onClick(DialogInterface dialog, int which) {
                 event.setDescription(input.getText().toString());
                 DataManager.getInstance().addOrUpdateEvent(event);
-                event.notifyObservers();
+                adapter.notifyDataSetChanged();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

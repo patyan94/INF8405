@@ -95,7 +95,7 @@ public class EventRowAdapter extends BaseAdapter{
             vi.findViewById(R.id.add_photo_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentActivity.SetEventPhoto(event);
+                    parentActivity.SetEventPhoto(event, EventRowAdapter.this);
                 }
             });
 
@@ -103,7 +103,7 @@ public class EventRowAdapter extends BaseAdapter{
             vi.findViewById(R.id.change_description_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    parentActivity.ShowEventDescriptionChangeDialog(event);
+                    parentActivity.ShowEventDescriptionChangeDialog(event, EventRowAdapter.this);
                 }
             });
         }
@@ -128,6 +128,7 @@ public class EventRowAdapter extends BaseAdapter{
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(0), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -143,6 +144,7 @@ public class EventRowAdapter extends BaseAdapter{
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(1), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -158,6 +160,7 @@ public class EventRowAdapter extends BaseAdapter{
                     MeetingEvent event = events.get(position);
                     events.get(position).Vote(event.getPlaces().get(2), DataManager.getInstance().getCurrentUser().getUsername());
                     DataManager.getInstance().addOrUpdateEvent(event);
+                    notifyDataSetChanged();
                 }
             });
 
