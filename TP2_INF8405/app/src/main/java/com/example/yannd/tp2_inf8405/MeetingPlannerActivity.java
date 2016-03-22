@@ -364,6 +364,7 @@ public class MeetingPlannerActivity extends FragmentActivity
         eventBeingModified = event;
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+        event.notifyObservers();
     }
 
     // Shows a dialog to modify the description of an event
@@ -381,6 +382,7 @@ public class MeetingPlannerActivity extends FragmentActivity
             public void onClick(DialogInterface dialog, int which) {
                 event.setDescription(input.getText().toString());
                 DataManager.getInstance().addOrUpdateEvent(event);
+                event.notifyObservers();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

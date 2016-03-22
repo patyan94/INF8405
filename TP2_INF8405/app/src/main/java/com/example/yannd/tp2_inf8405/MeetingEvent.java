@@ -32,6 +32,7 @@ public class MeetingEvent extends Observable {
         byte[] byteArray = bYtE.toByteArray();
         String imageFile = com.firebase.client.utilities.Base64.encodeBytes(byteArray);
         encodedPhoto = imageFile;
+        setChanged();
     }
     @JsonIgnore
     public Bitmap getGetDecodedImage(){
@@ -50,6 +51,7 @@ public class MeetingEvent extends Observable {
 
     public void setDescription(String description) {
         this.description = description;
+        setChanged();
     }
 
     public String getEncodedPhoto() {
