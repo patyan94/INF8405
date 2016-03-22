@@ -59,9 +59,10 @@ public class SettingsActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Save();
-                Toast.makeText(getApplicationContext(), "User profile updated", Toast.LENGTH_SHORT).show();
-                finish();
+                if(Save()){
+                    Toast.makeText(getApplicationContext(), "User profile updated", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         });
         setProfilePictureButton.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private void Save() {
+    private boolean Save() {
         UserProfile newProfile = DataManager.getInstance().getCurrentUser();
 
         newProfile.setUserProfileImage(((BitmapDrawable)profilePicture.getDrawable()).getBitmap());
@@ -95,10 +96,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if(userPreferences.size() < 3){
             Toast.makeText(getApplicationContext(), "Please specify at least three locations preferences.", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         newProfile.setPreferences(userPreferences);
         DataManager.getInstance().addOrUpdateUser(newProfile);
+
+        return true;
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
