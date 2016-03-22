@@ -55,7 +55,7 @@ public class PlaceFinder extends AsyncTask {
             Log.v("URL", urlString);
             String json = getResponse(urlString);
 
-            System.out.println(json);
+            //System.out.println(json);
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
 
