@@ -34,6 +34,7 @@ public class DatabaseInterface {
     private DatabaseInterface(){
         firebaseRef = new Firebase(path);
     }
+
     private static DatabaseInterface instance = null;
     public static DatabaseInterface Instance(){
         if(instance == null){

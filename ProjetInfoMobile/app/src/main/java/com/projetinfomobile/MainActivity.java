@@ -1,5 +1,6 @@
 package com.projetinfomobile;
 
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import Model.DatabaseInterface;
 import Model.UserData;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     ImageView profilePictureView;
     TextView usernameView;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //Loading the "Your series" fragment at application start
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        Fragment frag = new SeriesFragment();
+        fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_new_serie);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -58,6 +68,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Set the item menu "Your series" checked by default
+        navigationView.getMenu().getItem(3).setChecked(true);
 
         View drawerHeader = navigationView.getHeaderView(0);
         final UserData userData = DatabaseInterface.Instance().getUserData();
@@ -81,6 +94,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -98,6 +112,32 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        Fragment frag = null;
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            frag = new MapFragment();
+            navigationView.getMenu().getItem(3).setChecked(false);
+            navigationView.getMenu().getItem(1).setChecked(true);
+        } else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            frag = new SeriesFragment();
+            navigationView.getMenu().getItem(3).setChecked(true);
+            navigationView.getMenu().getItem(1).setChecked(false);
+        }
+
+        if(frag != null){
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
     }
 
     @Override
