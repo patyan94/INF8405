@@ -8,6 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +33,9 @@ public class MapFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private View fragmentView;
+    private MapView mapView;
 
     private OnMapFragmentInteractionListener mListener;
 
@@ -58,13 +68,19 @@ public class MapFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mapView = (MapView) fragmentView.findViewById(R.id.mapboxMapView);
+        mapView.setStyleUrl(Style.MAPBOX_STREETS);
+        //mapView.setCenterCoordinate(new LatLng(40.73581, -73.99155));
+        //mapView.setZoomLevel(11);
+        mapView.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_map, container, false);
+        return fragmentView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
