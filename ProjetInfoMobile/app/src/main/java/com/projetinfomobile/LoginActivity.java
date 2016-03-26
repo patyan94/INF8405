@@ -1,5 +1,7 @@
 package com.projetinfomobile;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
@@ -7,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +25,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import Model.DatabaseInterface;
 import Model.UserData;
@@ -47,8 +51,19 @@ public class LoginActivity extends AppCompatActivity{
         Firebase.setAndroidContext(this);
         firebaseRef = DatabaseInterface.Instance().GetDatabaseMainNode();
 
+        String possibleEmail = "a@a.com";
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+        Account[] accounts = AccountManager.get(getApplicationContext()).getAccounts();
+        for (Account account : accounts) {
+            if (emailPattern.matcher(account.name).matches()) {
+                possibleEmail = account.name;
+                break;
+            }
+        }
+
         // Set up the login form.
         mUsernameEntry = (EditText) findViewById(R.id.username);
+        mUsernameEntry.setText(possibleEmail, TextView.BufferType.EDITABLE);
 
         mPasswordEntry = (EditText) findViewById(R.id.password);
         mPasswordEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -183,7 +198,7 @@ public class LoginActivity extends AppCompatActivity{
             showProgress(false);
             switch (firebaseError.getCode()){
                 case FirebaseError.EMAIL_TAKEN:
-                    mUsernameEntry.setError("This email address is already taked");
+                    mUsernameEntry.setError("This email address is already registered");
                     mUsernameEntry.requestFocus();
                     break;
                 case FirebaseError.INVALID_EMAIL:
