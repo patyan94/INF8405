@@ -76,15 +76,15 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
     void Continue(){
         final String username = usernameEntry.getText().toString();
         usernameEntry.setError(null);
-        firebaseRef = DatabaseInterface.Instance().GetUsernamesNode();
-        firebaseRef.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+        firebaseRef = DatabaseInterface.Instance().GetUsersNode();
+        DatabaseInterface.Instance().GetUsersNode().child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String refUsername = (String)dataSnapshot.getValue();
-                if(refUsername != null){
+                if (dataSnapshot.getValue() != null){
                     usernameEntry.setError("Username already used");
                 }
                 else{
+                    DatabaseInterface.Instance().AddNewUSer(username);
                     DatabaseInterface.Instance().SetCurrentUser(userData);
                     DatabaseInterface.Instance().SaveCurrentUserProfile();
                     Intent intent = new Intent(UserInfoCompletionActivity.this, MainActivity.class);

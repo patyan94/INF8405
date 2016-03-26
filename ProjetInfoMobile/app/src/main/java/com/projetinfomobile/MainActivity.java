@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.SupportMapFragment;
+
 import Model.DatabaseInterface;
 import Model.UserData;
 
@@ -27,7 +29,6 @@ import Model.UserData;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         FriendsFragment.OnFriendsFragmentInteractionListener,
-        MapFragment.OnMapFragmentInteractionListener,
         SeriesFragment.OnSeriesFragmentInteractionListener,
         RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener{
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            frag = new MapFragment();
+            frag = new CloseUsersMapFragment();
             navigationView.getMenu().getItem(3).setChecked(false);
             navigationView.getMenu().getItem(1).setChecked(true);
         } else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                     break;
             case R.id.nav_map:
-                fragment = new MapFragment();
+                fragment = new CloseUsersMapFragment();
                 break;
             case  R.id.nav_your_series:
                 fragment = new SeriesFragment();
@@ -177,11 +178,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFriendsFragmentInteraction(Uri uri) {
-        //TODO
-    }
-
-    @Override
-    public void onMapFragmentInteraction(Uri uri) {
         //TODO
     }
 

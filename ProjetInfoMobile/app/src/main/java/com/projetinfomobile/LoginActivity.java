@@ -91,6 +91,7 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     protected void onResume(){
         super.onResume();
+        showProgress(false);
         //mPasswordEntry.setText("");
         //mUsernameEntry.setText("");
         mUsernameEntry.requestFocus();
@@ -162,8 +163,7 @@ public class LoginActivity extends AppCompatActivity{
     Firebase.AuthResultHandler authResultHandler = new Firebase.AuthResultHandler() {
         @Override
         public void onAuthenticated(AuthData authData) {
-            showProgress(false);
-            FetchUserInfo(authData);
+            FindUserID(authData);
         }
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
@@ -216,20 +216,19 @@ public class LoginActivity extends AppCompatActivity{
                 .setAction("Action", null).show();
     }
 
-    public void FetchUserInfo(final AuthData authData){
+    public void FindUserID(final AuthData authData){
 
-        firebaseRef.child("users").child(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseInterface.Instance().GetUserIDNode().child(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 DatabaseInterface.Instance().setAuthData(authData);
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    DatabaseInterface.Instance().SetCurrentUser(userSnapshot.getValue(UserData.class));
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+                if (dataSnapshot.getValue() != null) {
+                    FetchUserInfo((String) dataSnapshot.getValue(), authData.getUid());
                     return;
+                } else {
+                    Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
+                    startActivity(intent);
                 }
-                Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
-                startActivity(intent);
             }
 
             @Override
@@ -238,5 +237,24 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
     }
+    public void FetchUserInfo(String username, String uid){
+        DatabaseInterface.Instance().GetUsersNode().child(username).child(uid).child("UserData").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null) {
+                    showProgress(false);
+                    DatabaseInterface.Instance().SetCurrentUser(dataSnapshot.getValue(UserData.class));
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+
 }
 

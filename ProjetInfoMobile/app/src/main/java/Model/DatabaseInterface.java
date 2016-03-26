@@ -1,7 +1,13 @@
 package Model;
 
+import android.location.Location;
+
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 
 /**
  * Created by yannd on 2016-03-25.
@@ -10,6 +16,8 @@ public class DatabaseInterface {
 
     private final String path = "https://finalprojectmobile.firebaseio.com/";
     private Firebase firebaseRef;
+    GeoQuery geoQuery;
+    private GeoFire geofireRef;
     private UserData userData = null;
     private AuthData authData = null;
 
@@ -33,6 +41,7 @@ public class DatabaseInterface {
     //region singleton
     private DatabaseInterface(){
         firebaseRef = new Firebase(path);
+        geofireRef = new GeoFire(firebaseRef.child("positions"));
     }
 
     private static DatabaseInterface instance = null;
@@ -50,26 +59,42 @@ public class DatabaseInterface {
         this.userData.setProvider(authData.getProvider());
     }
 
-    public void SaveCurrentUserProfile(){
-        firebaseRef.child("users").child(this.authData.getUid()).child("UserData").setValue(userData);
+    public void AddNewUSer(String username){
+        firebaseRef.child("user_ids").child(authData.getUid()).setValue(username);
+    }
+
+    public void SaveCurrentUserProfile() {
+        firebaseRef.child("users").child(userData.getUsername()).child(this.authData.getUid()).child("UserData").setValue(userData);
     }
 
     public void DeleteCurrentUser(){
         this.userData = null;
         firebaseRef = null;
     }
+    public Firebase GetUsersNode(){
+        return firebaseRef.child("users");
+    }
+
+    public Firebase GetUserIDNode(){
+        return firebaseRef.child("user_ids");
+    }
     //endregion
 
-    //region usernameManagement
-    public void AddNewUsername(String username){
-        firebaseRef.child("usernames").child(username).setValue(username);
+    //endregion
 
+    //region positionmanagement
+    public void UpdateUserPosition(Location position){
+        geofireRef.setLocation(userData.getUsername(), new GeoLocation(position.getLatitude(), position.getLongitude()));
     }
-    public void DeleteUsername(String username){
-        //TODO
+
+    public void StartListeningToCloseUsers(Location position, double radius, GeoQueryEventListener listener){
+        if(geoQuery != null) return;
+        geoQuery =  geofireRef.queryAtLocation(new GeoLocation(position.getLatitude(), position.getLongitude()), radius);
+        geoQuery.addGeoQueryEventListener(listener);
     }
-    public Firebase GetUsernamesNode(){
-        return firebaseRef.child("usernames");
+
+    public void UpdateGeoQueryPosition(Location position){
+        geoQuery.setCenter(new GeoLocation(position.getLatitude(), position.getLongitude()));
     }
     //endregion
 }
