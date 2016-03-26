@@ -15,6 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import Model.DatabaseInterface;
+import Model.UserData;
 
 
 public class MainActivity extends AppCompatActivity
@@ -24,6 +29,9 @@ public class MainActivity extends AppCompatActivity
         SeriesFragment.OnSeriesFragmentInteractionListener,
         RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener{
+
+    ImageView profilePictureView;
+    TextView usernameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View drawerHeader = navigationView.getHeaderView(0);
+        final UserData userData = DatabaseInterface.Instance().getUserData();
+        profilePictureView = (ImageView)drawerHeader.findViewById(R.id.profile_picture_view);
+        profilePictureView.setImageBitmap(userData.getUserProfileImage());
+
+        usernameView = (TextView)drawerHeader.findViewById(R.id.user_display_name);
+        usernameView.setText(userData.getUsername());
     }
 
     @Override

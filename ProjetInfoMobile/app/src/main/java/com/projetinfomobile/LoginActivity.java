@@ -1,18 +1,12 @@
 package com.projetinfomobile;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Debug;
+import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
-import android.os.AsyncTask;
-
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,28 +16,37 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.Map;
+
+import Model.DatabaseInterface;
+import Model.UserData;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity{
 
+    private final int SELECT_PHOTO = 1;
     // UI references.
     private EditText mUsernameEntry;
     private EditText mPasswordEntry;
     private View mProgressView;
     private Firebase firebaseRef;
+    private Bitmap imagePicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         Firebase.setAndroidContext(this);
-        firebaseRef = new Firebase("https://finalprojectmobile.firebaseio.com");
+        firebaseRef = DatabaseInterface.Instance().GetDatabaseMainNode();
+
         // Set up the login form.
         mUsernameEntry = (EditText) findViewById(R.id.username);
 
@@ -70,6 +73,14 @@ public class LoginActivity extends AppCompatActivity{
         mProgressView = findViewById(R.id.login_progress);
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //mPasswordEntry.setText("");
+        //mUsernameEntry.setText("");
+        mUsernameEntry.requestFocus();
+        firebaseRef.unauth();
+    }
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -118,10 +129,6 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
-    private void Login(String username, String password){
-
-    }
-
     private boolean isUsernameValid(String username) {
         //TODO: Use better logic
         return username.length() > 1;
@@ -136,12 +143,12 @@ public class LoginActivity extends AppCompatActivity{
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    // Handles login results
     Firebase.AuthResultHandler authResultHandler = new Firebase.AuthResultHandler() {
         @Override
         public void onAuthenticated(AuthData authData) {
             showProgress(false);
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+            FetchUserInfo(authData);
         }
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
@@ -164,6 +171,7 @@ public class LoginActivity extends AppCompatActivity{
         }
     };
 
+    // Handles signin result
     Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler = new Firebase.ValueResultHandler<Map<String, Object>>() {
         @Override
         public void onSuccess(Map<String, Object> result) {
@@ -191,6 +199,29 @@ public class LoginActivity extends AppCompatActivity{
     public void ShowSnackBar(String message){
         Snackbar.make(findViewById(R.id.login_activity_layout), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+    }
+
+    public void FetchUserInfo(final AuthData authData){
+
+        firebaseRef.child("users").child(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DatabaseInterface.Instance().setAuthData(authData);
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    DatabaseInterface.Instance().SetCurrentUser(userSnapshot.getValue(UserData.class));
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    return;
+                }
+                Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 }
 
