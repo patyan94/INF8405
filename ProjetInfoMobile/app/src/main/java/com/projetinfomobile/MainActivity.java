@@ -1,12 +1,17 @@
 package com.projetinfomobile;
 
 import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,11 +36,19 @@ public class MainActivity extends AppCompatActivity
         FriendsFragment.OnFriendsFragmentInteractionListener,
         SeriesFragment.OnSeriesFragmentInteractionListener,
         RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
-        SettingsFragment.OnSettingsFragmentInteractionListener{
+        SettingsFragment.OnSettingsFragmentInteractionListener,
+        SensorEventListener{
 
     ImageView profilePictureView;
     TextView usernameView;
-    private Menu menu;
+
+    //Variables for shake detection
+    private static final float SHAKE_THRESHOLD = 20.0f; // m/S**2
+    private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 5000;
+    private long mLastShakeTime;
+    private long mLastShakeDetectTime;
+    private int shakeCount;
+    private SensorManager mSensorMgr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +93,15 @@ public class MainActivity extends AppCompatActivity
 
         usernameView = (TextView)drawerHeader.findViewById(R.id.user_display_name);
         usernameView.setText(userData.getUsername());
+
+        // Get a sensor manager to listen for shakes
+        mSensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        // Listen for shakes
+        Sensor accelerometer = mSensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer != null) {
+            mSensorMgr.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
@@ -95,7 +117,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -174,6 +195,41 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            long curTime = System.currentTimeMillis();
+
+            if (shakeCount >= 4 && (curTime - mLastShakeDetectTime) > MIN_TIME_BETWEEN_SHAKES_MILLISECS) {
+                Toast.makeText(getApplicationContext(), "Shake activated!", Toast.LENGTH_SHORT).show();
+                shakeCount = 0;
+                mLastShakeDetectTime = curTime;
+
+                //TODO : Action on shake
+            }else{
+                if(shakeCount == 0 || (curTime - mLastShakeTime) < 700) {
+                    float x = event.values[0];
+                    float y = event.values[1];
+                    float z = event.values[2];
+
+                    double acceleration = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2)) - SensorManager.GRAVITY_EARTH;
+
+                    if (acceleration > SHAKE_THRESHOLD) {
+                        mLastShakeTime = curTime;
+                        shakeCount = ++shakeCount % 5;
+                    }
+                } else {
+                    shakeCount = 0;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Ignore
     }
 
     @Override

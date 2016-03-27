@@ -52,8 +52,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
 
         //Inflate the layout for this fragment
@@ -98,8 +97,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
         mLocationRequest.setInterval(30000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setFastestInterval(5000);
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
     }
 
