@@ -54,20 +54,13 @@ public class CalendarManager {
     public List<Calendar> getAvailabilities(Calendar dateStart, Calendar dateEnd) {
         List<Calendar> availabilitesList = new ArrayList<>();
 
-        int currentDay = dateStart.get(Calendar.DAY_OF_MONTH);
-        int lastDay = dateEnd.get(Calendar.DAY_OF_MONTH);
-
-        //Ici je construit la liste initiale des disponibilités qui consiste en la liste des jours qui
-        //sont contenus dans l'interval fourni dans les paramètres de la fonction
-        while(currentDay != (lastDay + 1)) {
-            Calendar start = Calendar.getInstance();
-            start.set(dateStart.get(Calendar.YEAR), dateStart.get(Calendar.MONTH), currentDay);
-            availabilitesList.add(start);
-
-            currentDay++;
+        Calendar currentDayCalendar = dateStart;
+        while(currentDayCalendar.compareTo(dateEnd) < 0){
+            currentDayCalendar.add(Calendar.DAY_OF_YEAR, 1);
+            availabilitesList.add((Calendar)currentDayCalendar.clone());
         }
 
-        //Ici on va chercher les évènements du calendrier de la personne durant l'interval ddonné en paramètre
+        //Ici on va chercher les évènements du calendrier de la personne durant l'interval donné en paramètre
         Cursor cursor = null;
         if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             return null;
