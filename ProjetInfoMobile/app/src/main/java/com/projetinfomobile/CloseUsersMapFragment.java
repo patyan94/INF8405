@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.firebase.client.FirebaseError;
 import com.firebase.geofire.GeoLocation;
@@ -49,6 +50,11 @@ public class CloseUsersMapFragment extends SupportMapFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //TODO : show position of user AND surroundings only if the option is enabled - Also, do not update position in firebase at all if not enable
+        if(!DatabaseInterface.Instance().getUserData().isSharePosition()){
+            Toast.makeText(getContext(), "In order to be able to use this functionality, please enable the location sharing setting", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -89,6 +95,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(getContext(), "Please allow this application to use your location from Android/Applications settings", Toast.LENGTH_LONG).show();
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);

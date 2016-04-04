@@ -75,6 +75,7 @@ public class DatabaseInterface {
     public UserData GetCurrentUserData(){
         return this.userData;
     }
+
     public Firebase GetUsersNode(){
         return firebaseRef.child("users");
     }
@@ -82,8 +83,6 @@ public class DatabaseInterface {
     public Firebase GetUserIDNode(){
         return firebaseRef.child("user_ids");
     }
-    //endregion
-
     //endregion
 
     //region positionmanagement
