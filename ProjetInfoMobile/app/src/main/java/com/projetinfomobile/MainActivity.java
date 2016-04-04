@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private long mLastShakeDetectTime;
     private int shakeCount;
     private SensorManager mSensorMgr;
+    private int previousFragmentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,9 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+
+        //Setting the current fragment active
+        previousFragmentId = R.id.nav_your_series;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_new_serie);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -150,17 +154,49 @@ public class MainActivity extends AppCompatActivity
         super.onConfigurationChanged(newConfig);
 
         Fragment frag = null;
+        boolean mapMode = false;
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             frag = new CloseUsersMapFragment();
-            navigationView.getMenu().getItem(3).setChecked(false);
+            mapMode = true;
             navigationView.getMenu().getItem(1).setChecked(true);
         } else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            frag = new SeriesFragment();
-            navigationView.getMenu().getItem(3).setChecked(true);
             navigationView.getMenu().getItem(1).setChecked(false);
+        }
+
+        switch (previousFragmentId){
+            case R.id.nav_friends_recommendations:
+                if(!mapMode) {
+                    frag = new RecommandationsFragment();
+                }
+                navigationView.getMenu().getItem(2).setChecked(!mapMode);
+                break;
+            case R.id.nav_friends:
+                if(!mapMode){
+                    frag = new FriendsFragment();
+                }
+                navigationView.getMenu().getItem(0).setChecked(!mapMode);
+                break;
+            case R.id.nav_settings:
+                if(!mapMode){
+                    frag = new SettingsFragment();
+                }
+                navigationView.getMenu().getItem(4).setChecked(!mapMode);
+                break;
+            case R.id.nav_map:
+                if(!mapMode){
+                    frag = new CloseUsersMapFragment();
+                }
+                navigationView.getMenu().getItem(1).setChecked(!mapMode);
+                break;
+            case  R.id.nav_your_series:
+                if(!mapMode){
+                    frag = new SeriesFragment();
+                }
+                navigationView.getMenu().getItem(3).setChecked(!mapMode);
+                break;
         }
 
         if(frag != null){
@@ -200,6 +236,8 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
+
+            previousFragmentId = id;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
