@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
     TextView usernameView;
 
     //Variables for shake detection
-    private static final float SHAKE_THRESHOLD = 15.0f; // m/S**2
+    private static final float SHAKE_THRESHOLD = 15.0f;
     private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 5000;
     private long mLastShakeTime;
     private long mLastShakeDetectTime;

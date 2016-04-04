@@ -3,7 +3,10 @@ package Model;
 import android.location.Location;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -113,14 +116,17 @@ public class DatabaseInterface {
     public void SendFriendRequest(String username){
         firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).setValue(this.userData.getUsername());
     }
+
     public void CancelFriendRequest(String username){
         firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).removeValue();
     }
+
     public void AcceptFriendRequest(String username){
         firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
         firebaseRef.child("users").child(userData.getUsername()).child("friends").child(username).setValue(username);
         firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).setValue(userData.getUsername());
     }
+
     public void RefuseFriendRequest(String username){
         firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
     }

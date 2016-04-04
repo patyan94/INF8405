@@ -35,6 +35,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:text="Friends requests" />
         <ListView
             android:id="@+id/friends_requests_listview"
@@ -44,6 +45,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:text="@string/friends_list" />
         <ListView
             android:id="@+id/friends_listview"

@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -56,7 +57,16 @@ public class FriendsFragment extends Fragment {
         addFriendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                for(int i = 0; i < friendsListAdapter.getCount(); i++){
+                    if(friendsListAdapter.getItem(i).toString().equalsIgnoreCase(friendSearchAutocomplete.getText().toString())){
+                        Toast.makeText(getContext(), "This user is already in your friend list", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
                 DatabaseInterface.Instance().SendFriendRequest(friendSearchAutocomplete.getText().toString());
+                friendSearchAutocomplete.setText("");
+                Toast.makeText(getContext(), "Invitation sent", Toast.LENGTH_SHORT).show();
             }
         });
         friendSearchAutocomplete = (AutoCompleteTextView)fragmentView.findViewById(R.id.friend_search_entry);
