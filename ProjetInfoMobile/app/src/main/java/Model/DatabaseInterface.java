@@ -71,6 +71,10 @@ public class DatabaseInterface {
         this.userData = null;
         firebaseRef = null;
     }
+
+    public UserData GetCurrentUserData(){
+        return this.userData;
+    }
     public Firebase GetUsersNode(){
         return firebaseRef.child("users");
     }
@@ -95,6 +99,36 @@ public class DatabaseInterface {
 
     public void UpdateGeoQueryPosition(Location position){
         geoQuery.setCenter(new GeoLocation(position.getLatitude(), position.getLongitude()));
+    }
+    //endregion
+
+    //region friendsManagement
+    public Firebase GetReceivedFriendRequestsNode(){
+        return firebaseRef.child("friend_requests").child(this.userData.getUsername());
+    }
+
+    public Firebase GetFriendListNode(){
+        return firebaseRef.child("users").child(this.userData.getUsername()).child("friends");
+    }
+
+    public void SendFriendRequest(String username){
+        firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).setValue(this.userData.getUsername());
+    }
+    public void CancelFriendRequest(String username){
+        firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).removeValue();
+    }
+    public void AcceptFriendRequest(String username){
+        firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
+        firebaseRef.child("users").child(userData.getUsername()).child("friends").child(username).setValue(username);
+        firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).setValue(userData.getUsername());
+    }
+    public void RefuseFriendRequest(String username){
+        firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
+    }
+
+    public void DeleteFriend(String username){
+        firebaseRef.child("users").child(userData.getUsername()).child("friends").child(username).removeValue();
+        firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).removeValue();
     }
     //endregion
 }

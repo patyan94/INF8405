@@ -33,7 +33,6 @@ import Model.UserData;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        FriendsFragment.OnFriendsFragmentInteractionListener,
         SeriesFragment.OnSeriesFragmentInteractionListener,
         RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
@@ -230,11 +229,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignore
-    }
-
-    @Override
-    public void onFriendsFragmentInteraction(Uri uri) {
-        //TODO
     }
 
     @Override
