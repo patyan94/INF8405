@@ -1,30 +1,42 @@
 package com.projetinfomobile;
 
+import android.app.ActionBar;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-import com.firebase.ui.FirebaseListAdapter;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.FirebaseError;
 import com.firebase.ui.FirebaseRecyclerAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.DatabaseInterface;
 import Model.OMDBInterface;
@@ -37,12 +49,14 @@ public class SeriesFragment extends Fragment {
         TextView description;
         ImageView posterView;
         Button removeSerieButton;
+        Button recommendSerieButton;
         public WatchedSerieViewHolder(View itemView) {
             super(itemView);
             title = (TextView)itemView.findViewById(R.id.serie_name);
             description = (TextView)itemView.findViewById(R.id.serie_description);
             posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
             removeSerieButton =(Button)itemView.findViewById(R.id.remove_serie_button);
+            recommendSerieButton =(Button)itemView.findViewById(R.id.recommend_serie_button);
         }
     }
 
@@ -53,10 +67,11 @@ public class SeriesFragment extends Fragment {
     OMDBInterface omdbInterface;
     FirebaseRecyclerAdapter<String, WatchedSerieViewHolder> watchedSeriesAdapter;
     SerieSearchResultAdapter serieSearchResultAdapter;
+    ArrayAdapter<String> autoCompleteFriendAdapter;
+    List<String> autoCompleteFriendsSuggestions = new ArrayList<>();
     int currentSearchPage = 0;
 
     public SeriesFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -67,6 +82,34 @@ public class SeriesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        autoCompleteFriendAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_dropdown_item_1line, autoCompleteFriendsSuggestions);
+        DatabaseInterface.Instance().GetFriendListNode().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                autoCompleteFriendAdapter.add(dataSnapshot.getValue(String.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                autoCompleteFriendAdapter.remove(dataSnapshot.getValue(String.class));
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
 
         serieSearchResultAdapter = new SerieSearchResultAdapter(getContext());
         omdbInterface = OMDBInterface.Start(getContext());
@@ -100,6 +143,12 @@ public class SeriesFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         DatabaseInterface.Instance().DeleteSerie(serieID);
+                    }
+                });
+                view.recommendSerieButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RecommendSerie(serieID);
                     }
                 });
                 omdbInterface.GetSerieInfo(serieID, new Response.Listener<JSONObject>() {
@@ -170,4 +219,39 @@ public class SeriesFragment extends Fragment {
             error.printStackTrace();
         }
     };
+
+    void RecommendSerie(final String serieID){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Recommend");
+
+        final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(getContext());
+        input.setAdapter(autoCompleteFriendAdapter);
+        input.setThreshold(2);
+        input.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String[] friends = input.getText().toString().split(", ");
+                for(int i = 0; i < friends.length; ++i){
+                    DatabaseInterface.Instance().SendSerieSuggestion(friends[i], serieID);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.show();
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setAttributes(lp);
+    }
 }
