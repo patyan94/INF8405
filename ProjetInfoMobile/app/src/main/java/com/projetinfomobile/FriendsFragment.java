@@ -1,34 +1,29 @@
 package com.projetinfomobile;
 
-import android.app.DownloadManager;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
 import com.firebase.ui.FirebaseListAdapter;
 
 import java.util.ArrayList;
 
 import Model.DatabaseInterface;
-import Model.UserData;
 
 public class FriendsFragment extends Fragment {
     FirebaseListAdapter<String> friendsListAdapter;
@@ -95,6 +90,7 @@ public class FriendsFragment extends Fragment {
         friendsListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friends_listview_item, DatabaseInterface.Instance().GetFriendListNode()) {
             @Override
             protected void populateView(View view, final String username, int position) {
+                Log.i("Populate", username);
                 ((TextView)view.findViewById(R.id.username)).setText(username);
                 ((Button)view.findViewById(R.id.delete_friend_button)).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -106,7 +102,7 @@ public class FriendsFragment extends Fragment {
             }
         };
         ((ListView) fragmentView.findViewById(R.id.friends_listview)).setAdapter(friendsListAdapter);
-        friendsRequestListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friend_request_layout, DatabaseInterface.Instance().GetReceivedFriendRequestsNode()) {
+        friendsRequestListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friend_request_listview_item, DatabaseInterface.Instance().GetReceivedFriendRequestsNode()) {
             @Override
             protected void populateView(View view, final String username, int position) {
                 ((TextView)view.findViewById(R.id.username)).setText(username);

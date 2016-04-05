@@ -150,7 +150,7 @@ public class DatabaseInterface {
         return firebaseRef.child("users").child(this.userData.getUsername()).child("series");
     }
 
-    public void AcceptSerieSuggestion(String suggestionID){
+    public void AddSerie(String suggestionID){
         firebaseRef.child("serie_suggestions").child(userData.getUsername()).child(suggestionID).removeValue();
         firebaseRef.child("users").child(userData.getUsername()).child("series").child(suggestionID).setValue(suggestionID);
     }

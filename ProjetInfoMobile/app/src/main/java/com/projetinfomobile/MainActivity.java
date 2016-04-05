@@ -33,7 +33,6 @@ import Model.UserData;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SeriesFragment.OnSeriesFragmentInteractionListener,
         RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         SensorEventListener{
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null){
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
-            fragmentTransaction.addToBackStack(null);
+            //fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
 
             previousFragmentId = id;
@@ -277,11 +276,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignore
-    }
-
-    @Override
-    public void onSeriesFragmentInteraction(Uri uri) {
-        //TODO
     }
 
     @Override
