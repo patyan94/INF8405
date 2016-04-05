@@ -14,7 +14,6 @@ public class UserData {
 
     private String provider;
     private String encodedUserProfileImage;
-    private List<String> preferedSeriesTitles = new ArrayList<>();
     private boolean sharePosition = true;
 
 
@@ -40,14 +39,6 @@ public class UserData {
 
     public void setEncodedUserProfileImage(String encodedUserProfileImage) {
         this.encodedUserProfileImage = encodedUserProfileImage;
-    }
-
-    public List<String> getPreferedSeriesTitles() {
-        return preferedSeriesTitles;
-    }
-
-    public void setPreferedSeriesTitles(List<String> preferedSeriesTitles) {
-        this.preferedSeriesTitles = preferedSeriesTitles;
     }
 
     public boolean isSharePosition() {

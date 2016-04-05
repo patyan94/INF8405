@@ -136,4 +136,31 @@ public class DatabaseInterface {
         firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).removeValue();
     }
     //endregion
+
+    //region seriesManagement
+    public Firebase GetSeriesSuggestionNode(){
+        return firebaseRef.child("serie_suggestions").child(this.userData.getUsername());
+    }
+    public void SendSerieSuggestion(String username, String suggestionID){
+        // Serie with a list of people who suggested it
+        firebaseRef.child("serie_suggestions").child(username).child(suggestionID).push().setValue(this.userData.getUsername());
+    }
+
+    public Firebase GetSeriesListNode(){
+        return firebaseRef.child("users").child(this.userData.getUsername()).child("series");
+    }
+
+    public void AcceptSerieSuggestion(String suggestionID){
+        firebaseRef.child("serie_suggestions").child(userData.getUsername()).child(suggestionID).removeValue();
+        firebaseRef.child("users").child(userData.getUsername()).child("series").child(suggestionID).setValue(suggestionID);
+    }
+
+    public void RefuseSerieSuggestion(String suggestionID){
+        firebaseRef.child("serie_suggestions").child(userData.getUsername()).child(suggestionID).removeValue();
+    }
+
+    public void DeleteSerie(String suggestionID){
+        firebaseRef.child("users").child(userData.getUsername()).child("series").child(suggestionID).removeValue();
+    }
+    //endregion
 }
