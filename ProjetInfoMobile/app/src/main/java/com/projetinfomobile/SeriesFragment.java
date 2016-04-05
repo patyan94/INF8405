@@ -248,10 +248,5 @@ public class SeriesFragment extends Fragment {
         });
 
         AlertDialog dialog = builder.show();
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        dialog.getWindow().setAttributes(lp);
     }
 }
