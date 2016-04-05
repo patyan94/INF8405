@@ -3,6 +3,7 @@ package com.projetinfomobile;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import Model.DatabaseInterface;
@@ -29,54 +31,64 @@ import Model.Serie;
 /**
  * Created by yannd on 2016-04-05.
  */
-public class SerieSearchResultAdapter extends ArrayAdapter<Serie> {
+public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieSearchResultAdapter.ViewHolder> {
 
     RequestQueue imageRequests;
     private LayoutInflater inflater = null;
     public SerieSearchResultAdapter(Context context){
-        super(context, R.layout.serie_search_result_listview_item);
+        super(new ArrayList<Serie>());
         imageRequests = Volley.newRequestQueue(context);
-        inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final View row = inflater.inflate(R.layout.serie_search_result_listview_item, parent, false);
-
-        final Serie serie = getItem(position);
-        Button add = (Button) row.findViewById(R.id.add_serie);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatabaseInterface.Instance().AddSerie(serie.getID());
-            }
-        });
-        TextView serieName = (TextView)row.findViewById((R.id.serie_name));
-        serieName.setText(serie.getName());
-
-        if(!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
-            ImageRequest request = new ImageRequest(serie.getPhotoURL(),
-                    new Response.Listener<Bitmap>() {
-                        @Override
-                        public void onResponse(Bitmap bitmap) {
-                            ImageView imageView = (ImageView) row.findViewById(R.id.serie_poster);
-                            imageView.setImageBitmap(bitmap);
-                        }
-                    }, 0, 0, null,
-                    new Response.ErrorListener() {
-                        public void onErrorResponse(VolleyError error) {
-                            error.printStackTrace();
-                        }
-                    });
-            imageRequests.add(request);
-        }
-
-        return row;
     }
 
     @Override
     public void clear(){
         super.clear();
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.serie_search_result_listview_item, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.BindSerie(getItem(position));
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        TextView title;
+        ImageView posterView;
+        Button addSerieButton;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            title = (TextView)itemView.findViewById(R.id.serie_name);
+            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
+            addSerieButton =(Button)itemView.findViewById(R.id.add_serie_button);
+        }
+        public void BindSerie(final Serie serie) {
+            title.setText(serie.getName());
+            addSerieButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DatabaseInterface.Instance().AddSerie(serie.getID());
+                }
+            });
+            if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
+                ImageRequest request = new ImageRequest(serie.getPhotoURL(),
+                        new Response.Listener<Bitmap>() {
+                            @Override
+                            public void onResponse(Bitmap bitmap) {
+                                posterView.setImageBitmap(bitmap);
+                            }
+                        }, 0, 0, null,
+                        new Response.ErrorListener() {
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        });
+                imageRequests.add(request);
+            }
+        }
     }
 }

@@ -27,8 +27,8 @@
             android:layout_height="wrap_content"
             android:text="Search"/>
     </LinearLayout>
-    <ListView
-        android:id="@+id/search_results_listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/search_results_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>

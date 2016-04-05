@@ -32,7 +32,7 @@ import Model.Serie;
 
 public class SeriesFragment extends Fragment {
 
-    public class WatchedSerieViewHolder extends RecyclerView.ViewHolder {
+    public static class WatchedSerieViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView description;
         ImageView posterView;
@@ -45,23 +45,10 @@ public class SeriesFragment extends Fragment {
             removeSerieButton =(Button)itemView.findViewById(R.id.remove_serie_button);
         }
     }
-    public class SearchSerieResultViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView description;
-        ImageView posterView;
-        Button removeSerieButton;
-        public SearchSerieResultViewHolder(View itemView) {
-            super(itemView);
-            title = (TextView)itemView.findViewById(R.id.serie_name);
-            description = (TextView)itemView.findViewById(R.id.serie_description);
-            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
-            removeSerieButton =(Button)itemView.findViewById(R.id.remove_serie_button);
-        }
-    }
 
     Button searchSeriesButton;
     EditText searchSerieTitle;
-    ListView searchSerieResults;
+    RecyclerView searchSerieResults;
     RecyclerView watchedSeriesListview;
     OMDBInterface omdbInterface;
     FirebaseRecyclerAdapter<String, WatchedSerieViewHolder> watchedSeriesAdapter;
@@ -99,7 +86,9 @@ public class SeriesFragment extends Fragment {
         watchedSeriesListview = (RecyclerView)view.findViewById(R.id.series_listview);
         watchedSeriesListview.setHasFixedSize(true);
         watchedSeriesListview.setLayoutManager(new LinearLayoutManager(getContext()));
-        searchSerieResults = (ListView)view.findViewById(R.id.search_results_listview);
+        searchSerieResults = (RecyclerView)view.findViewById(R.id.search_results_recyclerview);
+        searchSerieResults.setHasFixedSize(true);
+        searchSerieResults.setLayoutManager(new LinearLayoutManager(getContext()));
         searchSerieResults.setAdapter(serieSearchResultAdapter);
 
 
@@ -162,7 +151,7 @@ public class SeriesFragment extends Fragment {
                     serieSearchResultAdapter.add(Serie.FromJSONObject(results.getJSONObject(i)));
                 }
                 int nbResults = response.getInt("totalResults");
-                if(serieSearchResultAdapter.getCount() < nbResults){
+                if(serieSearchResultAdapter.getItemCount() < nbResults){
                     omdbInterface.SearchSerie(searchSerieTitle.getText().toString(), ++currentSearchPage, onSerieSearchResponse, onSerieSearchError);
                 }
                 else{

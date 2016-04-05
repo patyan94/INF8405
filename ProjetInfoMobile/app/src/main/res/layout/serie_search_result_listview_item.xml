@@ -15,7 +15,7 @@
         android:layout_weight="1"
         android:text="Name"/>
     <Button
-        android:id="@+id/add_serie"
+        android:id="@+id/add_serie_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add"/>
