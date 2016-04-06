@@ -31,11 +31,12 @@
         android:id="@+id/search_results_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_weight="1.5"/>
     <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Your Series" />
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Series" />
     <android.support.v7.widget.RecyclerView
         android:id="@+id/series_listview"
         android:layout_width="match_parent"

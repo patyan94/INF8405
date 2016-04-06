@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -125,6 +127,24 @@ public class SeriesFragment extends Fragment {
             }
         });
         searchSerieTitle = (EditText)view.findViewById(R.id.search_serie_title);
+        searchSerieTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.toString().isEmpty()){
+                    serieSearchResultAdapter.clear();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         watchedSeriesListview = (RecyclerView)view.findViewById(R.id.series_listview);
         watchedSeriesListview.setHasFixedSize(true);
         watchedSeriesListview.setLayoutManager(new LinearLayoutManager(getContext()));
