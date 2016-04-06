@@ -69,7 +69,7 @@ public class SeriesFragment extends Fragment {
 
     public SeriesFragment() {
     }
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

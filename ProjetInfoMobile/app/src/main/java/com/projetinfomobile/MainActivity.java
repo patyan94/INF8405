@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
 
         //Loading the "Your series" fragment at application start
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Fragment frag = new SeriesFragment();
+        final Fragment frag = new SeriesFragment();
         fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -66,14 +66,6 @@ public class MainActivity extends AppCompatActivity
         //Setting the current fragment active
         previousFragmentId = R.id.nav_your_series;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_new_serie);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -81,11 +73,28 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //Set the item menu "Your series" checked by default
         navigationView.getMenu().getItem(3).setChecked(true);
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_new_serie);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SeriesFragment fragment = new SeriesFragment();
+                navigationView.getMenu().getItem(3).setChecked(true);
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
+                //fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                previousFragmentId = R.id.nav_your_series;
+
+            }
+        });
 
         View drawerHeader = navigationView.getHeaderView(0);
         final UserData userData = DatabaseInterface.Instance().getUserData();
@@ -136,7 +145,7 @@ public class MainActivity extends AppCompatActivity
                 fragment = new SettingsFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
-                fragmentTransaction.addToBackStack(null);
+                //fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 return true;
 
