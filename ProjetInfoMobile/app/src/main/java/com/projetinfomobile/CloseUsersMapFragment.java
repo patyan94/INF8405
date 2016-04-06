@@ -2,20 +2,29 @@ package com.projetinfomobile;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.firebase.client.FirebaseError;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.firebase.ui.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -24,15 +33,18 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.security.KeyPair;
+import org.json.JSONObject;
+
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import Model.DatabaseInterface;
+import Model.OMDBInterface;
+import Model.Serie;
 
 public class CloseUsersMapFragment extends SupportMapFragment
         implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -42,6 +54,20 @@ public class CloseUsersMapFragment extends SupportMapFragment
     private  Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
+    private FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter;
+    private OMDBInterface omdbInterface;
+
+    public static class SeriesViewHolder extends RecyclerView.ViewHolder {
+        TextView title;
+        TextView description;
+        ImageView posterView;
+        public SeriesViewHolder(View itemView) {
+            super(itemView);
+            title = (TextView)itemView.findViewById(R.id.serie_name);
+            description = (TextView)itemView.findViewById(R.id.serie_description);
+            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
+        }
+    }
 
     public CloseUsersMapFragment() {
         // Required empty public constructor
@@ -55,6 +81,8 @@ public class CloseUsersMapFragment extends SupportMapFragment
         if(!DatabaseInterface.Instance().getUserData().isSharePosition()){
             Toast.makeText(getContext(), "In order to be able to use this functionality, please enable the location sharing setting", Toast.LENGTH_LONG).show();
         }
+
+        omdbInterface = OMDBInterface.Start(getContext());
     }
 
     @Override
@@ -130,8 +158,23 @@ public class CloseUsersMapFragment extends SupportMapFragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                String username = marker.getTitle();
+
+                //If we clicked on ourselves we don't do anything special
+                if(DatabaseInterface.Instance().getUserData().getUsername().equalsIgnoreCase(username)){
+                    return true;
+                }else{
+                    PromptUserSeries(username);
+                    return true;
+                }
+            }
+        });
+
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -146,7 +189,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     private GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
         @Override
         public void onKeyEntered(String key, GeoLocation location) {
-            closeUsersLocations.put(key, new MarkerOptions().position(new LatLng(location.latitude, location.longitude)));
+            closeUsersLocations.put(key, new MarkerOptions().position(new LatLng(location.latitude, location.longitude)).title(key));
         }
 
         @Override
@@ -176,7 +219,64 @@ public class CloseUsersMapFragment extends SupportMapFragment
     private void ShowUsersLocationOnMap(){
         map.clear();
         for(MarkerOptions pos : closeUsersLocations.values()){
-            map.addMarker(pos);
+            Marker m = map.addMarker(pos);
+
+            //For the marker of the current user, show it in a distinctive colour
+            if(pos.getTitle().equalsIgnoreCase(DatabaseInterface.Instance().getUserData().getUsername())){
+                m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            }else{
+                //TODO : m.setVisible(); Si serie(s) en commun ou pas.
+            }
         }
+    }
+
+    private void PromptUserSeries(final String username){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(username);
+        View seriesView = View.inflate(getContext(), R.layout.alert_dialog_series, null);
+        builder.setView(seriesView);
+
+        RecyclerView seriesListview = (RecyclerView)seriesView.findViewById(R.id.series_listview_alert);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        seriesListview.setLayoutManager(layoutManager);
+
+        seriesAdapter = new FirebaseRecyclerAdapter<String, SeriesViewHolder>(String.class, R.layout.alert_series_listview_item, SeriesViewHolder.class,DatabaseInterface.Instance().GetUsersNode().child(username).child("series")) {
+            @Override
+            protected void populateViewHolder(final SeriesViewHolder view, final String serieID, int position) {
+                omdbInterface.GetSerieInfo(serieID, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Serie serie = Serie.FromJSONObject(response);
+                            view.title.setText(serie.getName());
+                            view.description.setText(serie.getDescription());
+                            if(!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
+                                omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+            }
+        };
+        seriesListview.setAdapter(seriesAdapter);
+
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.show();
     }
 }
