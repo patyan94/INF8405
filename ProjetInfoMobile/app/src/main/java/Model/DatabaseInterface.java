@@ -99,6 +99,12 @@ public class DatabaseInterface {
         geoQuery.addGeoQueryEventListener(listener);
     }
 
+    public void StopListeningToCloseUsers(){
+        if(geoQuery != null)
+            geoQuery.removeAllListeners();
+        geoQuery = null;
+    }
+
     public void UpdateGeoQueryPosition(Location position){
         geoQuery.setCenter(new GeoLocation(position.getLatitude(), position.getLongitude()));
     }
@@ -164,6 +170,9 @@ public class DatabaseInterface {
 
     public Firebase GetSeriesListNode(){
         return firebaseRef.child("users").child(this.userData.getUsername()).child("series");
+    }
+    public Firebase GetSeriesListNode(String user){
+        return firebaseRef.child("users").child(user).child("series");
     }
 
     public void AddSerie(String suggestionID){

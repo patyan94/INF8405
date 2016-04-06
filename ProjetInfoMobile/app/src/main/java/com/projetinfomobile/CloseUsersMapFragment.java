@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -54,6 +55,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
         implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private HashMap<String, MarkerOptions> closeUsersLocations = new HashMap<>();
+    private HashMap<String, Marker> actualMarkersUsers = new HashMap<>();
     private GoogleMap map;
     private  Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
@@ -61,6 +63,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     private FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter;
     private OMDBInterface omdbInterface;
     private List<String> currentUserSeriesId;
+    private HashMap<String, List<String>> closeUsersSeries;
 
     public static class SeriesViewHolder extends RecyclerView.ViewHolder {
         TextView title;
@@ -75,6 +78,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     }
 
     public CloseUsersMapFragment() {
+        closeUsersSeries = new HashMap<>();
         // Required empty public constructor
     }
 
@@ -104,7 +108,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
         DatabaseInterface.Instance().GetSeriesListNode().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot s: dataSnapshot.getChildren()){
+                for (DataSnapshot s : dataSnapshot.getChildren()) {
                     currentUserSeriesId.add(s.getValue(String.class));
                 }
             }
@@ -132,6 +136,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     @Override
     public void onDetach() {
         super.onDetach();
+        DatabaseInterface.Instance().StopListeningToCloseUsers();
         mGoogleApiClient.disconnect();
     }
 
@@ -212,43 +217,80 @@ public class CloseUsersMapFragment extends SupportMapFragment
         @Override
         public void onKeyEntered(String key, GeoLocation location) {
             closeUsersLocations.put(key, new MarkerOptions().position(new LatLng(location.latitude, location.longitude)).title(key));
+            ShowUserLocationOnMap(closeUsersLocations.get(key));
         }
 
         @Override
         public void onKeyExited(String key) {
             closeUsersLocations.remove(key);
-            ShowUsersLocationOnMap();
+            actualMarkersUsers.get(key).remove();
+            actualMarkersUsers.remove(key);
         }
 
         @Override
         public void onKeyMoved(String key, GeoLocation location) {
-            MarkerOptions mk = closeUsersLocations.get(key);
-            mk.position(new LatLng(location.latitude, location.longitude));
+            Marker m = actualMarkersUsers.get(key);
+            m.setPosition(new LatLng(location.latitude, location.longitude));
         }
 
         @Override
         public void onGeoQueryReady() {
-            Log.i("Query", "done");
-            ShowUsersLocationOnMap();
         }
 
         @Override
         public void onGeoQueryError(FirebaseError error) {
-            Log.i("Query", "failed");
 
         }
     };
-    private void ShowUsersLocationOnMap(){
-        map.clear();
-        for(MarkerOptions pos : closeUsersLocations.values()){
-            Marker m = map.addMarker(pos);
+    private void ShowUserLocationOnMap(MarkerOptions pos) {
+        final Marker m = map.addMarker(pos);
+        actualMarkersUsers.put(pos.getTitle(), m);
 
-            //For the marker of the current user, show it in a distinctive colour
-            if(pos.getTitle().equalsIgnoreCase(DatabaseInterface.Instance().getUserData().getUsername())){
-                m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            }else{
-                //TODO : Enable marker (pos.visible()) only if commons series between currentUser and this one (pos.getTitle() for the username)
-            }
+        //For the marker of the current user, show it in a distinctive colour
+        if (pos.getTitle().equalsIgnoreCase(DatabaseInterface.Instance().getUserData().getUsername())) {
+            m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        } else {
+            m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            DatabaseInterface.Instance().GetSeriesListNode(pos.getTitle()).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (!closeUsersSeries.containsKey(dataSnapshot.getKey())) {
+                        closeUsersSeries.put(dataSnapshot.getKey(), new ArrayList<String>());
+                    }
+                    closeUsersSeries.get(dataSnapshot.getKey()).add(dataSnapshot.getValue(String.class));
+                    if (currentUserSeriesId.contains(dataSnapshot.getValue(String.class))) {
+                        m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    if (!closeUsersSeries.containsKey(dataSnapshot.getKey())) {
+                        closeUsersSeries.get(dataSnapshot.getKey()).remove(dataSnapshot.getValue(String.class));
+                    }
+                    for (String s : closeUsersSeries.get(dataSnapshot.getKey())) {
+                        if (currentUserSeriesId.contains(s)) {
+                            m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                            return;
+                        }
+                    }
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+
+                }
+            });
         }
     }
 
