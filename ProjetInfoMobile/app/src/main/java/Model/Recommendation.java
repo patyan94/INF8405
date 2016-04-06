@@ -1,34 +1,43 @@
 package Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yannd on 2016-03-25.
  */
 public class Recommendation {
-    private String recommender;
-    private String recommendee;
-    private String serieName;
 
-    public String getRecommender() {
-        return recommender;
+    String serieID;
+    List<String> users;
+
+    Recommendation(){
+        users = new ArrayList<>();
+        serieID = "";
     }
 
-    public void setRecommender(String recommender) {
-        this.recommender = recommender;
+    public String getSerieID() {
+        return serieID;
     }
 
-    public String getRecommendee() {
-        return recommendee;
+    public void setSerieID(String serieID) {
+        this.serieID = serieID;
     }
 
-    public void setRecommendee(String recommendee) {
-        this.recommendee = recommendee;
+    public List<String> getUsers() {
+        return users;
     }
 
-    public String getSerieName() {
-        return serieName;
+    public void setUsers(List<String> users) {
+        this.users = users;
     }
 
-    public void setSerieName(String serieName) {
-        this.serieName = serieName;
+    public void AddRecommendation(String user){
+        RemoveRecommendation(user);
+        users.add(user);
+    }
+
+    public void RemoveRecommendation(String user){
+        users.remove(user);
     }
 }

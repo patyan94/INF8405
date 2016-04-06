@@ -141,9 +141,25 @@ public class DatabaseInterface {
     public Firebase GetSeriesSuggestionNode(){
         return firebaseRef.child("serie_suggestions").child(this.userData.getUsername());
     }
-    public void SendSerieSuggestion(String username, String suggestionID){
+    public void SendSerieSuggestion(final String username, final String suggestionID){
         // Serie with a list of people who suggested it
-        firebaseRef.child("serie_suggestions").child(username).child(suggestionID).push().setValue(this.userData.getUsername());
+        firebaseRef.child("serie_suggestions").child(username).child(suggestionID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Recommendation rec = dataSnapshot.getValue(Recommendation.class);
+                if(rec == null){
+                    rec = new Recommendation();
+                    rec.setSerieID(suggestionID);
+                }
+                rec.AddRecommendation(userData.getUsername());
+                firebaseRef.child("serie_suggestions").child(username).child(suggestionID).setValue(rec);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 
     public Firebase GetSeriesListNode(){

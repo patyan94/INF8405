@@ -33,7 +33,6 @@ import Model.UserData;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        RecommandationsFragment.OnRecommandationsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         SensorEventListener{
 
@@ -280,10 +279,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSettingsFragmentInteraction(Uri uri) {
-        //TODO
-    }
-    @Override
-    public void onRecommandationsFragmentInteraction(Uri uri) {
         //TODO
     }
 }
