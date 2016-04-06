@@ -189,7 +189,6 @@ public class SeriesFragment extends Fragment {
             }
         };
         watchedSeriesListview.setAdapter(watchedSeriesAdapter);
-
         return view;
     }
 
@@ -248,7 +247,7 @@ public class SeriesFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String[] friends = input.getText().toString().split(", ");
-                for(int i = 0; i < friends.length; ++i){
+                for (int i = 0; i < friends.length; ++i) {
                     DatabaseInterface.Instance().SendSerieSuggestion(friends[i], serieID);
                 }
             }

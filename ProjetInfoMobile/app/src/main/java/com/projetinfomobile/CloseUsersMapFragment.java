@@ -21,7 +21,9 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.ui.FirebaseRecyclerAdapter;
@@ -40,7 +42,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import Model.DatabaseInterface;
 import Model.OMDBInterface;
@@ -56,6 +60,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     LocationRequest mLocationRequest;
     private FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter;
     private OMDBInterface omdbInterface;
+    private List<String> currentUserSeriesId;
 
     public static class SeriesViewHolder extends RecyclerView.ViewHolder {
         TextView title;
@@ -93,6 +98,23 @@ public class CloseUsersMapFragment extends SupportMapFragment
         //View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         getMapAsync(this);
+
+        ///We retrieve each serie ID of the current user
+        currentUserSeriesId = new ArrayList<String>();
+        DatabaseInterface.Instance().GetSeriesListNode().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot s: dataSnapshot.getChildren()){
+                    currentUserSeriesId.add(s.getValue(String.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
         return v;
     }
 
@@ -165,9 +187,9 @@ public class CloseUsersMapFragment extends SupportMapFragment
                 String username = marker.getTitle();
 
                 //If we clicked on ourselves we don't do anything special
-                if(DatabaseInterface.Instance().getUserData().getUsername().equalsIgnoreCase(username)){
+                if (DatabaseInterface.Instance().getUserData().getUsername().equalsIgnoreCase(username)) {
                     return true;
-                }else{
+                } else {
                     PromptUserSeries(username);
                     return true;
                 }
@@ -225,12 +247,14 @@ public class CloseUsersMapFragment extends SupportMapFragment
             if(pos.getTitle().equalsIgnoreCase(DatabaseInterface.Instance().getUserData().getUsername())){
                 m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             }else{
-                //TODO : m.setVisible(); Si serie(s) en commun ou pas.
+                //TODO : Enable marker (pos.visible()) only if commons series between currentUser and this one (pos.getTitle() for the username)
             }
         }
     }
 
     private void PromptUserSeries(final String username){
+
+        //We build the window
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(username);
         View seriesView = View.inflate(getContext(), R.layout.alert_dialog_series, null);
@@ -252,7 +276,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
                             Serie serie = Serie.FromJSONObject(response);
                             view.title.setText(serie.getName());
                             view.description.setText(serie.getDescription());
-                            if(!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
+                            if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
                                 omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
                             }
                         } catch (Exception e) {
