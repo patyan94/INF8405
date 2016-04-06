@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -320,6 +321,9 @@ public class CloseUsersMapFragment extends SupportMapFragment
                             view.description.setText(serie.getDescription());
                             if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
                                 omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
+                            }
+                            if(currentUserSeriesId.contains(serie.getID())) {
+                                view.itemView.setBackgroundColor(Color.GREEN);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
