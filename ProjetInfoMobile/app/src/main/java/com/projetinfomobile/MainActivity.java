@@ -5,13 +5,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.SupportMapFragment;
 
 import Model.DatabaseInterface;
 import Model.UserData;
@@ -33,74 +29,71 @@ import Model.UserData;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        SettingsFragment.OnSettingsFragmentInteractionListener,
         SensorEventListener{
 
-    ImageView profilePictureView;
-    TextView usernameView;
 
     //Variables for shake detection
     private static final float SHAKE_THRESHOLD = 15.0f;
     private static final int MIN_TIME_BETWEEN_SHAKES_MILLISECS = 5000;
+
+
+    private SensorManager mSensorMgr;
+
+    ImageView profilePictureView;
+    TextView usernameView;
+
     private long mLastShakeTime;
     private long mLastShakeDetectTime;
-    private int shakeCount;
-    private SensorManager mSensorMgr;
     private int previousFragmentId;
+    private int shakeCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
+        // Setup the toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Loading the "Your series" fragment at application start
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        final Fragment frag = new SeriesFragment();
-        fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-
-        //Setting the current fragment active
+        LoadFragment(new SeriesFragment());
         previousFragmentId = R.id.nav_your_series;
 
-
+        // Setup the drawer layout
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        // Setup the navigation view in the drawer
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //Set the item menu "Your series" checked by default
-        navigationView.getMenu().getItem(3).setChecked(true);
+        navigationView.getMenu().getItem(3).setChecked(true);//Set the item menu "Your series" checked by default
 
 
+        // Setup the floating button to open the search fragment
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_new_serie);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                SeriesFragment fragment = new SeriesFragment();
                 navigationView.getMenu().getItem(3).setChecked(true);
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
-                //fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                LoadFragment(new SeriesFragment());
                 previousFragmentId = R.id.nav_your_series;
 
             }
         });
 
         View drawerHeader = navigationView.getHeaderView(0);
-        final UserData userData = DatabaseInterface.Instance().getUserData();
+        UserData userData = DatabaseInterface.Instance().getUserData();
+
+        // Sets the user photo
         profilePictureView = (ImageView)drawerHeader.findViewById(R.id.profile_picture_view);
         profilePictureView.setImageBitmap(userData.getUserProfileImage());
 
+        // Sets the username
         usernameView = (TextView)drawerHeader.findViewById(R.id.user_display_name);
         usernameView.setText(userData.getUsername());
 
@@ -141,12 +134,7 @@ public class MainActivity extends AppCompatActivity
         switch(item.getItemId())
         {
             case R.id.action_settings :
-
-                fragment = new SettingsFragment();
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
-                //fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                LoadFragment(new SettingsFragment());
                 return true;
 
             //Add any new button's action in a new case if needed
@@ -160,13 +148,14 @@ public class MainActivity extends AppCompatActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        Fragment frag = null;
+        // Change views when the orientation changes
+        Fragment fragment = null;
         boolean mapMode = false;
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            frag = new CloseUsersMapFragment();
+            fragment = new CloseUsersMapFragment();
             mapMode = true;
             navigationView.getMenu().getItem(1).setChecked(true);
         } else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -176,41 +165,38 @@ public class MainActivity extends AppCompatActivity
         switch (previousFragmentId){
             case R.id.nav_friends_recommendations:
                 if(!mapMode) {
-                    frag = new RecommandationsFragment();
+                    fragment = new RecommandationsFragment();
                 }
                 navigationView.getMenu().getItem(2).setChecked(!mapMode);
                 break;
             case R.id.nav_friends:
                 if(!mapMode){
-                    frag = new FriendsFragment();
+                    fragment = new FriendsFragment();
                 }
                 navigationView.getMenu().getItem(0).setChecked(!mapMode);
                 break;
             case R.id.nav_settings:
                 if(!mapMode){
-                    frag = new SettingsFragment();
+                    fragment = new SettingsFragment();
                 }
                 navigationView.getMenu().getItem(4).setChecked(!mapMode);
                 break;
             case R.id.nav_map:
                 if(!mapMode){
-                    frag = new CloseUsersMapFragment();
+                    fragment = new CloseUsersMapFragment();
                 }
                 navigationView.getMenu().getItem(1).setChecked(!mapMode);
                 break;
             case  R.id.nav_your_series:
                 if(!mapMode){
-                    frag = new SeriesFragment();
+                    fragment = new SeriesFragment();
                 }
                 navigationView.getMenu().getItem(3).setChecked(!mapMode);
                 break;
         }
 
-        if(frag != null){
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, frag, frag.getTag());
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+        if(fragment != null){
+            LoadFragment(fragment);
         }
     }
 
@@ -239,10 +225,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(fragment != null){
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
-            //fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            LoadFragment(fragment);
 
             previousFragmentId = id;
         }
@@ -286,8 +269,10 @@ public class MainActivity extends AppCompatActivity
         // Ignore
     }
 
-    @Override
-    public void onSettingsFragmentInteraction(Uri uri) {
-        //TODO
+    void LoadFragment(Fragment fragment){
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
+        fragmentTransaction.commit();
+
     }
 }

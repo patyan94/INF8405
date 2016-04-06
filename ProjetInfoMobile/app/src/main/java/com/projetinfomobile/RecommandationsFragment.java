@@ -27,35 +27,9 @@ import Model.Serie;
 
 
 public class RecommandationsFragment extends Fragment {
-    public static class RecommendedSerieViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView description;
-        ImageView posterView;
-        Button removeRecommendationButton;
-        Button addRecommendationSerieButton;
-        public RecommendedSerieViewHolder(View itemView) {
-            super(itemView);
-            title = (TextView)itemView.findViewById(R.id.serie_name);
-            description = (TextView)itemView.findViewById(R.id.serie_description);
-            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
-            removeRecommendationButton =(Button)itemView.findViewById(R.id.remove_recommendation);
-            addRecommendationSerieButton =(Button)itemView.findViewById(R.id.add_recommendation);
-        }
-    }
-
-
     FirebaseRecyclerAdapter<Recommendation, RecommendedSerieViewHolder> recommendedSeriesAdapter;
     RecyclerView recommendedSeriesView;
     OMDBInterface omdbInterface;
-
-    public RecommandationsFragment() {
-    }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,6 +37,8 @@ public class RecommandationsFragment extends Fragment {
 
         omdbInterface = OMDBInterface.Start(getContext());
         View view = inflater.inflate(R.layout.fragment_recommandations, container, false);
+
+        // Setups the view for the list of recommendations
         recommendedSeriesView = (RecyclerView)view.findViewById(R.id.recommendation_recyclerView);
         recommendedSeriesAdapter = new FirebaseRecyclerAdapter<Recommendation, RecommendedSerieViewHolder>(Recommendation.class, R.layout.series_suggsetion_listview_item, RecommendedSerieViewHolder.class, DatabaseInterface.Instance().GetCurrentUserSeriesSuggestionNode()) {
             @Override
@@ -108,13 +84,25 @@ public class RecommandationsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         recommendedSeriesAdapter.cleanup();
+    }
+
+    // Holder for the recommandation item
+    public static class RecommendedSerieViewHolder extends RecyclerView.ViewHolder {
+        TextView title;
+        TextView description;
+        ImageView posterView;
+        Button removeRecommendationButton;
+        Button addRecommendationSerieButton;
+        public RecommendedSerieViewHolder(View itemView) {
+            super(itemView);
+            title = (TextView)itemView.findViewById(R.id.serie_name);
+            description = (TextView)itemView.findViewById(R.id.serie_description);
+            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
+            removeRecommendationButton =(Button)itemView.findViewById(R.id.remove_recommendation);
+            addRecommendationSerieButton =(Button)itemView.findViewById(R.id.add_recommendation);
+        }
     }
 }

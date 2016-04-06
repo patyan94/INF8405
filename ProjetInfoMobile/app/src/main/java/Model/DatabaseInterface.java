@@ -56,16 +56,20 @@ public class DatabaseInterface {
     //endregion
 
     //region authentication
+
+    // Login
     public void LoginWithPassword(final String email, final String password, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
         firebaseRef.authWithPassword(email, password, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
+                // Gets user data if login succeded
                 DatabaseInterface.this.authData = authData;
                 FetchUserData(authData, authResultHandler, userCreationHandler);
             }
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
+                // Signs up user if account doesnt exist, notify user for other errors
                 if (firebaseError.getCode() == FirebaseError.USER_DOES_NOT_EXIST) {
                     SignupWithPassword(email, password, authResultHandler, userCreationHandler);
                 } else {
@@ -75,15 +79,18 @@ public class DatabaseInterface {
         });
     }
 
+    // Signup
     public void SignupWithPassword(final String email, final String password, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
         firebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> stringObjectMap) {
+                // Tries to login if signup succeded
                 LoginWithPassword(email, password, authResultHandler, userCreationHandler);
             }
 
             @Override
             public void onError(FirebaseError firebaseError) {
+                // Notifies user if signup didnt work
                 userCreationHandler.onError(firebaseError);
             }
         });
@@ -97,6 +104,7 @@ public class DatabaseInterface {
 
     //region nodes
 
+    // All functions of this region return the URL address on the database of their field
     public Firebase GetUsersNode(){
         return firebaseRef.child("users");
     }
@@ -149,10 +157,12 @@ public class DatabaseInterface {
     //endregion
 
     //region usermanagement
+    // Gets the username from its UID
     public void FetchUserData(final AuthData authData, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
         GetUserIDNode(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // If found username then load all the data, if not, the user must set a username
                 if (dataSnapshot.getValue() != null) {
                     FetchDetailledUserInfo(dataSnapshot.getValue(String.class), authResultHandler);
                     return;
@@ -171,6 +181,7 @@ public class DatabaseInterface {
         GetUserDataNode(username).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // Listens for changes on each user info
                 userData = dataSnapshot.getValue(UserData.class);
                 GetFriendListNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<String>(String.class, userData.getFriendsList()));
                 GetSeriesListNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<String>(String.class, userData.getSeriesList()));
@@ -187,6 +198,7 @@ public class DatabaseInterface {
 
     }
 
+    // Creates a new user account
     public void AddNewUSer(final String username, final ValueEventListener valueEventListener){
        GetUserNode(username).addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
@@ -213,15 +225,22 @@ public class DatabaseInterface {
         return this.userData;
     }
 
+    public void SaveCurrentUserData(){
+        GetUserDataNode(userData.getUsername()).setValue(userData);
+    }
+
     //endregion
 
     //region positionmanagement
     public void UpdateUserPosition(Location position){
-        geofireRef.setLocation(userData.getUsername(), new GeoLocation(position.getLatitude(), position.getLongitude()));
+        if(userData.isSharePosition())
+            geofireRef.setLocation(userData.getUsername(), new GeoLocation(position.getLatitude(), position.getLongitude()));
+        else
+            geofireRef.removeLocation(userData.getUsername());
     }
 
     public void StartListeningToCloseUsers(Location position, double radius, GeoQueryEventListener listener){
-        if(geoQuery != null) return;
+        if(geoQuery != null || !userData.isSharePosition()) return;
         geoQuery =  geofireRef.queryAtLocation(new GeoLocation(position.getLatitude(), position.getLongitude()), radius);
         geoQuery.addGeoQueryEventListener(listener);
     }

@@ -32,13 +32,14 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
     ImageButton chooseProfilePictureButton;
     EditText usernameEntry;
     UserData userData = new UserData();
-    Firebase firebaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info_completion);
         Firebase.setAndroidContext(this);
+
+        // Button to select a profile picture
         chooseProfilePictureButton = (ImageButton)findViewById(R.id.select_profile_picture_button);
         chooseProfilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +48,8 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
                 startActivityForResult(photoPickerIntent, SELECT_PHOTO);
             }
         });
+
+        // Button to continue to the main application
         continueButton = (Button)findViewById(R.id.continue_button);
         continueButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +57,7 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
                 Continue();
             }
         });
+
         usernameEntry = (EditText)findViewById(R.id.username);
         usernameEntry.addTextChangedListener(new TextWatcher() {
             @Override
@@ -73,15 +77,23 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
         });
     }
 
+    // Called when we click on the continue button
     void Continue(){
+        // Checks the username which is mandatory
         final String username = usernameEntry.getText().toString();
         usernameEntry.setError(null);
+        if(username.isEmpty()) {
+            usernameEntry.setError("You must enter a valid username");
+            return;
+        }
+        // Creates a new user account
         DatabaseInterface.Instance().AddNewUSer(username, new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null){
                     usernameEntry.setError("Username already used");
                 } else{
+                    // Go to main activity once the setup is complete
                     Intent intent = new Intent(UserInfoCompletionActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
@@ -91,12 +103,9 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
 
             }
         });
-        firebaseRef = DatabaseInterface.Instance().GetUsersNode();
-
-        userData.setUsername(usernameEntry.getText().toString());
-
     }
 
+    // Sets the profile picture
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);

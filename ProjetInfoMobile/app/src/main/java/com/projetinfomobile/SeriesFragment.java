@@ -67,18 +67,11 @@ public class SeriesFragment extends Fragment {
     List<String> autoCompleteFriendsSuggestions = new ArrayList<>();
     int currentSearchPage = 0;
 
-    public SeriesFragment() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Setup the autocomplete friend finder
         autoCompleteFriendAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_dropdown_item_1line, autoCompleteFriendsSuggestions);
         DatabaseInterface.Instance().GetCurrentUserFriendListNode().addChildEventListener(new ChildEventListener() {
             @Override
@@ -111,6 +104,8 @@ public class SeriesFragment extends Fragment {
         omdbInterface = OMDBInterface.Start(getContext());
 
         View view = inflater.inflate(R.layout.fragment_series, container, false);
+
+        // Search serie button
         searchSeriesButton = (Button)view.findViewById(R.id.search_serie_button);
         searchSeriesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,6 +115,8 @@ public class SeriesFragment extends Fragment {
                 omdbInterface.SearchSerie(searchSerieTitle.getText().toString().trim(), currentSearchPage, onSerieSearchResponse, onSerieSearchError);
             }
         });
+
+        // The title of the serie to search
         searchSerieTitle = (EditText)view.findViewById(R.id.search_serie_title);
         searchSerieTitle.addTextChangedListener(new TextWatcher() {
             @Override
@@ -139,6 +136,8 @@ public class SeriesFragment extends Fragment {
 
             }
         });
+
+        // Setup the recycler views
         watchedSeriesListview = (RecyclerView)view.findViewById(R.id.series_listview);
         watchedSeriesListview.setHasFixedSize(true);
         watchedSeriesListview.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -148,10 +147,13 @@ public class SeriesFragment extends Fragment {
         searchSerieResults.setAdapter(serieSearchResultAdapter);
 
 
+        // Populates the list with each serie watched
         watchedSeriesAdapter = new FirebaseRecyclerAdapter<String, WatchedSerieViewHolder>(String.class, R.layout.series_listview_item, WatchedSerieViewHolder.class,DatabaseInterface.Instance().GetCurrentUserSeriesListNode()) {
             @Override
             protected void populateViewHolder(final WatchedSerieViewHolder view, final String serieID, int position) {
                 Log.i("Populate", serieID);
+                view.recommendSerieButton.setEnabled(false);
+                view.removeSerieButton.setEnabled(false);
                 view.removeSerieButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -161,7 +163,7 @@ public class SeriesFragment extends Fragment {
                 view.recommendSerieButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        RecommendSerie(serieID);
+                        RecommendSerie(serieID, view.title.getText().toString());
                     }
                 });
                 omdbInterface.GetSerieInfo(serieID, new Response.Listener<JSONObject>() {
@@ -176,6 +178,8 @@ public class SeriesFragment extends Fragment {
                             if(!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
                                 omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
                             }
+                            view.recommendSerieButton.setEnabled(true);
+                            view.removeSerieButton.setEnabled(true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -193,16 +197,12 @@ public class SeriesFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         watchedSeriesAdapter.cleanup();
     }
 
+    // Callback when we received the results of a serie search
     Response.Listener<JSONObject> onSerieSearchResponse = new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
@@ -212,6 +212,7 @@ public class SeriesFragment extends Fragment {
                     serieSearchResultAdapter.add(Serie.FromJSONObject(results.getJSONObject(i)));
                 }
                 int nbResults = response.getInt("totalResults");
+                //Continue the search if we didnt get all the results
                 if(serieSearchResultAdapter.getItemCount() < nbResults){
                     omdbInterface.SearchSerie(searchSerieTitle.getText().toString(), ++currentSearchPage, onSerieSearchResponse, onSerieSearchError);
                 }
@@ -232,9 +233,10 @@ public class SeriesFragment extends Fragment {
         }
     };
 
-    void RecommendSerie(final String serieID){
+    // Shows a dialog to send a serie recommendation to multiple friends at the time
+    void RecommendSerie(final String serieID, String serieName){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Recommend");
+        builder.setTitle("Recommend" + serieName);
 
         final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(getContext());
         input.setAdapter(autoCompleteFriendAdapter);

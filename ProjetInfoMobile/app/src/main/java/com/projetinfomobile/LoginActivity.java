@@ -35,12 +35,9 @@ import Model.UserData;
  */
 public class LoginActivity extends AppCompatActivity{
 
-    private final int SELECT_PHOTO = 1;
-    // UI references.
     private EditText mUsernameEntry;
     private EditText mPasswordEntry;
     private View mProgressView;
-    private Bitmap imagePicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +46,8 @@ public class LoginActivity extends AppCompatActivity{
 
         Firebase.setAndroidContext(this);
 
-        String possibleEmail = "a@a.com";
+        // Puts an email from your contact list in the email field
+        String possibleEmail = "";
         Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
         Account[] accounts = AccountManager.get(getApplicationContext()).getAccounts();
         for (Account account : accounts) {
@@ -112,7 +110,7 @@ public class LoginActivity extends AppCompatActivity{
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password)) {
             mPasswordEntry.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordEntry;
             cancel = true;
@@ -121,10 +119,6 @@ public class LoginActivity extends AppCompatActivity{
         // Check for a valid email address.
         if (TextUtils.isEmpty(username)) {
             mUsernameEntry.setError(getString(R.string.error_field_required));
-            focusView = mUsernameEntry;
-            cancel = true;
-        } else if (!isUsernameValid(username)) {
-            mUsernameEntry.setError(getString(R.string.error_invalid_email));
             focusView = mUsernameEntry;
             cancel = true;
         }
@@ -141,32 +135,23 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
-    private boolean isUsernameValid(String username) {
-        //TODO: Use better logic
-        return username.length() > 1;
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Use better logic
-        return password.length() > 1;
-    }
-
-    private void showProgress(final boolean show) {
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
     // Handles login results
     Firebase.AuthResultHandler authResultHandler = new Firebase.AuthResultHandler() {
         @Override
         public void onAuthenticated(AuthData authData) {
+            // Go to main activity if we logged in
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
         }
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
+            // Show the error to the user if there is one
             ShowSnackBar(firebaseError.getMessage());
             showProgress(false);
             switch (firebaseError.getCode()){
+                case  FirebaseError.INVALID_EMAIL:
+                    mUsernameEntry.setError("Invalid email");
+                    mUsernameEntry.requestFocus();
                 case FirebaseError.INVALID_PASSWORD:
                     mPasswordEntry.setError("Invalid password");
                     mPasswordEntry.requestFocus();
@@ -185,9 +170,6 @@ public class LoginActivity extends AppCompatActivity{
             if(result == null){
                 Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
                 startActivity(intent);
-            }
-            else {
-                ShowSnackBar("Successfully created user account with uid: " + result.get("uid"));
             }
         }
         @Override
@@ -212,6 +194,10 @@ public class LoginActivity extends AppCompatActivity{
     public void ShowSnackBar(String message){
         Snackbar.make(findViewById(R.id.login_activity_layout), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+    }
+
+    private void showProgress(final boolean show) {
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }
 

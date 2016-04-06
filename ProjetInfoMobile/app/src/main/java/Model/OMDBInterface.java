@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 /**
  * Created by yannd on 2016-04-05.
+ * Interface to search on the series database
  */
 public class OMDBInterface {
     final String URLSearchSerie = "http://www.omdbapi.com/?type=series&r=json&s=";
@@ -34,16 +35,13 @@ public class OMDBInterface {
 
     }
 
-    public RequestQueue GetRequestQueue(){
-        return  this.requestQueue;
-    }
-
     public static OMDBInterface Start(Context context){
         OMDBInterface instance = new OMDBInterface();
         instance.requestQueue = Volley.newRequestQueue(context);
         return instance;
     }
 
+    // Finds a list of series matching the search
     public void SearchSerie(String title, int page, Response.Listener<JSONObject> responselistener, Response.ErrorListener errorListener){
         StringBuilder urlString = new StringBuilder(URLSearchSerie);
         urlString.append(title.replace(' ', '+'));
@@ -52,6 +50,8 @@ public class OMDBInterface {
                 (Request.Method.GET, urlString.toString(), null, responselistener, errorListener);
         requestQueue.add(jsObjRequest);
     }
+
+    // Find s specific infos
     public void GetSerieInfo(String serieID, Response.Listener<JSONObject> responselistener, Response.ErrorListener errorListener){
         StringBuilder urlString = new StringBuilder(URLSearchID);
         urlString.append(serieID);
@@ -59,6 +59,8 @@ public class OMDBInterface {
                 (Request.Method.GET, urlString.toString(), null, responselistener, errorListener);
         requestQueue.add(jsObjRequest);
     }
+
+    // Find a serie image
     public void GetPoster(String url, final ImageView view){
         ImageRequest request = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {

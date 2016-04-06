@@ -31,6 +31,7 @@ import Model.Serie;
 
 /**
  * Created by yannd on 2016-04-05.
+ * Adapter for the serie search results
  */
 public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieSearchResultAdapter.ViewHolder> {
 
@@ -43,12 +44,6 @@ public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieS
         imageRequests = Volley.newRequestQueue(context);
         ctx = context;
     }
-
-    @Override
-    public void clear(){
-        super.clear();
-    }
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.serie_search_result_listview_item, parent, false);
@@ -86,6 +81,7 @@ public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieS
 
                 }
             });
+            // Fetch the serie photo if there is one
             if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
                 ImageRequest request = new ImageRequest(serie.getPhotoURL(),
                         new Response.Listener<Bitmap>() {
