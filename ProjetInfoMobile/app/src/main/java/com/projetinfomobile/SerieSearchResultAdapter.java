@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,9 +36,12 @@ public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieS
 
     RequestQueue imageRequests;
     private LayoutInflater inflater = null;
+    private Context ctx;
+
     public SerieSearchResultAdapter(Context context){
         super(new ArrayList<Serie>());
         imageRequests = Volley.newRequestQueue(context);
+        ctx = context;
     }
 
     @Override
@@ -60,11 +64,14 @@ public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieS
         TextView title;
         ImageView posterView;
         Button addSerieButton;
+        EditText searchSerieTitle ;
+
         public ViewHolder(View itemView) {
             super(itemView);
             title = (TextView)itemView.findViewById(R.id.serie_name);
             posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
             addSerieButton =(Button)itemView.findViewById(R.id.add_serie_button);
+            searchSerieTitle = (EditText) ((Activity) ctx).findViewById(R.id.search_serie_title);
         }
         public void BindSerie(final Serie serie) {
             title.setText(serie.getName());
@@ -72,6 +79,11 @@ public class SerieSearchResultAdapter extends RecyclerArrayAdapter<Serie, SerieS
                 @Override
                 public void onClick(View v) {
                     DatabaseInterface.Instance().AddSerie(serie.getID());
+
+                    //Clearing the results when a serie is selected.
+                    SerieSearchResultAdapter.this.clear();
+                    searchSerieTitle.setText("");
+
                 }
             });
             if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {

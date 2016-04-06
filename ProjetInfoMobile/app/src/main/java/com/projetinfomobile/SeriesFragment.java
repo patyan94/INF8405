@@ -119,10 +119,9 @@ public class SeriesFragment extends Fragment {
         searchSeriesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchSeriesButton.setEnabled(false);
                 serieSearchResultAdapter.clear();
                 currentSearchPage = 1;
-                omdbInterface.SearchSerie(searchSerieTitle.getText().toString(), currentSearchPage, onSerieSearchResponse, onSerieSearchError);
+                omdbInterface.SearchSerie(searchSerieTitle.getText().toString().trim(), currentSearchPage, onSerieSearchResponse, onSerieSearchError);
             }
         });
         searchSerieTitle = (EditText)view.findViewById(R.id.search_serie_title);
