@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class UserData {
@@ -15,7 +16,6 @@ public class UserData {
     private String provider;
     private String encodedUserProfileImage;
     private boolean sharePosition = true;
-
 
     public String getUsername() {
         return username;
@@ -49,11 +49,60 @@ public class UserData {
         this.sharePosition = sharePosition;
     }
 
+//region jsonignore
+    @JsonIgnore
+    HashMap<String, String> friendsList = new HashMap<>();
+    @JsonIgnore
+    HashMap<String, String> seriesList = new HashMap<>();
+    @JsonIgnore
+    HashMap<String, String> friendsRequests = new HashMap<>();
+    @JsonIgnore
+    HashMap<String, Recommendation> seriesSuggestions = new HashMap<>();
+
+    @JsonIgnore
+    public HashMap<String, String> getFriendsList() {
+        return friendsList;
+    }
+
+    @JsonIgnore
+    public void setFriendsList(HashMap<String, String> friendsList) {
+        this.friendsList = friendsList;
+    }
+
+    @JsonIgnore
+    public HashMap<String, String> getSeriesList() {
+        return seriesList;
+    }
+
+    @JsonIgnore
+    public void setSeriesList(HashMap<String, String> seriesList) {
+        this.seriesList = seriesList;
+    }
+
+    @JsonIgnore
+    public HashMap<String, String> getFriendsRequests() {
+        return friendsRequests;
+    }
+
+    @JsonIgnore
+    public void setFriendsRequests(HashMap<String, String> friendsRequests) {
+        this.friendsRequests = friendsRequests;
+    }
+
+    @JsonIgnore
+    public HashMap<String, Recommendation> getSeriesSuggestions() {
+        return seriesSuggestions;
+    }
+
+    @JsonIgnore
+    public void setSeriesSuggestions(HashMap<String, Recommendation> seriesSuggestions) {
+        this.seriesSuggestions = seriesSuggestions;
+    }
+
     @JsonIgnore
     public void setUserProfileImage(Bitmap image){
         ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.PNG, 100, bYtE);
-        //image.recycle();
         byte[] byteArray = bYtE.toByteArray();
         String imageFile = com.firebase.client.utilities.Base64.encodeBytes(byteArray);
         encodedUserProfileImage = imageFile;
@@ -68,4 +117,5 @@ public class UserData {
             return null;
         }
     }
+//endregion
 }

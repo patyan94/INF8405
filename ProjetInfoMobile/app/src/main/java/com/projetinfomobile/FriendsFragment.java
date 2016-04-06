@@ -87,7 +87,7 @@ public class FriendsFragment extends Fragment {
         });
 
 
-        friendsListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friends_listview_item, DatabaseInterface.Instance().GetFriendListNode()) {
+        friendsListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friends_listview_item, DatabaseInterface.Instance().GetCurrentUserFriendListNode()) {
             @Override
             protected void populateView(View view, final String username, int position) {
                 Log.i("Populate", username);
@@ -102,7 +102,7 @@ public class FriendsFragment extends Fragment {
             }
         };
         ((ListView) fragmentView.findViewById(R.id.friends_listview)).setAdapter(friendsListAdapter);
-        friendsRequestListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friend_request_listview_item, DatabaseInterface.Instance().GetReceivedFriendRequestsNode()) {
+        friendsRequestListAdapter = new FirebaseListAdapter<String>(this.getActivity(), String.class, R.layout.friend_request_listview_item, DatabaseInterface.Instance().GetCurrentUserReceivedFriendRequestsNode()) {
             @Override
             protected void populateView(View view, final String username, int position) {
                 ((TextView)view.findViewById(R.id.username)).setText(username);
@@ -123,7 +123,7 @@ public class FriendsFragment extends Fragment {
         ((ListView) fragmentView.findViewById(R.id.friends_requests_listview)).setAdapter(friendsRequestListAdapter);
 
 
-        usernameQuery = DatabaseInterface.Instance().GetUserIDNode();
+        usernameQuery = DatabaseInterface.Instance().GetUsersIDNode();
         usernameQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

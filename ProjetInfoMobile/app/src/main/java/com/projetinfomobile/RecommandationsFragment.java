@@ -64,7 +64,7 @@ public class RecommandationsFragment extends Fragment {
         omdbInterface = OMDBInterface.Start(getContext());
         View view = inflater.inflate(R.layout.fragment_recommandations, container, false);
         recommendedSeriesView = (RecyclerView)view.findViewById(R.id.recommendation_recyclerView);
-        recommendedSeriesAdapter = new FirebaseRecyclerAdapter<Recommendation, RecommendedSerieViewHolder>(Recommendation.class, R.layout.series_suggsetion_listview_item, RecommendedSerieViewHolder.class, DatabaseInterface.Instance().GetSeriesSuggestionNode()) {
+        recommendedSeriesAdapter = new FirebaseRecyclerAdapter<Recommendation, RecommendedSerieViewHolder>(Recommendation.class, R.layout.series_suggsetion_listview_item, RecommendedSerieViewHolder.class, DatabaseInterface.Instance().GetCurrentUserSeriesSuggestionNode()) {
             @Override
             protected void populateViewHolder(final RecommendedSerieViewHolder recommendedSerieViewHolder, final Recommendation r, int i) {
                 recommendedSerieViewHolder.addRecommendationSerieButton.setOnClickListener(new View.OnClickListener() {

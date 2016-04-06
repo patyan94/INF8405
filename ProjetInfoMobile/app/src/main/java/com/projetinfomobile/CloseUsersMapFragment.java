@@ -63,7 +63,6 @@ public class CloseUsersMapFragment extends SupportMapFragment
     LocationRequest mLocationRequest;
     private FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter;
     private OMDBInterface omdbInterface;
-    private List<String> currentUserSeriesId;
     private HashMap<String, List<String>> closeUsersSeries;
 
     public static class SeriesViewHolder extends RecyclerView.ViewHolder {
@@ -103,23 +102,6 @@ public class CloseUsersMapFragment extends SupportMapFragment
         //View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         getMapAsync(this);
-
-        ///We retrieve each serie ID of the current user
-        currentUserSeriesId = new ArrayList<String>();
-        DatabaseInterface.Instance().GetSeriesListNode().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot s : dataSnapshot.getChildren()) {
-                    currentUserSeriesId.add(s.getValue(String.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-
         return v;
     }
 
@@ -259,7 +241,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
                         closeUsersSeries.put(dataSnapshot.getKey(), new ArrayList<String>());
                     }
                     closeUsersSeries.get(dataSnapshot.getKey()).add(dataSnapshot.getValue(String.class));
-                    if (currentUserSeriesId.contains(dataSnapshot.getValue(String.class))) {
+                    if (DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(dataSnapshot.getKey())) {
                         m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     }
                 }
@@ -275,7 +257,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
                         closeUsersSeries.get(dataSnapshot.getKey()).remove(dataSnapshot.getValue(String.class));
                     }
                     for (String s : closeUsersSeries.get(dataSnapshot.getKey())) {
-                        if (currentUserSeriesId.contains(s)) {
+                        if (DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(s)) {
                             m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                             return;
                         }
@@ -322,7 +304,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
                             if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
                                 omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
                             }
-                            if(currentUserSeriesId.contains(serie.getID())) {
+                            if(DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(serie.getID())) {
                                 view.itemView.setBackgroundColor(Color.GREEN);
                             }
                         } catch (Exception e) {

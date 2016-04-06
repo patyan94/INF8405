@@ -1,8 +1,10 @@
 package Model;
 
+import android.content.Intent;
 import android.location.Location;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -11,6 +13,10 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.projetinfomobile.MainActivity;
+import com.projetinfomobile.UserInfoCompletionActivity;
+
+import java.util.Map;
 
 /**
  * Created by yannd on 2016-03-25.
@@ -22,18 +28,11 @@ public class DatabaseInterface {
     GeoQuery geoQuery;
     private GeoFire geofireRef;
     private UserData userData = null;
-    private AuthData authData = null;
+    private AuthData authData;
 
     //region getters/setters
     public UserData getUserData() {
         return userData;
-    }
-    public AuthData getAuthData() {
-        return authData;
-    }
-
-    public void setAuthData(AuthData authData) {
-        this.authData = authData;
     }
 
     public Firebase GetDatabaseMainNode(){
@@ -56,36 +55,164 @@ public class DatabaseInterface {
     }
     //endregion
 
+    //region authentication
+    public void LoginWithPassword(final String email, final String password, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
+        firebaseRef.authWithPassword(email, password, new Firebase.AuthResultHandler() {
+            @Override
+            public void onAuthenticated(AuthData authData) {
+                DatabaseInterface.this.authData = authData;
+                FetchUserData(authData, authResultHandler, userCreationHandler);
+            }
+
+            @Override
+            public void onAuthenticationError(FirebaseError firebaseError) {
+                if (firebaseError.getCode() == FirebaseError.USER_DOES_NOT_EXIST) {
+                    SignupWithPassword(email, password, authResultHandler, userCreationHandler);
+                } else {
+                    authResultHandler.onAuthenticationError(firebaseError);
+                }
+            }
+        });
+    }
+
+    public void SignupWithPassword(final String email, final String password, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
+        firebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> stringObjectMap) {
+                LoginWithPassword(email, password, authResultHandler, userCreationHandler);
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                userCreationHandler.onError(firebaseError);
+            }
+        });
+    }
+
+    public void  Logout(){
+        firebaseRef.unauth();
+        userData = null;
+    }
+    //endregion
+
+    //region nodes
+
+    public Firebase GetUsersNode(){
+        return firebaseRef.child("users");
+    }
+
+    public Firebase GetUserNode(String username){
+        return GetUsersNode().child(username);
+    }
+    public Firebase GetUserDataNode(String username){
+        return GetUsersNode().child(username).child("user_data");
+    }
+
+    public Firebase GetUsersIDNode(){
+        return firebaseRef.child("user_ids");
+    }
+
+    public Firebase GetUserIDNode(String uid){
+        return GetUsersIDNode().child(uid);
+    }
+
+    public Firebase GetReceivedFriendRequestsNode(String username){
+        return GetUserNode(username).child("friends_requests");
+    }
+
+    public Firebase GetFriendListNode(String username){
+        return GetUserNode(username).child("friends");
+    }
+    public Firebase GetSeriesSuggestionNode(String username){
+        return GetUserNode(username).child("series_suggestions");
+    }
+
+    public Firebase GetSeriesListNode(String username){
+        return GetUserNode(username).child("series");
+    }
+
+    public Firebase GetCurrentUserReceivedFriendRequestsNode(){
+        return GetReceivedFriendRequestsNode(userData.getUsername());
+    }
+
+    public Firebase GetCurrentUserFriendListNode(){
+        return GetFriendListNode(userData.getUsername());
+    }
+    public Firebase GetCurrentUserSeriesSuggestionNode(){
+        return GetSeriesSuggestionNode(userData.getUsername());
+    }
+
+    public Firebase GetCurrentUserSeriesListNode(){
+        return GetSeriesListNode(userData.getUsername());
+    }
+
+    //endregion
+
     //region usermanagement
-    public void SetCurrentUser(UserData userData){
-        this.userData = userData;
-        this.userData.setProvider(authData.getProvider());
+    public void FetchUserData(final AuthData authData, final Firebase.AuthResultHandler authResultHandler, final Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler){
+        GetUserIDNode(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    FetchDetailledUserInfo(dataSnapshot.getValue(String.class), authResultHandler);
+                    return;
+                } else {
+                    userCreationHandler.onSuccess(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+    }
+    public void FetchDetailledUserInfo(final String username, final Firebase.AuthResultHandler authResultHandler) {
+        GetUserDataNode(username).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userData = dataSnapshot.getValue(UserData.class);
+                GetFriendListNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<String>(String.class, userData.getFriendsList()));
+                GetSeriesListNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<String>(String.class, userData.getSeriesList()));
+                GetReceivedFriendRequestsNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<String>(String.class, userData.getFriendsRequests()));
+                GetSeriesSuggestionNode(userData.getUsername()).addChildEventListener(new CustomChildEventListener<Recommendation>(Recommendation.class, userData.getSeriesSuggestions()));
+                authResultHandler.onAuthenticated(DatabaseInterface.this.authData);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
     }
 
-    public void AddNewUSer(String username){
-        firebaseRef.child("user_ids").child(authData.getUid()).setValue(username);
-    }
+    public void AddNewUSer(final String username, final ValueEventListener valueEventListener){
+       GetUserNode(username).addListenerForSingleValueEvent(new ValueEventListener() {
+           @Override
+           public void onDataChange(DataSnapshot dataSnapshot) {
+               if(dataSnapshot.getValue()== null) {
+                   GetUserIDNode(DatabaseInterface.this.authData.getUid()).setValue(username);
+                   userData = new UserData();
+                   userData.setUsername(username);
+                   userData.setProvider(DatabaseInterface.this.authData.getProvider());
+                   GetUserDataNode(username).setValue(userData);
+               }
+               valueEventListener.onDataChange(dataSnapshot);
+           }
 
-    public void SaveCurrentUserProfile() {
-        firebaseRef.child("users").child(userData.getUsername()).child(this.authData.getUid()).child("UserData").setValue(userData);
-    }
+           @Override
+           public void onCancelled(FirebaseError firebaseError) {
 
-    public void DeleteCurrentUser(){
-        this.userData = null;
-        firebaseRef = null;
+           }
+       });
+
     }
 
     public UserData GetCurrentUserData(){
         return this.userData;
     }
 
-    public Firebase GetUsersNode(){
-        return firebaseRef.child("users");
-    }
-
-    public Firebase GetUserIDNode(){
-        return firebaseRef.child("user_ids");
-    }
     //endregion
 
     //region positionmanagement
@@ -98,10 +225,9 @@ public class DatabaseInterface {
         geoQuery =  geofireRef.queryAtLocation(new GeoLocation(position.getLatitude(), position.getLongitude()), radius);
         geoQuery.addGeoQueryEventListener(listener);
     }
-
     public void StopListeningToCloseUsers(){
-        if(geoQuery != null)
-            geoQuery.removeAllListeners();
+        if(geoQuery == null) return;
+        geoQuery.removeAllListeners();
         geoQuery = null;
     }
 
@@ -111,45 +237,31 @@ public class DatabaseInterface {
     //endregion
 
     //region friendsManagement
-    public Firebase GetReceivedFriendRequestsNode(){
-        return firebaseRef.child("friend_requests").child(this.userData.getUsername());
-    }
-
-    public Firebase GetFriendListNode(){
-        return firebaseRef.child("users").child(this.userData.getUsername()).child("friends");
-    }
 
     public void SendFriendRequest(String username){
-        firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).setValue(this.userData.getUsername());
-    }
-
-    public void CancelFriendRequest(String username){
-        firebaseRef.child("friend_requests").child(username).child(this.userData.getUsername()).removeValue();
+        GetReceivedFriendRequestsNode(username).child(this.userData.getUsername()).setValue(this.userData.getUsername());
     }
 
     public void AcceptFriendRequest(String username){
-        firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
-        firebaseRef.child("users").child(userData.getUsername()).child("friends").child(username).setValue(username);
-        firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).setValue(userData.getUsername());
+        GetReceivedFriendRequestsNode(userData.getUsername()).child(username).removeValue();
+        GetFriendListNode(userData.getUsername()).child(username).setValue(username);
+        GetFriendListNode(username).child(userData.getUsername()).setValue(userData.getUsername());
     }
 
     public void RefuseFriendRequest(String username){
-        firebaseRef.child("friend_requests").child(this.userData.getUsername()).child(username).removeValue();
+        GetReceivedFriendRequestsNode(userData.getUsername()).child(username).removeValue();
     }
 
     public void DeleteFriend(String username){
-        firebaseRef.child("users").child(userData.getUsername()).child("friends").child(username).removeValue();
-        firebaseRef.child("users").child(username).child("friends").child(userData.getUsername()).removeValue();
+        GetFriendListNode(userData.getUsername()).child(username).removeValue();
+        GetFriendListNode(username).child(userData.getUsername()).removeValue();
     }
     //endregion
 
     //region seriesManagement
-    public Firebase GetSeriesSuggestionNode(){
-        return firebaseRef.child("serie_suggestions").child(this.userData.getUsername());
-    }
     public void SendSerieSuggestion(final String username, final String suggestionID){
         // Serie with a list of people who suggested it
-        firebaseRef.child("serie_suggestions").child(username).child(suggestionID).addListenerForSingleValueEvent(new ValueEventListener() {
+        GetSeriesSuggestionNode(username).child(suggestionID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Recommendation rec = dataSnapshot.getValue(Recommendation.class);
@@ -158,34 +270,24 @@ public class DatabaseInterface {
                     rec.setSerieID(suggestionID);
                 }
                 rec.AddRecommendation(userData.getUsername());
-                firebaseRef.child("serie_suggestions").child(username).child(suggestionID).setValue(rec);
+                GetSeriesSuggestionNode(username).child(suggestionID).setValue(rec);
             }
-
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
+            public void onCancelled(FirebaseError firebaseError) {}
         });
     }
 
-    public Firebase GetSeriesListNode(){
-        return firebaseRef.child("users").child(this.userData.getUsername()).child("series");
-    }
-    public Firebase GetSeriesListNode(String user){
-        return firebaseRef.child("users").child(user).child("series");
-    }
-
     public void AddSerie(String suggestionID){
-        firebaseRef.child("serie_suggestions").child(userData.getUsername()).child(suggestionID).removeValue();
-        firebaseRef.child("users").child(userData.getUsername()).child("series").child(suggestionID).setValue(suggestionID);
+        GetSeriesSuggestionNode(userData.getUsername()).child(suggestionID).removeValue();
+        GetSeriesListNode(userData.getUsername()).child(suggestionID).setValue(suggestionID);
     }
 
     public void RefuseSerieSuggestion(String suggestionID){
-        firebaseRef.child("serie_suggestions").child(userData.getUsername()).child(suggestionID).removeValue();
+        GetSeriesSuggestionNode(userData.getUsername()).child(suggestionID).removeValue();
     }
 
     public void DeleteSerie(String suggestionID){
-        firebaseRef.child("users").child(userData.getUsername()).child("series").child(suggestionID).removeValue();
+        GetSeriesListNode(userData.getUsername()).child(suggestionID).removeValue();
     }
     //endregion
 }

@@ -69,7 +69,7 @@ public class SeriesFragment extends Fragment {
 
     public SeriesFragment() {
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +80,7 @@ public class SeriesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         autoCompleteFriendAdapter = new ArrayAdapter<String>(getContext(),android.R.layout.simple_dropdown_item_1line, autoCompleteFriendsSuggestions);
-        DatabaseInterface.Instance().GetFriendListNode().addChildEventListener(new ChildEventListener() {
+        DatabaseInterface.Instance().GetCurrentUserFriendListNode().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 autoCompleteFriendAdapter.add(dataSnapshot.getValue(String.class));
@@ -148,7 +148,7 @@ public class SeriesFragment extends Fragment {
         searchSerieResults.setAdapter(serieSearchResultAdapter);
 
 
-        watchedSeriesAdapter = new FirebaseRecyclerAdapter<String, WatchedSerieViewHolder>(String.class, R.layout.series_listview_item, WatchedSerieViewHolder.class,DatabaseInterface.Instance().GetSeriesListNode()) {
+        watchedSeriesAdapter = new FirebaseRecyclerAdapter<String, WatchedSerieViewHolder>(String.class, R.layout.series_listview_item, WatchedSerieViewHolder.class,DatabaseInterface.Instance().GetCurrentUserSeriesListNode()) {
             @Override
             protected void populateViewHolder(final WatchedSerieViewHolder view, final String serieID, int position) {
                 Log.i("Populate", serieID);

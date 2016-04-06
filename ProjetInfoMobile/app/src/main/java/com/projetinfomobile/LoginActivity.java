@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity{
     private EditText mUsernameEntry;
     private EditText mPasswordEntry;
     private View mProgressView;
-    private Firebase firebaseRef;
     private Bitmap imagePicked;
 
     @Override
@@ -49,7 +48,6 @@ public class LoginActivity extends AppCompatActivity{
         setContentView(R.layout.activity_login);
 
         Firebase.setAndroidContext(this);
-        firebaseRef = DatabaseInterface.Instance().GetDatabaseMainNode();
 
         String possibleEmail = "a@a.com";
         Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
@@ -92,10 +90,8 @@ public class LoginActivity extends AppCompatActivity{
     protected void onResume(){
         super.onResume();
         showProgress(false);
-        //mPasswordEntry.setText("");
-        //mUsernameEntry.setText("");
         mUsernameEntry.requestFocus();
-        firebaseRef.unauth();
+        DatabaseInterface.Instance().Logout();
     }
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -141,7 +137,7 @@ public class LoginActivity extends AppCompatActivity{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            firebaseRef.authWithPassword(mUsernameEntry.getText().toString(), mPasswordEntry.getText().toString(), authResultHandler);
+            DatabaseInterface.Instance().LoginWithPassword(mUsernameEntry.getText().toString(), mPasswordEntry.getText().toString(), authResultHandler, userCreationHandler);
         }
     }
 
@@ -163,26 +159,21 @@ public class LoginActivity extends AppCompatActivity{
     Firebase.AuthResultHandler authResultHandler = new Firebase.AuthResultHandler() {
         @Override
         public void onAuthenticated(AuthData authData) {
-            FindUserID(authData);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
         }
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
             ShowSnackBar(firebaseError.getMessage());
+            showProgress(false);
             switch (firebaseError.getCode()){
-                //Create  non existing user
-                case FirebaseError.USER_DOES_NOT_EXIST:
-                    firebaseRef.createUser(mUsernameEntry.getText().toString(), mPasswordEntry.getText().toString(), userCreationHandler);
-                    break;
                 case FirebaseError.INVALID_PASSWORD:
                     mPasswordEntry.setError("Invalid password");
                     mPasswordEntry.requestFocus();
-                    showProgress(false);
                     break;
                 default:
-                    showProgress(false);
                     break;
             }
-            // Authenticated failed with error firebaseError
         }
     };
 
@@ -190,7 +181,14 @@ public class LoginActivity extends AppCompatActivity{
     Firebase.ValueResultHandler<Map<String, Object>> userCreationHandler = new Firebase.ValueResultHandler<Map<String, Object>>() {
         @Override
         public void onSuccess(Map<String, Object> result) {
-            ShowSnackBar("Successfully created user account with uid: " + result.get("uid"));
+            // Null if we have to complete the users info
+            if(result == null){
+                Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
+                startActivity(intent);
+            }
+            else {
+                ShowSnackBar("Successfully created user account with uid: " + result.get("uid"));
+            }
         }
         @Override
         public void onError(FirebaseError firebaseError) {
@@ -215,46 +213,5 @@ public class LoginActivity extends AppCompatActivity{
         Snackbar.make(findViewById(R.id.login_activity_layout), message, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
     }
-
-    public void FindUserID(final AuthData authData){
-
-        DatabaseInterface.Instance().GetUserIDNode().child(authData.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                DatabaseInterface.Instance().setAuthData(authData);
-                if (dataSnapshot.getValue() != null) {
-                    FetchUserInfo((String) dataSnapshot.getValue(), authData.getUid());
-                    return;
-                } else {
-                    Intent intent = new Intent(LoginActivity.this, UserInfoCompletionActivity.class);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-    }
-    public void FetchUserInfo(String username, String uid){
-        DatabaseInterface.Instance().GetUsersNode().child(username).child(uid).child("UserData").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot != null) {
-                    showProgress(false);
-                    DatabaseInterface.Instance().SetCurrentUser(dataSnapshot.getValue(UserData.class));
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
-    }
-
 }
 
