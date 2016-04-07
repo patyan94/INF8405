@@ -6,12 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 
 import java.io.FileNotFoundException;
@@ -24,6 +26,7 @@ public class SettingsFragment extends Fragment {
 
     public static final int ACTIVITY_FOR_RESULOT_PHOTO_PICKER = 1;
     ImageButton profilePictureSelectionButton;
+    CheckBox sharePosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,9 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        sharePosition = (CheckBox) view.findViewById(R.id.share_position_checkbox);
+        sharePosition.setChecked(DatabaseInterface.Instance().getUserData().isSharePosition());
 
         profilePictureSelectionButton = (ImageButton)view.findViewById(R.id.profile_picture_selection);
         profilePictureSelectionButton.setOnClickListener(new View.OnClickListener() {

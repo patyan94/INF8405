@@ -1,5 +1,6 @@
 package com.projetinfomobile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
@@ -24,6 +25,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,7 +100,6 @@ public class MainActivity extends AppCompatActivity
                 navigationView.getMenu().getItem(3).setChecked(true);
                 LoadFragment(new SeriesFragment());
                 previousFragmentId = R.id.nav_your_series;
-
             }
         });
 
