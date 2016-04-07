@@ -31,6 +31,7 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
     Button continueButton;
     ImageButton chooseProfilePictureButton;
     EditText usernameEntry;
+    Bitmap selectedImage;
     UserData userData = new UserData();
 
     @Override
@@ -87,7 +88,7 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
             return;
         }
         // Creates a new user account
-        DatabaseInterface.Instance().AddNewUSer(username, new ValueEventListener() {
+        DatabaseInterface.Instance().AddNewUSer(username, selectedImage,new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() != null){
@@ -116,9 +117,8 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
                     try {
                         final Uri imageUri = imageReturnedIntent.getData();
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                        final Bitmap image = BitmapFactory.decodeStream(imageStream);
-                        userData.setUserProfileImage(image);
-                        chooseProfilePictureButton.setImageBitmap(image);
+                        selectedImage = BitmapFactory.decodeStream(imageStream);
+                        chooseProfilePictureButton.setImageBitmap(selectedImage);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }

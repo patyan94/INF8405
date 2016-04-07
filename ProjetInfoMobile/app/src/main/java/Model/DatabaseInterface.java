@@ -1,6 +1,7 @@
 package Model;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.firebase.client.AuthData;
@@ -199,7 +200,7 @@ public class DatabaseInterface {
     }
 
     // Creates a new user account
-    public void AddNewUSer(final String username, final ValueEventListener valueEventListener){
+    public void AddNewUSer(final String username, final Bitmap image,final ValueEventListener valueEventListener){
        GetUserNode(username).addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(DataSnapshot dataSnapshot) {
@@ -207,6 +208,7 @@ public class DatabaseInterface {
                    GetUserIDNode(DatabaseInterface.this.authData.getUid()).setValue(username);
                    userData = new UserData();
                    userData.setUsername(username);
+                   userData.setUserProfileImage(image);
                    userData.setProvider(DatabaseInterface.this.authData.getProvider());
                    GetUserDataNode(username).setValue(userData);
                }
