@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:text="Friends requests" />
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/friends_requests_listview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:text="@string/friends_list" />
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/friends_listview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
