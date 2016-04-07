@@ -125,6 +125,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+
+        mSensorMgr.unregisterListener(this);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Sensor accelerometer = mSensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (accelerometer != null) {
+            mSensorMgr.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
