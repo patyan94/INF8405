@@ -61,21 +61,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
     private  Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
-    private FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter;
-    private OMDBInterface omdbInterface;
     private HashMap<String, List<String>> closeUsersSeries;
-
-    public static class SeriesViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView description;
-        ImageView posterView;
-        public SeriesViewHolder(View itemView) {
-            super(itemView);
-            title = (TextView)itemView.findViewById(R.id.serie_name);
-            description = (TextView)itemView.findViewById(R.id.serie_description);
-            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
-        }
-    }
 
     public CloseUsersMapFragment() {
         closeUsersSeries = new HashMap<>();
@@ -90,8 +76,6 @@ public class CloseUsersMapFragment extends SupportMapFragment
         if(!DatabaseInterface.Instance().getUserData().isSharePosition()){
             Toast.makeText(getContext(), "In order to be able to use this functionality, please enable the location sharing setting", Toast.LENGTH_LONG).show();
         }
-
-        omdbInterface = OMDBInterface.Start(getContext());
     }
 
     @Override
@@ -178,7 +162,7 @@ public class CloseUsersMapFragment extends SupportMapFragment
                 if (DatabaseInterface.Instance().getUserData().getUsername().equalsIgnoreCase(username)) {
                     return true;
                 } else {
-                    PromptUserSeries(username);
+                    MainActivity.PromptUserSeries(username, getContext());
                     return true;
                 }
             }
@@ -275,60 +259,5 @@ public class CloseUsersMapFragment extends SupportMapFragment
                 }
             });
         }
-    }
-
-    private void PromptUserSeries(final String username){
-
-        //We build the window
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(username);
-        View seriesView = View.inflate(getContext(), R.layout.alert_dialog_series, null);
-        builder.setView(seriesView);
-
-        RecyclerView seriesListview = (RecyclerView)seriesView.findViewById(R.id.series_listview_alert);
-
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        seriesListview.setLayoutManager(layoutManager);
-
-        seriesAdapter = new FirebaseRecyclerAdapter<String, SeriesViewHolder>(String.class, R.layout.alert_series_listview_item, SeriesViewHolder.class,DatabaseInterface.Instance().GetUsersNode().child(username).child("series")) {
-            @Override
-            protected void populateViewHolder(final SeriesViewHolder view, final String serieID, int position) {
-                omdbInterface.GetSerieInfo(serieID, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            Serie serie = Serie.FromJSONObject(response);
-                            view.title.setText(serie.getName());
-                            view.description.setText(serie.getDescription());
-                            if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
-                                omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
-                            }
-                            if(DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(serie.getID())) {
-                                view.itemView.setBackgroundColor(Color.GREEN);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                });
-            }
-        };
-        seriesListview.setAdapter(seriesAdapter);
-
-
-        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.show();
     }
 }

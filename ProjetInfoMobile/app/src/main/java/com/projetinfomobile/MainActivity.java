@@ -1,6 +1,9 @@
 package com.projetinfomobile;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,6 +12,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,7 +29,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.firebase.ui.FirebaseRecyclerAdapter;
+
+import org.json.JSONObject;
+
 import Model.DatabaseInterface;
+import Model.OMDBInterface;
+import Model.Serie;
 import Model.UserData;
 
 
@@ -274,5 +288,74 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.fragment_container, fragment, fragment.getTag());
         fragmentTransaction.commit();
 
+    }
+
+    //Static method used to pop up an altert dialog with the specified user series, it's used in the map and friend activity
+    public static void PromptUserSeries(final String username, Context ctx){
+        final OMDBInterface omdbInterface;
+        omdbInterface = OMDBInterface.Start(ctx);
+
+        //We build the window
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(username);
+        View seriesView = View.inflate(ctx, R.layout.alert_dialog_series, null);
+        builder.setView(seriesView);
+
+        RecyclerView seriesListview = (RecyclerView)seriesView.findViewById(R.id.series_listview_alert);
+
+        seriesListview.setHasFixedSize(true);
+        seriesListview.setLayoutManager(new LinearLayoutManager(ctx));
+
+        FirebaseRecyclerAdapter<String, SeriesViewHolder> seriesAdapter = new FirebaseRecyclerAdapter<String, SeriesViewHolder>(String.class, R.layout.alert_series_listview_item, SeriesViewHolder.class,DatabaseInterface.Instance().GetUsersNode().child(username).child("series")) {
+            @Override
+            protected void populateViewHolder(final SeriesViewHolder view, final String serieID, int position) {
+                omdbInterface.GetSerieInfo(serieID, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Serie serie = Serie.FromJSONObject(response);
+                            view.title.setText(serie.getName());
+                            view.description.setText(serie.getDescription());
+                            if (!serie.getPhotoURL().equalsIgnoreCase("N/A")) {
+                                omdbInterface.GetPoster(serie.getPhotoURL(), view.posterView);
+                            }
+                            if(DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(serie.getID())) {
+                                view.itemView.setBackgroundColor(Color.LTGRAY);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+            }
+        };
+        seriesListview.setAdapter(seriesAdapter);
+
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.show();
+    }
+
+    public static class SeriesViewHolder extends RecyclerView.ViewHolder {
+        TextView title;
+        TextView description;
+        ImageView posterView;
+        public SeriesViewHolder(View itemView) {
+            super(itemView);
+            title = (TextView)itemView.findViewById(R.id.serie_name);
+            description = (TextView)itemView.findViewById(R.id.serie_description);
+            posterView = (ImageView)itemView.findViewById(R.id.serie_poster);
+        }
     }
 }

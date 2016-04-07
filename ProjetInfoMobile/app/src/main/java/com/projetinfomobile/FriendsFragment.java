@@ -128,6 +128,12 @@ public class FriendsFragment extends Fragment {
             @Override
             protected void populateViewHolder(final FriendViewHolder view, final String username, int position) {
                 Log.i("Populate", username);
+                view.username.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MainActivity.PromptUserSeries(username, getContext());
+                    }
+                });
                 view.username.setText(username);
                 view.deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
