@@ -3,6 +3,7 @@ package com.projetinfomobile;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -10,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -38,6 +40,8 @@ import com.android.volley.VolleyError;
 import com.firebase.ui.FirebaseRecyclerAdapter;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 import Model.DatabaseInterface;
 import Model.OMDBInterface;
@@ -134,6 +138,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
+        // Sets the user theme
+        SetTheme();
 
         Sensor accelerometer = mSensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
@@ -365,6 +371,15 @@ public class MainActivity extends AppCompatActivity
         });
 
         AlertDialog dialog = builder.show();
+    }
+
+    public void SetTheme(){
+        int color = SettingsFragment.ThemeUtils.GetBackgroundColor(PreferenceManager.getDefaultSharedPreferences(this), getResources());
+
+        View drawerContent = (View)findViewById(R.id.nav_view);
+        drawerContent.setBackgroundColor(color);
+        View background = (View) findViewById(R.id.content_main);
+        background.setBackgroundColor(color);
     }
 
     public static class SeriesViewHolder extends RecyclerView.ViewHolder {
