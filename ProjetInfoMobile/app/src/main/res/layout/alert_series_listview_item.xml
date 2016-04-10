@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/backgroundColor"
     android:padding="4dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -11,7 +13,9 @@
         <ImageView
             android:id="@+id/serie_poster"
             android:layout_width="80dp"
-            android:layout_height="80dp" />
+            android:layout_height="80dp"
+            android:layout_margin="4dp"
+            android:background="@color/imageBackgroundColor"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,6 +23,7 @@
             <TextView
                 android:textStyle="bold"
                 android:id="@+id/serie_name"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"/>
@@ -26,6 +31,7 @@
                 android:id="@+id/serie_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/descriptionColor"
                 android:layout_weight="1"
                 android:text="Description"/>
         </LinearLayout>

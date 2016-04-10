@@ -6,7 +6,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="bottom"
+    android:padding="16dp"
     tools:context="com.projetinfomobile.UserInfoCompletionActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="bottom">
+        <ImageView
+            android:id="@+id/profile_picture_view"
+            android:background="@color/imageBackgroundColor"
+            android:layout_width="200dp"
+            android:layout_height="200dp"/>
+        <Button
+            android:id="@+id/choose_profile_picture_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Pick profile picture"
+            android:background="@drawable/buttonborderpositive"
+            android:textColor="#EFEFEF"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -18,33 +42,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/prompt_username"
+            android:textColor="@color/colorPrimary"
+            android:textColorHint="@color/colorPrimaryLight"
             android:inputType="text"
             android:maxLines="1"
             android:singleLine="true"
             android:paddingTop="12dp"/>
 
     </android.support.design.widget.TextInputLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:text="Set profile picture"
-        android:paddingTop="12dp"/>
-
-    <ImageButton
-        android:id="@+id/select_profile_picture_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center"/>
-
     <Button
         android:id="@+id/continue_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/buttonborderpositive"
+        android:textColor="#EFEFEF"
         android:text="Continue"/>
-
 
 
 </LinearLayout>

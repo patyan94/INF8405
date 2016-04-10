@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -25,7 +26,8 @@ import Model.DatabaseInterface;
 public class SettingsFragment extends Fragment {
 
     public static final int ACTIVITY_FOR_RESULOT_PHOTO_PICKER = 1;
-    ImageButton profilePictureSelectionButton;
+    Button profilePictureSelectionButton;
+    ImageView profilePictureView;
     CheckBox sharePosition;
 
     @Override
@@ -39,10 +41,12 @@ public class SettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        profilePictureView = (ImageView)view.findViewById(R.id.profile_picture);
+
         sharePosition = (CheckBox) view.findViewById(R.id.share_position_checkbox);
         sharePosition.setChecked(DatabaseInterface.Instance().getUserData().isSharePosition());
 
-        profilePictureSelectionButton = (ImageButton)view.findViewById(R.id.profile_picture_selection);
+        profilePictureSelectionButton = (Button)view.findViewById(R.id.profile_picture_selection);
         profilePictureSelectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,7 +56,7 @@ public class SettingsFragment extends Fragment {
         });
         Bitmap profilePicture = DatabaseInterface.Instance().getUserData().getUserProfileImage();
         if(profilePicture != null)
-            profilePictureSelectionButton.setImageBitmap(profilePicture);
+            profilePictureView.setImageBitmap(profilePicture);
         return view;
     }
 
@@ -78,7 +82,7 @@ public class SettingsFragment extends Fragment {
                         final Uri imageUri = imageReturnedIntent.getData();
                         final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
                         final Bitmap image = BitmapFactory.decodeStream(imageStream);
-                        profilePictureSelectionButton.setImageBitmap(image);
+                        profilePictureView.setImageBitmap(image);
                         DatabaseInterface.Instance().getUserData().setUserProfileImage(image);
                         DatabaseInterface.Instance().SaveCurrentUserData();
                     } catch (FileNotFoundException e) {

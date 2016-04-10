@@ -3,16 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="26dp"
-    android:paddingRight="26dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="6dp">
+    android:padding="16dp"
+    android:background="@color/backgroundColor">
 
     <TextView
         android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Series" />
+        android:textColor="@color/colorPrimary"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:text="SERIES" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="2dp"
+        android:background="@color/colorPrimaryDark"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/series_listview_alert"

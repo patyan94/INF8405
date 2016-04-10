@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -29,7 +30,8 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
 
     final static int SELECT_PHOTO = 1;
     Button continueButton;
-    ImageButton chooseProfilePictureButton;
+    ImageView profilePicture;
+    Button chooseProfilePictureButton;
     EditText usernameEntry;
     Bitmap selectedImage;
     UserData userData = new UserData();
@@ -40,8 +42,10 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_info_completion);
         Firebase.setAndroidContext(this);
 
+        profilePicture = (ImageView) findViewById(R.id.profile_picture_view);
+
         // Button to select a profile picture
-        chooseProfilePictureButton = (ImageButton)findViewById(R.id.select_profile_picture_button);
+        chooseProfilePictureButton = (Button)findViewById(R.id.choose_profile_picture_button);
         chooseProfilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,7 +122,7 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
                         final Uri imageUri = imageReturnedIntent.getData();
                         final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                         selectedImage = BitmapFactory.decodeStream(imageStream);
-                        chooseProfilePictureButton.setImageBitmap(selectedImage);
+                        profilePicture.setImageBitmap(selectedImage);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
