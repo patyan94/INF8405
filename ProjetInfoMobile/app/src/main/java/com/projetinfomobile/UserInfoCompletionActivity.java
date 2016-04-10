@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -34,7 +35,6 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
     Button chooseProfilePictureButton;
     EditText usernameEntry;
     Bitmap selectedImage;
-    UserData userData = new UserData();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,12 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        SetTheme();
+    }
+
     // Called when we click on the continue button
     void Continue(){
         // Checks the username which is mandatory
@@ -92,17 +98,18 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
             return;
         }
         // Creates a new user account
-        DatabaseInterface.Instance().AddNewUSer(username, selectedImage,new ValueEventListener() {
+        DatabaseInterface.Instance().AddNewUSer(username, selectedImage, new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null){
+                if (dataSnapshot.getValue() != null) {
                     usernameEntry.setError("Username already used");
-                } else{
+                } else {
                     // Go to main activity once the setup is complete
                     Intent intent = new Intent(UserInfoCompletionActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
             }
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
 
@@ -128,6 +135,13 @@ public class UserInfoCompletionActivity extends AppCompatActivity {
                     }
                 }
         }
+    }
+
+    public void SetTheme(){
+        int color = SettingsFragment.ThemeUtils.GetBackgroundColor(PreferenceManager.getDefaultSharedPreferences(this), getResources());
+
+        View layout = (View)findViewById(R.id.user_info_completion_layout);
+        layout.setBackgroundColor(color);
     }
 
 }

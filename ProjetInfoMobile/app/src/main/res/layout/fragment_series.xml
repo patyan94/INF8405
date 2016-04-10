@@ -21,7 +21,6 @@
                 android:id="@+id/search_serie_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/edittexttackground"
                 android:hint="Search Serie" />
         </android.support.design.widget.TextInputLayout>
         <Button

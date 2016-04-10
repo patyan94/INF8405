@@ -5,6 +5,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -89,6 +90,7 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     protected void onResume(){
         super.onResume();
+        SetTheme();
         showProgress(false);
         mUsernameEntry.requestFocus();
         DatabaseInterface.Instance().Logout();
@@ -200,6 +202,13 @@ public class LoginActivity extends AppCompatActivity{
 
     private void showProgress(final boolean show) {
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    public void SetTheme(){
+        int color = SettingsFragment.ThemeUtils.GetBackgroundColor(PreferenceManager.getDefaultSharedPreferences(this), getResources());
+
+        View layout = (View)findViewById(R.id.login_activity_layout);
+        layout.setBackgroundColor(color);
     }
 }
 
