@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     private void showProgress(final boolean show) {
-        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void SetTheme(){
