@@ -31,6 +31,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import com.firebase.ui.FirebaseRecyclerAdapter;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import Model.DatabaseInterface;
 import Model.OMDBInterface;
@@ -280,6 +282,7 @@ public class MainActivity extends AppCompatActivity
             long curTime = System.currentTimeMillis();
 
             if (shakeCount >= 4 && (curTime - mLastShakeDetectTime) > MIN_TIME_BETWEEN_SHAKES_MILLISECS) {
+                ShowRandomSerie(null);
                 Toast.makeText(getApplicationContext(), "Shake activated!", Toast.LENGTH_SHORT).show();
                 shakeCount = 0;
                 mLastShakeDetectTime = curTime;
@@ -370,6 +373,67 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        AlertDialog dialog = builder.show();
+    }
+
+    public void ShowRandomSerie(OMDBInterface omdb){
+        String AB = "0123456789";
+        Random rnd = new Random();
+
+        StringBuilder sb = new StringBuilder( 9 );
+        sb.append("tt");
+        for( int i = 0; i < 7; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        String id = sb.toString();
+
+        final OMDBInterface omdbInterface = (omdb != null) ? omdb : OMDBInterface.Start(this);
+
+        omdbInterface.GetSerieInfo(id, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getString("Response").equalsIgnoreCase("True") && response.getString("Type").equalsIgnoreCase("series")) {
+                                Serie serie = Serie.FromJSONObject(response);
+                                ShowSerieAlertDialog(serie, omdbInterface);
+                            }else{
+                                ShowRandomSerie(omdbInterface);
+                            }
+                        } catch (Exception e) {
+                            ShowRandomSerie(omdbInterface);
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        ShowRandomSerie(omdbInterface);
+                    }
+                });
+    }
+
+    void ShowSerieAlertDialog(final Serie serie, OMDBInterface omdb){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(serie.getName());
+
+        final ImageView poster = new ImageView(this);
+        omdb.GetPoster(serie.getPhotoURL(), poster);
+        poster.setMaxHeight(100);
+        poster.setMaxWidth(100);
+        builder.setView(poster);
+
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DatabaseInterface.Instance().AddSerie(serie.getID());
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
         AlertDialog dialog = builder.show();
     }
 

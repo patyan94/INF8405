@@ -126,7 +126,7 @@ public class SeriesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.toString().isEmpty()){
+                if (s.toString().isEmpty()) {
                     serieSearchResultAdapter.clear();
                 }
             }
@@ -136,6 +136,12 @@ public class SeriesFragment extends Fragment {
 
             }
         });
+
+        searchSerieTitle.requestFocus();
+        if (getActivity().getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager=(InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.toggleSoftInputFromWindow(getActivity().getCurrentFocus().getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+        }
 
         // Setup the recycler views
         watchedSeriesListview = (RecyclerView)view.findViewById(R.id.series_listview);
@@ -218,6 +224,11 @@ public class SeriesFragment extends Fragment {
                     omdbInterface.SearchSerie(searchSerieTitle.getText().toString(), ++currentSearchPage, onSerieSearchResponse, onSerieSearchError);
                 }
                 else{
+                    if (getActivity().getCurrentFocus() != null) {
+                        InputMethodManager inputMethodManager=(InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager.toggleSoftInputFromWindow(getActivity().getCurrentFocus().getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS, 0);
+                        inputMethodManager.toggleSoftInputFromWindow(getActivity().getCurrentFocus().getApplicationWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                    }
                     searchSeriesButton.setEnabled(true);
                 }
 
