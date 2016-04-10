@@ -51,6 +51,9 @@ public class UserData {
 
 //region jsonignore
     @JsonIgnore
+    Bitmap userProfilePicture;
+
+    @JsonIgnore
     HashMap<String, String> friendsList = new HashMap<>();
     @JsonIgnore
     HashMap<String, String> seriesList = new HashMap<>();
@@ -102,6 +105,7 @@ public class UserData {
     @JsonIgnore
     public void setUserProfileImage(Bitmap image){
         try {
+            userProfilePicture = image;
             ByteArrayOutputStream bYtE = new ByteArrayOutputStream();
             image.compress(Bitmap.CompressFormat.WEBP, 100, bYtE);
             byte[] byteArray = bYtE.toByteArray();
@@ -114,9 +118,11 @@ public class UserData {
     @JsonIgnore
     public Bitmap getUserProfileImage(){
         try {
-            byte[] decodedByte = com.firebase.client.utilities.Base64.decode(encodedUserProfileImage);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
-            return bitmap;
+            if (userProfilePicture == null) {
+                byte[] decodedByte = com.firebase.client.utilities.Base64.decode(encodedUserProfileImage);
+                userProfilePicture = BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+            }
+            return userProfilePicture;
         } catch(Exception e) {
             return null;
         }
