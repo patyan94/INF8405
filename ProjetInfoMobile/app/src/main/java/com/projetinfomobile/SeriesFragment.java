@@ -248,7 +248,7 @@ public class SeriesFragment extends Fragment {
     // Shows a dialog to send a serie recommendation to multiple friends at the time
     void RecommendSerie(final String serieID, String serieName){
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Recommend" + serieName);
+        builder.setTitle("Recommend " + serieName);
 
         final MultiAutoCompleteTextView input = new MultiAutoCompleteTextView(getContext());
         input.setAdapter(autoCompleteFriendAdapter);

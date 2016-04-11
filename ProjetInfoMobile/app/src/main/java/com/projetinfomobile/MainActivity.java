@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -38,11 +40,18 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.firebase.ui.FirebaseRecyclerAdapter;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import Model.DatabaseInterface;
@@ -282,12 +291,11 @@ public class MainActivity extends AppCompatActivity
             long curTime = System.currentTimeMillis();
 
             if (shakeCount >= 4 && (curTime - mLastShakeDetectTime) > MIN_TIME_BETWEEN_SHAKES_MILLISECS) {
-                ShowRandomSerie(null);
+                ShowRandomSerie();
                 Toast.makeText(getApplicationContext(), "Shake activated!", Toast.LENGTH_SHORT).show();
                 shakeCount = 0;
                 mLastShakeDetectTime = curTime;
 
-                //TODO : Action on shake
             }else{
                 if(shakeCount == 0 || (curTime - mLastShakeTime) < 700) {
                     float x = event.values[0];
@@ -376,45 +384,113 @@ public class MainActivity extends AppCompatActivity
         AlertDialog dialog = builder.show();
     }
 
-    public void ShowRandomSerie(OMDBInterface omdb){
-        String AB = "0123456789";
-        Random rnd = new Random();
+    public void ShowRandomSerie(){
 
-        StringBuilder sb = new StringBuilder( 9 );
-        sb.append("tt");
-        for( int i = 0; i < 7; i++ )
-            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
-        String id = sb.toString();
+        //Getting the friend of the current user
+        Map<String, String> m = DatabaseInterface.Instance().getUserData().getFriendsList();
 
-        final OMDBInterface omdbInterface = (omdb != null) ? omdb : OMDBInterface.Start(this);
+        if(m.size() > 0)
+        {
+            List<String> keys = new ArrayList<>(m.keySet());
+            Collections.shuffle(keys);
 
-        omdbInterface.GetSerieInfo(id, new Response.Listener<JSONObject>() {
+            final boolean[] flag = new boolean[2];
+
+            for(int i = 0; i < keys.size(); i++)
+            {
+                String friend = m.get(keys.get(i));
+
+                //For each serie of the friend, we add it to an array if we don't already own this serie
+                final List<String> unknownSeries = new ArrayList<String>();
+
+                //Getting the series of the selected friend
+                DatabaseInterface.Instance().GetSeriesListNode(friend).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            if(response.getString("Response").equalsIgnoreCase("True") && response.getString("Type").equalsIgnoreCase("series")) {
-                                Serie serie = Serie.FromJSONObject(response);
-                                ShowSerieAlertDialog(serie, omdbInterface);
-                            }else{
-                                ShowRandomSerie(omdbInterface);
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot ds : dataSnapshot.getChildren())
+                        {
+                            if(!DatabaseInterface.Instance().GetCurrentUserData().getSeriesList().containsKey(ds.getValue(String.class)))
+                            {
+                                unknownSeries.add(ds.getValue(String.class));
                             }
-                        } catch (Exception e) {
-                            ShowRandomSerie(omdbInterface);
-                            e.printStackTrace();
+                        }
+
+                        if(unknownSeries.isEmpty())
+                        {
+                            //Then we try again with another friend if possible
+                        }
+                        else if(!flag[0])
+                        {
+                            //We then randomly select an unknown serie from the array and prompt the message
+                            Random random = new Random();
+                            String serieName = unknownSeries.get(random.nextInt(unknownSeries.size()));
+
+                            final OMDBInterface omdbInterface = OMDBInterface.Start(getApplicationContext());
+                            omdbInterface.GetSerieInfo(serieName, new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            try {
+                                                if (response.getString("Response").equalsIgnoreCase("True") && response.getString("Type").equalsIgnoreCase("series")) {
+                                                    Serie serie = Serie.FromJSONObject(response);
+                                                    ShowSerieAlertDialog(serie, omdbInterface);
+                                                }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    },
+                                    new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                        }
+                                    });
+
+                            flag[0] = true;
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        ShowRandomSerie(omdbInterface);
+                    public void onCancelled(FirebaseError firebaseError) {
                     }
                 });
+            }
+
+            //Countdown timer used the print the toast message after 10 seconds if none of the listeners have flipped the flag before that
+            new CountDownTimer(10000, 1000) {
+                public void onTick(long millisUntilFinished) { }
+                public void onFinish() {
+                    flag[1] = true;
+                }
+            }.start();
+
+            new Thread(new Runnable() {
+                public void run() {
+
+                    //Wait for one of the flag the flip
+                    while(!flag[0] && !flag[1]);
+
+                    if(flag[0]){
+                        //This means that one of the friend was able to make a recommendation
+                    }else{
+                        //this means the cunt down ended, so no one could make a recommendation
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Sorry, none of your friends can recommend anything...", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+            }).start();
+
+        }else{
+            Toast.makeText(getApplicationContext(), "Sorry, you must have at least one friend to get recommendations...", Toast.LENGTH_LONG).show();
+        }
     }
 
     void ShowSerieAlertDialog(final Serie serie, OMDBInterface omdb){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(serie.getName());
+        builder.setTitle("Would you like to add '" + serie.getName() + "' ?");
 
         final ImageView poster = new ImageView(this);
         omdb.GetPoster(serie.getPhotoURL(), poster);
