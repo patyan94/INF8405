@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -113,6 +114,8 @@ public class SeriesFragment extends Fragment {
                 serieSearchResultAdapter.clear();
                 currentSearchPage = 1;
                 omdbInterface.SearchSerie(searchSerieTitle.getText().toString().trim(), currentSearchPage, onSerieSearchResponse, onSerieSearchError);
+
+                RessourceMonitor.getInstance().SaveCurrentBatteryLevel();
             }
         });
 
@@ -235,6 +238,8 @@ public class SeriesFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            Toast.makeText(getContext(), "Serie search battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
         }
     };
 

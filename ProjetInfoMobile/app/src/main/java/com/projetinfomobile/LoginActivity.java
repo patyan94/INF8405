@@ -2,8 +2,11 @@ package com.projetinfomobile;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -20,6 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
@@ -47,7 +51,11 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        RessourceMonitor.getInstance();
+        Intent batteryStatus = registerReceiver(RessourceMonitor.getInstance(), new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
         Firebase.setAndroidContext(this);
+
 
         // Puts an email from your contact list in the email field
         String possibleEmail = "";
@@ -146,6 +154,7 @@ public class LoginActivity extends AppCompatActivity{
             // Go to main activity if we logged in
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
+            RessourceMonitor.getInstance().SaveCurrentBatteryLevel();
         }
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
@@ -209,6 +218,34 @@ public class LoginActivity extends AppCompatActivity{
 
         View layout = (View)findViewById(R.id.login_activity_layout);
         layout.setBackgroundColor(color);
+    }
+
+    @Override
+    public void onBackPressed() {
+        String batteryLevelMessage =
+                new String("Battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetTotalBatteryUsage()));
+        ShowBatteryUsage("Application battery usage", batteryLevelMessage, true);
+    }
+
+    void ShowBatteryUsage(String title, String message, boolean leavePage) {
+        final boolean leave = leavePage;
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (leave) finish();
+            }
+        });
+        if(leave)
+            builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // do nothing
+                }
+            });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
 

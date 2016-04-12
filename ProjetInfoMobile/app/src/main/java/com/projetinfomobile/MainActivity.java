@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity
         if (accelerometer != null) {
             mSensorMgr.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         }
+
+        Toast.makeText(getApplicationContext(), "Login battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
     }
 
     @Override

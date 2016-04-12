@@ -150,6 +150,18 @@ public class CloseUsersMapFragment extends SupportMapFragment
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+        RessourceMonitor.getInstance().SaveCurrentBatteryLevel();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        Toast.makeText(getContext(), "Map battery usage : " + String.valueOf(RessourceMonitor.getInstance().GetLastBatteryUsage()), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
